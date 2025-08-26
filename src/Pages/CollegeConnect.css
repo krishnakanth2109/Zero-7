@@ -1,0 +1,225 @@
+/* General Page Styling */
+.college-connect {
+  font-family: "Poppins", sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Hero Section */
+.hero {
+  height: 75vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.hero-overlay h1 {
+  font-size: 2.8rem;
+  margin-bottom: 15px;
+  color: white;
+}
+
+.hero-overlay p {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+  color: white;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ff9800, #f44336);
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-size: 1rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #f44336, #ff9800);
+}
+
+/* ===============================
+   Responsive Styles
+================================ */
+
+/* Tablets (max-width: 992px) */
+@media (max-width: 992px) {
+  .hero {
+    height: 65vh;
+  }
+  .hero-overlay h1 {
+    font-size: 2.2rem;
+  }
+  .hero-overlay p {
+    font-size: 1rem;
+  }
+  .btn-primary {
+    padding: 10px 24px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+  .hero {
+    height: 60vh;
+    padding: 0 15px;
+  }
+  .hero-overlay h1 {
+    font-size: 1.8rem;
+  }
+  .hero-overlay p {
+    font-size: 0.95rem;
+  }
+  .btn-primary {
+    padding: 9px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .hero {
+    height: 55vh;
+    padding: 0 12px;
+  }
+  .hero-overlay h1 {
+    font-size: 1.5rem;
+  }
+  .hero-overlay p {
+    font-size: 0.85rem;
+  }
+  .btn-primary {
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    width: 40%; /* full-width button for easy tap */
+    max-width: 280px;
+    margin: 0 auto;
+  }
+}
+
+
+/* About Section */
+.about {
+  padding: 60px 10%;
+  text-align: center;
+}
+
+.about h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+/* Features Section */
+.features {
+  padding: 60px 10%;
+  background: #f9fafc;
+  text-align: center;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.feature-card {
+  background: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+}
+
+.feature-card h3 {
+  color: #0056b3;
+  margin-bottom: 12px;
+}
+
+/* Get Connected Section */
+.get-connected {
+  padding: 60px 10%;
+  text-align: center;
+}
+
+.btn-secondary {
+  background: #0056b3;
+  color: #fff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #003f88;
+  transform: scale(1.05);
+}
+
+/* Proposal Form */
+.proposal-form {
+  padding: 60px 10%;
+  background: #f4f7fb;
+}
+
+.proposal-form h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+form {
+  max-width: 700px;
+  margin: auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #0056b3;
+}
+
+textarea {
+  resize: none;
+  height: 120px;
+}

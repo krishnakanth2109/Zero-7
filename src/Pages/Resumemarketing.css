@@ -1,0 +1,382 @@
+/* ================================
+   Education theme – Resume Marketing
+   Fonts: Outfit (headings) + Inter (body)
+   Scope: only this page
+================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap');
+
+.resume-marketing-container{
+  /* color system */
+  --bg: #0b1221;        
+  --page: #f7f9ff;      
+  --card: #ffffff;
+  --ink: #0e1326;       /* deeper text for contrast */
+  --muted: #5b6b7a;
+  --line: #e6eef7;
+
+  /* education blues */
+  --g1: #2563eb;        /* medium blue */
+  --g2: #3b82f6;        /* lighter medium blue */
+  --glow: 0 20px 60px rgba(37,99,235,.25);
+
+  /* base type */
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--ink);
+  line-height: 1.65;
+  letter-spacing: 0.1px;
+
+  /* soft background with subtle academic gradient */
+  background:
+    radial-gradient(1100px 600px at 85% -10%, rgba(37,99,235,.14), transparent 60%),
+    radial-gradient(1000px 520px at -10% 5%, rgba(37,99,235,.12), transparent 55%),
+    var(--page);
+}
+
+/* headings – Outfit for an academic, modern tone */
+.resume-marketing-container h1,
+.resume-marketing-container h2,
+.resume-marketing-container h3 {
+  font-family: 'Outfit', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+/* layout */
+.resume-marketing-container .rm-container{max-width:1200px;margin:0 auto;padding:0 20px;}
+.resume-marketing-container .marketing-content section{
+  padding:100px 0; /* more breathing space between sections */
+}
+.resume-marketing-container .marketing-content h2{
+  font-size:2rem;text-align:center;margin-bottom:42px;text-transform:capitalize;
+}
+.resume-marketing-container .marketing-content h2::after{
+  content:"";display:block;width:80px;height:4px;margin:14px auto 0;border-radius:999px;
+  background:linear-gradient(90deg,var(--g1),var(--g2)); box-shadow:var(--glow);
+}
+
+/* hero header */
+.resume-marketing-container .marketing-header{
+background: linear-gradient(rgb(9, 139, 225));
+  padding:100px; 
+  text-align:center; 
+  border-bottom:1px solid var(--line);
+}
+.resume-marketing-container .marketing-header h1{
+  font-size:2.6rem; letter-spacing:.2px; margin:0 0 12px;
+  text-transform: uppercase;          /* <= ALL CAPS as requested */
+  font-weight: 800;
+  color: #fff;                        /* white text for contrast */
+  -webkit-background-clip: unset;
+  background-clip: unset;
+}
+.resume-marketing-container .header-subtitle{
+  font-size:1.04rem;
+  opacity:.95;
+  max-width:720px;
+  margin:0 auto;
+  color:#f0f6ff;
+}
+
+/* benefits */
+.resume-marketing-container .benefits-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px;
+}
+.resume-marketing-container .benefit-card{
+  background:linear-gradient(180deg,#ffffff, #fbfdff);
+  border:1px solid var(--line); border-radius:16px; padding:26px; text-align:center;
+  box-shadow:0 8px 24px rgba(15,23,42,.06);
+  transition:transform .18s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.resume-marketing-container .benefit-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 18px 40px rgba(15,23,42,.12);
+  border-color:#d7e4f5;
+}
+.resume-marketing-container .benefit-icon{
+  width:68px;height:68px;margin:0 auto 14px;border-radius:16px;border:1px solid var(--line);
+  background:#eef3ff; display:grid;place-items:center; color:var(--g1);
+}
+.resume-marketing-container .benefit-icon svg{width:30px;height:30px}
+.resume-marketing-container .benefit-card h3{font-size:1.14rem;margin-bottom:8px}
+.resume-marketing-container .benefit-card p{color:var(--muted)}
+
+/* steps */
+.resume-marketing-container .how-section{background:linear-gradient(180deg,#fbfdff,#ffffff)}
+.resume-marketing-container .process-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.resume-marketing-container .process-step{
+  background:#ffffff;border:1px solid var(--line);border-radius:16px;padding:28px 22px;text-align:center;
+  box-shadow:0 10px 26px rgba(15,23,42,.06);transition:transform .18s ease, box-shadow .2s ease;
+}
+.resume-marketing-container .process-step:hover{transform:translateY(-6px);box-shadow:0 22px 50px rgba(15,23,42,.12)}
+.resume-marketing-container .step-icon{
+  width:78px;height:78px;margin:0 auto 14px;border-radius:50%;
+  background:#eef3ff; display:grid;place-items:center;color:var(--g1);
+  box-shadow:0 0 0 4px rgba(37,99,235,.12);
+}
+.resume-marketing-container .step-icon svg{width:32px;height:32px}
+.resume-marketing-container .step-icon.animated{animation:iconPulse 2s infinite}
+.resume-marketing-container .step-content h3{font-size:1.05rem;margin-bottom:6px}
+.resume-marketing-container .step-content p{color:var(--muted)}
+
+/* upload section */
+.resume-marketing-container .upload-section{
+  background:
+    radial-gradient(1000px 560px at 5% 10%, rgba(37,99,235,.10), transparent 60%),
+    radial-gradient(1000px 560px at 95% -10%, rgba(37,99,235,.10), transparent 60%),
+    linear-gradient(180deg,#f6f9ff,#ffffff);
+}
+.resume-marketing-container .upload-card{
+  background:linear-gradient(180deg,#ffffff,#f7fbff);
+  border:1px solid var(--line); border-radius:20px; padding:26px;
+  display:grid;grid-template-columns:1.05fr 1.25fr;gap:26px;align-items:center;
+  box-shadow:0 20px 60px rgba(15,23,42,.12);
+}
+
+/* info side */
+.resume-marketing-container .upload-info h2{margin-bottom:8px}
+.resume-marketing-container .upload-info .muted{color:var(--muted);margin-bottom:14px}
+.resume-marketing-container .bullets{list-style:none;padding:0;margin:0 0 14px}
+.resume-marketing-container .bullets li{position:relative;margin:10px 0;padding-left:28px}
+.resume-marketing-container .bullets li::before{
+  content:"";position:absolute;left:0;top:7px;width:14px;height:14px;border-radius:4px;
+  background:var(--g1);
+}
+.resume-marketing-container .badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.resume-marketing-container .badges span{
+  font-size:.86rem;padding:6px 10px;border-radius:999px;background:#f0f6ff;border:1px solid var(--line);
+  font-family:'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+}
+
+/* dropzone */
+.resume-marketing-container .dropzone{
+  position:relative;border:2px dashed #cfe0f2;background:#fbfdff;
+  border-radius:16px;padding:24px;display:grid;place-items:center;min-height:190px;text-align:center;
+  transition:border-color .15s ease, background .15s ease, transform .1s ease, box-shadow .2s ease;
+}
+.resume-marketing-container .dropzone.dragging{
+  border-color:transparent; background:#ffffff; transform:scale(1.01);
+  box-shadow:0 0 0 3px rgba(37,99,235,.18), 0 14px 36px rgba(15,23,42,.10);
+}
+.resume-marketing-container .dropzone.has-file{ padding:18px 20px; }
+
+.resume-marketing-container .dz-icon{width:44px;height:44px;margin-bottom:10px;color:var(--g1)}
+
+/* centered row: "drag & drop ... | choose file" */
+.resume-marketing-container .dz-text{
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  font-size: 0.98rem;
+}
+.resume-marketing-container .dz-text strong{color:var(--g1)}
+
+/* blue pill choose-file */
+.resume-marketing-container .dz-text .link{
+  background: var(--g1);
+  color:#fff;
+  border: 1px solid transparent;
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-family: 'Outfit', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1;
+  transition: transform .1s ease, box-shadow .2s ease, background .2s ease;
+}
+.resume-marketing-container .dz-text .link:hover{ transform: translateY(-1px); box-shadow: 0 10px 24px rgba(37,99,235,.25); background: var(--g2); }
+.resume-marketing-container .dz-text .link:focus{ outline: 2px solid var(--g2); outline-offset: 2px; }
+
+/* hide the native file input */
+.resume-marketing-container .hidden-input{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  pointer-events:none;
+}
+
+/* file row (after selecting a file) */
+.resume-marketing-container .file-row{
+  width:100%;
+  display:flex;align-items:center;justify-content:space-between;gap:12px
+}
+.resume-marketing-container .file-name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:460px}
+.resume-marketing-container .file-size{color:var(--muted);font-size:.9rem}
+.resume-marketing-container .btn.tiny{padding:8px 12px;font-weight:700}
+
+/* progress */
+.resume-marketing-container .progress{width:100%;background:#edf2f7;height:10px;border-radius:999px;margin-top:10px;position:relative;overflow:hidden}
+.resume-marketing-container .progress .bar{
+  height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--g1),var(--g2));
+  box-shadow:var(--glow);transition:width .15s ease;
+}
+.resume-marketing-container .progress .pct{position:absolute;top:-26px;right:0;font-size:.86rem;color:var(--muted)}
+
+/* actions */
+.resume-marketing-container .actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  margin-top:24px;
+  gap:12px;
+}
+.resume-marketing-container .btn{
+  border:1px solid #cdddf1;background:#ffffff;color:var(--ink);
+  padding:12px 18px;border-radius:12px;cursor:pointer;
+  transition:transform .1s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+  font-family: 'Outfit', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+.resume-marketing-container .btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 26px rgba(15,23,42,.10);border-color:#bed4ea}
+.resume-marketing-container .btn.primary{
+  background:linear-gradient(135deg,var(--g1),var(--g2));
+  color:#fff; border:1px solid transparent; box-shadow:var(--glow);
+}
+.resume-marketing-container .btn.primary:disabled{opacity:.7;cursor:not-allowed}
+
+/* footnote links */
+.resume-marketing-container .alink{background:none;border:0;padding:0;margin:0;color:var(--g1);font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.resume-marketing-container .alink:focus,
+.resume-marketing-container .btn:focus,
+.resume-marketing-container .dropzone:focus{outline:2px solid var(--g2);outline-offset:2px}
+
+/* toast */
+.resume-marketing-container .toast{display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px 14px;border-radius:12px;border:1px solid var(--line)}
+.resume-marketing-container .toast.success{background:#eaf7ef;color:#14532d}
+.resume-marketing-container .toast svg{width:20px;height:20px;color:#22c55e}
+
+/* responsive */
+@keyframes iconPulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+@media (max-width:992px){
+  .resume-marketing-container .process-steps{grid-template-columns:repeat(2,1fr)}
+  .resume-marketing-container .upload-card{grid-template-columns:1fr}
+}
+@media (max-width:768px){
+  .resume-marketing-container .marketing-content section{padding:70px 0}
+  .resume-marketing-container .marketing-header h1{font-size:2.2rem}
+  .resume-marketing-container .benefits-grid{grid-template-columns:1fr}
+  .resume-marketing-container .process-steps{grid-template-columns:1fr}
+  .resume-marketing-container .actions{justify-content:center}
+}
+
+
+/* ================================
+   Education theme – Resume Marketing
+   Responsive Enhancements
+================================ */
+
+/* Tablet adjustments */
+@media (max-width: 1200px) {
+  .resume-marketing-container .rm-container {
+    padding: 0 16px;
+  }
+  .resume-marketing-container .marketing-header {
+    padding: 80px 20px;
+  }
+}
+
+/* Medium screens (992px and below) */
+@media (max-width: 992px) {
+  .resume-marketing-container .marketing-content section {
+    padding: 80px 0;
+  }
+  .resume-marketing-container .process-steps {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  .resume-marketing-container .upload-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .resume-marketing-container .upload-info {
+    margin-bottom: 20px;
+  }
+}
+
+/* Tablets & large phones (768px and below) */
+@media (max-width: 768px) {
+  .resume-marketing-container .marketing-header {
+    padding: 60px 20px;
+  }
+  .resume-marketing-container .marketing-header h1 {
+    font-size: 2rem;
+  }
+  .resume-marketing-container .header-subtitle {
+    font-size: 0.95rem;
+    max-width: 90%;
+  }
+
+  .resume-marketing-container .marketing-content section {
+    padding: 60px 0;
+  }
+
+  .resume-marketing-container .benefits-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .resume-marketing-container .process-steps {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .resume-marketing-container .upload-card {
+    padding: 20px;
+  }
+  .resume-marketing-container .actions {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+/* Small phones (600px and below) */
+@media (max-width: 600px) {
+  .resume-marketing-container h1 {
+    font-size: 1.7rem;
+  }
+  .resume-marketing-container h2 {
+    font-size: 1.4rem;
+  }
+  .resume-marketing-container h3 {
+    font-size: 1.1rem;
+  }
+
+  .resume-marketing-container .benefit-card,
+  .resume-marketing-container .process-step {
+    padding: 20px;
+  }
+
+  .resume-marketing-container .dropzone {
+    min-height: 150px;
+    padding: 18px;
+  }
+  .resume-marketing-container .dz-text {
+    font-size: 0.9rem;
+  }
+
+  .resume-marketing-container .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Extra small (480px and below) */
+@media (max-width: 480px) {
+  .resume-marketing-container .marketing-header h1 {
+    font-size: 1.5rem;
+  }
+  .resume-marketing-container .header-subtitle {
+    font-size: 0.88rem;
+  }
+  .resume-marketing-container .upload-card {
+    padding: 16px;
+  }
+  .resume-marketing-container .file-name {
+    max-width: 200px;
+  }
+}

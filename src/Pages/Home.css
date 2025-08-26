@@ -1,0 +1,62 @@
+.slider {
+  position: relative;
+  width: 100%;
+  height: 500px; /* adjust height */
+  overflow: hidden;
+  background: black;
+}
+
+.slider-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill; /* ✅ you asked to keep fill */
+  opacity: 0;
+  transition: opacity 1s ease-in-out; /* ✅ fade speed fixed */
+}
+
+.slider-image.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+/* Progress bar styles */
+.progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+  z-index: 3;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(79, 172, 254, 0.7);
+  transition: width 0.1s linear;
+}
+
+/* Navigation buttons */
+.prev,
+.next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.prev { left: 10px; }
+.next { right: 10px; }

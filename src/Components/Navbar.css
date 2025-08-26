@@ -1,0 +1,224 @@
+/* Navbar.css */
+
+/* Base styles */
+.navbar {
+  background-color: #fff;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.navbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: 70px;        /* fill most of the navbar (80px) */
+  width: auto;         /* keep aspect ratio */
+  object-fit: contain; /* prevent stretching */
+  display: block;
+}
+
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+  width: 100%;
+  max-width: 1500px;
+  padding: 0 20px;
+}
+
+.navbar-logo {
+  color: #2c3e50;
+  justify-self: start;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo:hover {
+  color: #3498db;
+}
+
+.mobile-menu-icon {
+  display: none;
+  color: #2c3e50;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  height: 80px;
+  position: relative;
+}
+
+.nav-links {
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.nav-links:hover {
+  color: #3498db;
+}
+
+.dropdown-icon, .submenu-icon {
+  margin-left: 5px;
+  font-size: 0.8rem;
+}
+
+/* Dropdown styles */
+.services-dropdown, .training-dropdown, .others-dropdown {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  background-color: #fff;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 10px 0;
+  min-width: 200px;
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.services-item:hover .services-dropdown,
+.training-submenu:hover .training-dropdown,
+.others-item:hover .others-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-link {
+  color: #2c3e50;
+  text-decoration: none;
+  padding: 10px 20px;
+  display: block;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.dropdown-link:hover {
+  color: #3498db;
+  background-color: #f8f9fa;
+}
+
+.training-dropdown {
+  left: 100%;
+  top: 0;
+}
+
+/* Mobile menu styles */
+@media screen and (max-width: 960px) {
+  .mobile-menu-icon {
+    display: block;
+  }
+
+  .nav-menu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    position: absolute;
+    top: 80px;
+    left: -100%;
+    opacity: 0;
+    transition: all 0.5s ease;
+    background-color: #fff;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-menu.active {
+    left: 0;
+    opacity: 1;
+    transition: all 0.5s ease;
+    z-index: 1;
+  }
+
+  .nav-item {
+    height: auto;
+    width: 100%;
+    border-bottom: 1px solid #eee;
+  }
+
+  .nav-links {
+    text-align: left;
+    padding: 1rem;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Mobile dropdown styles */
+  .services-dropdown, .training-dropdown, .others-dropdown {
+    position: static;
+    box-shadow: none;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0;
+    background-color: #f8f9fa;
+  }
+
+  .services-item.active .services-dropdown,
+  .training-submenu.active .training-dropdown,
+  .others-item.active .others-dropdown {
+    max-height: 1000px;
+    padding: 10px 0;
+  }
+
+  .training-dropdown {
+    left: 0;
+    background-color: #e9ecef;
+  }
+
+  .dropdown-link {
+    padding: 10px 30px;
+  }
+}
+
+/* Active state for mobile dropdowns */
+.services-item.active .nav-links,
+.training-submenu.active .dropdown-link,
+.others-item.active .nav-links {
+  color: #3498db;
+}
+@media screen and (max-width: 960px) {
+  .services-dropdown,
+  .training-dropdown,
+  .others-dropdown {
+    max-height: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}

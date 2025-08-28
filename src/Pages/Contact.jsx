@@ -45,21 +45,18 @@ const Contact = () => {
             </div>
             <div className="contact-item">
               <i className="fas fa-envelope"></i>
-              <span>info@company.com</span>
+              <span>ops@zero7technologies.com</span>
             </div>
-            <div className="contact-item">
-              <i className="fab fa-whatsapp"></i>
-              <span>+1 (555) 987-6543</span>
-            </div>
+            
             <div className="contact-item">
               <i className="fas fa-map-marker-alt"></i>
-              <span>123 Business Ave, Suite 100<br />New York, NY 10001</span>
+              <span>201, 2nd floor, Spline Arcade, Opp Rajugari Biryani<br />Ayyappa Society Main Road, Madhapur<br/>Hyderabad, Telangana, 500081</span>
             </div>
           </div>
           
           <div className="map-container">
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.15830869428!2d-74.11976397304613!3d40.69766374874431!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1623942392926!5m2!1sen!2s" 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.279330956011!2d78.38993397331942!3d17.446339601107837!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb9167790c2429%3A0xe761ca87ad0d7005!2sSpline%20Arcade!5e0!3m2!1sen!2sin!4v1756298878073!5m2!1sen!2sin" 
               width="100%" 
               height="250" 
               style={{border:0}} 

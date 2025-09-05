@@ -1,62 +1,169 @@
+body {
+  margin: 0;
+  background: #0d0d0d;
+  font-family: Arial, sans-serif;
+}
+
+/* Container */
+.slider-container {
+  position: relative;
+  width: 90%;
+  max-width: 1000px;
+  height: auto;
+  margin: 40px auto;
+  perspective: 2000px; /* 3D depth */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  overlay: hidden;
+  
+}
+
+/* Slider */
 .slider {
   position: relative;
   width: 100%;
-  height: 500px; /* adjust height */
-  overflow: hidden;
-  background: black;
+  height: 100px;
+  margin-top: 250px;
+  padding-top: 4%;
+  padding-bottom: 19%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.slider-image {
+/* Images */
+.slider img {
   position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 100%;
-  object-fit: fill; /* ✅ you asked to keep fill */
+  height: 200%;
+  gap: 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  transition: transform 1s ease, opacity 1s ease;
   opacity: 0;
-  transition: opacity 1s ease-in-out; /* ✅ fade speed fixed */
+  transform: scale(0.2);
+  background: #000; /* fallback if img has transparency */
 }
 
-.slider-image.active {
+
+
+/* Center image */
+.slider img.active {
   opacity: 1;
-  z-index: 1;
-}
-
-/* Progress bar styles */
-.progress-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 6px;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
-  overflow: hidden;
+  transform: translateX(0) scale(1) rotateY(0deg);
   z-index: 3;
 }
 
-.progress-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #4facfe, #00f2fe);
-  border-radius: 3px;
-  box-shadow: 0 0 10px rgba(79, 172, 254, 0.7);
-  transition: width 0.1s linear;
-}
-
-/* Navigation buttons */
-.prev,
-.next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,0.5);
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
+/* Left */
+.slider img.left {
+  opacity: 0.6;
+  transform: translateX(-250px) scale(0.85) rotateY(20deg);
   z-index: 2;
 }
 
-.prev { left: 10px; }
-.next { right: 10px; }
+/* Right */
+.slider img.right {
+  opacity: 0.6;
+  transform: translateX(250px) scale(0.85) rotateY(-20deg);
+  z-index: 2;
+}
+
+/* Hidden */
+.slider img.hidden {
+  opacity: 0;
+  transform: scale(0.7);
+  z-index: 1;
+}
+
+/* Navigation */
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: none;
+  padding: 12px 18px;
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 5;
+  transition: background 0.3s ease;
+}
+
+.nav:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.prev {
+  left: 20px;
+}
+.next {
+  right: 20px;
+}
+
+/* ========================= */
+/* 📱 Responsive Adjustments */
+/* ========================= */
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .slider {
+    margin-top: 120px;
+    height: 360px;
+    padding-top: 2%;
+    padding-bottom: 4%;
+  }
+  .slider img {
+    width: 80%;       /* smaller image */
+    height: auto;
+  }
+  .slider img.left {
+    transform: translateX(-160px) scale(0.8) rotateY(18deg);
+  }
+  .slider img.right {
+    transform: translateX(160px) scale(0.8) rotateY(-18deg);
+  }
+}
+
+/* Large phones / small tablets */
+@media (max-width: 768px) {
+  .slider {
+    margin-top: 100px;
+    height: 280px;
+    padding-top: 2%;
+    padding-bottom: 4%;
+  }
+  .slider img {
+    width: 95%;       /* smaller but balanced */
+    height: auto;
+  }
+  .slider img.left {
+    transform: translateX(-120px) scale(0.75) rotateY(15deg);
+  }
+  .slider img.right {
+    transform: translateX(120px) scale(0.75) rotateY(-15deg);
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .slider {
+    margin-top: 70px;
+    height: 220px;
+    padding-top: 1%;
+    padding-bottom: 2%;
+  }
+  .slider img {
+    width: 100%;      /* takes most width but with margin */
+    height: auto;
+  }
+  .slider img.left {
+    transform: translateX(-80px) scale(0.7) rotateY(12deg);
+  }
+  .slider img.right {
+    transform: translateX(80px) scale(0.7) rotateY(-12deg);
+  }
+}

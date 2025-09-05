@@ -7,6 +7,10 @@ const Resumemarketing = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [atsScore, setAtsScore] = useState(null);
+  const [keywordsFound, setKeywordsFound] = useState([]);
+  const [keywordsMissing, setKeywordsMissing] = useState([]);
+  const [showTemplates, setShowTemplates] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -20,6 +24,7 @@ const Resumemarketing = () => {
     };
   }, []);
 
+  
   const acceptTypes = [
     "application/pdf",
     "application/msword",
@@ -60,21 +65,39 @@ const Resumemarketing = () => {
     }
     setUploading(true);
     setProgress(0);
+    setAtsScore(null);
+    setKeywordsFound([]);
+    setKeywordsMissing([]);
+    setShowTemplates(false);
+
     const id = setInterval(() => {
       setProgress((p) => {
         if (p >= 100) {
           clearInterval(id);
           setUploading(false);
+
+          // Simulate ATS analysis after upload
           setTimeout(() => {
-            setFile(null);
-            setProgress(0);
-          }, 1600);
+            const score = Math.floor(Math.random() * (95 - 60 + 1)) + 60;
+            setAtsScore(score);
+            setKeywordsFound(["React", "JavaScript", "Node.js"]);
+            setKeywordsMissing(["TypeScript", "Redux", "CI/CD"]);
+          }, 1200);
+
           return 100;
         }
         return p + 8;
       });
     }, 120);
   };
+
+  const handleShowTemplates = () => setShowTemplates(true);
+
+  const templates = [
+    { id: 1, name: "Classic ATS Template", img: "/templates/template1.png" },
+    { id: 2, name: "Modern ATS Template", img: "/templates/template2.png" },
+    { id: 3, name: "Executive ATS Template", img: "/templates/template3.png" },
+  ];
 
   return (
     <div className="resume-marketing-container">
@@ -132,7 +155,8 @@ const Resumemarketing = () => {
           </div>
         </section>
 
-        {/* How */}
+
+{/* How */}
         <section className="how-section">
           <div className="rm-container">
             <h2>How It Works</h2>
@@ -180,7 +204,8 @@ const Resumemarketing = () => {
           </div>
         </section>
 
-        {/* Upload */}
+
+        {/* Upload + ATS Features */}
         <section className="upload-section">
           <div className="rm-container">
             <div className="upload-card">
@@ -271,16 +296,59 @@ const Resumemarketing = () => {
                 </button>
               </div>
 
-              {!uploading && progress === 100 && (
-                <div className="toast success" role="status">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      fillRule="evenodd"
-                      d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Resume Uploaded. Our Team Will Contact You Soon.
+              {/* ATS Score Section */}
+              {atsScore !== null && (
+                <div className="ats-result">
+                  <h3>Your ATS Score</h3>
+                  <div className="score-circle">
+                    
+                    <span>{atsScore}%</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Keyword Section */}
+              {atsScore !== null && (
+                <div className="keywords-section">
+                  <h4>Keywords Found</h4>
+                  <div className="keyword-list">
+                    {keywordsFound.map((kw) => (
+                      <span key={kw} className="keyword found">{kw}</span>
+                    ))}
+                  </div>
+
+                  <h4>Suggested Keywords</h4>
+                  <div className="keyword-list">
+                    {keywordsMissing.map((kw) => (
+                      <span key={kw} className="keyword missing">{kw}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Templates Section */}
+              {atsScore !== null && !showTemplates && (
+                <button className="btn secondary" onClick={handleShowTemplates}>
+                  View ATS-Friendly Templates
+                </button>
+              )}
+
+              {showTemplates && (
+                <div className="templates-section">
+                  <h3>Choose A Template</h3>
+                  <div className="template-grid">
+                    {templates.map((tpl) => (
+                      <div className="template-card" key={tpl.id}>
+                        <img src={tpl.img} alt={tpl.name} />
+                        <p>{tpl.name}</p>
+                        <div className="template-actions">
+                          <button className="btn tiny">Preview</button>
+                          <button className="btn tiny">Edit</button>
+                          <button className="btn tiny">Download</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 

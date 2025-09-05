@@ -1,5 +1,63 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
+
+/* Hero Banner */
+.nonit-hero {
+  position: relative;
+  width: 100%;
+  height: 50vh; /* half screen height */
+  overflow: hidden;
+}
+
+.nonit-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* makes sure image fills the container */
+}
+
+.nonit-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(191, 192, 194, 0.6); /* navy blue overlay */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #373737;
+  padding: 1rem;
+}
+
+.nonit-hero-overlay h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.nonit-hero-overlay p {
+  font-size: 1.2rem;
+  max-width: 700px;
+}
+
+/* Responsive Hero */
+@media (max-width: 768px) {
+  .nonit-hero {
+    height: 35vh;
+  }
+
+  .nonit-hero-overlay h1 {
+    font-size: 1.8rem;
+  }
+
+  .nonit-hero-overlay p {
+    font-size: 1rem;
+  }
+}
+
+
 /* Base Styles */
 .nonittraining-container {
   max-width: 1200px;
@@ -8,25 +66,27 @@
   font-family: 'Poppins', sans-serif;
   background-color: #f9fafc;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Typography */
+/* Page Header */
 .nonit-page-header {
   text-align: center;
   padding: 2rem 1rem;
-  margin-bottom: 40px;   /* same as IT page so cards move up */
+  margin-bottom: 40px;  
 }
 
 .nonit-page-header h1 {
   font-size: 3rem;
   font-weight: 800;
   line-height: 1.2;
-  background: linear-gradient(90deg, #87a0fc, #7da0d6); /* match IT style */
+  background: linear-gradient(90deg, #87a0fc, #7da0d6);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   margin-bottom: 1rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .nonit-page-header p {
@@ -36,66 +96,78 @@
   margin: 0 auto;
   line-height: 1.6;
   font-weight: 500;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.nonit-programs-section h2 {
-  font-size: 1.8rem;
-  color: #2d3748;
-  margin: 2.5rem 0 1.5rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 2px solid #e2e8f0;
-  position: relative;
-}
 
-.nonit-programs-section h2::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100px;
-  height: 2px;
-  background: #3182ce; /* Blue for Non-IT */
-}
-
-/* Course Grid */
+/* Course Grid Layout */
 .nonit-courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.8rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
   margin-top: 1.5rem;
+  align-items: stretch;  /* makes all grid items equal in height */
+  justify-items: stretch; /* cards expand fully inside grid cell */
+  transition: all 0.6s ease;
 }
 
-/* Course Card */
+/* Course Card Styling */
 .nonit-course-card {
   background: white;
   border-radius: 12px;
   padding: 2rem 1.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 
               0 2px 4px -1px rgba(0, 0, 0, 0.02);
-  transition: all 0.3s ease;
+  transition: all 0.4s ease-in-out;
   border: 1px solid #edf2f7;
+
+  /* Flexible sizing */
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
   text-align: center;
+
+  min-height: 340px;  /* base uniform size */
+  height: auto;       /* expands naturally when content grows */
   position: relative;
-  overflow: hidden;
+  overflow: visible;  /* allow expanded content to show */
+  animation: fadeUp 0.8s ease-in-out;
 }
+
+/* Smooth expand effect */
+.nonit-course-card.expanded {
+  transition: all 0.4s ease-in-out;
+  transform: scale(1.02); /* slight pop effect */
+}
+
 
 .nonit-course-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
               0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border-color: #c6f6d5;
+  border-color: #a9cae9;
 }
 
 .nonit-course-card::before {
   content: '';
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 4px;
-  background: linear-gradient(90deg, #3182ce, #00b5d8);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #2886de, #73a2cf);
+}
+
+/* Expanded State */
+.nonit-course-card.expanded {
+  grid-column: 1 / -1;
+  max-width: 1000px;
+  margin: 0 auto;
+  border: 2px solid #3182ce;
+  background: #fff;
+  transform: scale(1.02);
+  transition: all 1s ease-in-out;
+  animation: expandSmooth 1s ease-in-out;
 }
 
 /* Course Card Elements */
@@ -107,7 +179,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ebf8ff;
+  background: #eef6ff;
   border-radius: 50%;
   color: #3182ce;
 }
@@ -116,28 +188,62 @@
   font-size: 1.3rem;
   font-weight: 600;
   color: #2d3748;
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
 .nonit-course-description {
   font-size: 0.95rem;
   color: #718096;
-  margin-bottom: 1.5rem;
-  line-height: 1.5;
-  flex-grow: 1;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  text-align: center;
 }
 
-.nonit-course-price {
-  background: #3182ce;   /* same blue pill as IT */
-  color: #fff;
-  padding: 0.5rem 1.2rem;
-  border-radius: 20px;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-  font-size: 1rem;
+/* Tech badges wrapper */
+.nonit-course-technologies {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+/* Individual badges */
+.nonit-tech-badge {
+  background: #e6f4ff; /* light blue default */
+  color: #0369a1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 5px;
+  transition: all 0.3s ease;
   display: inline-block;
 }
 
+.nonit-tech-badge:nth-child(2n) {
+  background: #e8fdee; /* light green */
+  color: #065f46;
+}
+
+.nonit-tech-badge:nth-child(3n) {
+  background: #fff5e6; /* soft orange */
+  color: #92400e;
+}
+
+.nonit-tech-badge:nth-child(4n) {
+  background: #fce7f3; /* soft pink */
+  color: #9d174d;
+}
+
+.nonit-tech-badge:hover {
+  background: #3182ce;
+  color: white;
+}
+
+/* Learn More Button */
 .nonit-learn-more-btn {
   background: white;
   border: 2px solid #3182ce;
@@ -156,4 +262,63 @@
   background: #3182ce;
   color: white;
   transform: translateY(-2px);
+}
+
+/* Expanded details */
+.nonit-course-details {
+  margin-top: 1.2rem;
+  background: #f1f9ff;
+  padding: 0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #3182ce;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 1s ease-in-out, opacity 1s ease-in-out, padding 0.8s ease-in-out;
+  text-align: center;
+}
+
+.nonit-course-card.expanded .nonit-course-details {
+  max-height: 800px;
+  opacity: 1;
+  padding: 1.5rem;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes expandSmooth {
+  from { transform: scale(0.98); opacity: 0.8; }
+  to { transform: scale(1.02); opacity: 1; }
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .nonit-courses-grid { grid-template-columns: repeat(2, 1fr); }
+  .nonit-course-card.expanded { max-width: 90%; }
+}
+
+@media (max-width: 768px) {
+  .nonit-courses-grid { grid-template-columns: 1fr; }
+  .nonit-page-header h1 { font-size: 2rem; }
+  .nonit-course-card { max-width: 95%; padding: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .nonit-page-header h1 { font-size: 1.6rem; }
+  .nonit-page-header p { font-size: 0.9rem; }
+  .nonit-course-card { padding: 1.2rem; max-width: 100%; }
+  .nonit-course-icon { font-size: 2.4rem; width: 60px; height: 60px; }
+  .nonit-learn-more-btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+  .nonit-course-details { font-size: 0.9rem; padding: 1rem; }
 }

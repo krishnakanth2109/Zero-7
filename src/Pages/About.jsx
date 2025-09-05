@@ -18,9 +18,15 @@ const About = () => {
           <div className="section-content">
             <div className="text-content">
               <h2>Who We Are</h2>
-              <p>We're career architects and talent strategists united by a common belief: everyone deserves access to meaningful work, and every business deserves access to exceptional talent.</p>
-              <p>Founded in 2018, we've grown from a passionate startup to a trusted partner for both job seekers and Fortune 500 companies. What sets us apart is our dual focus—we don't just place candidates, we prepare them through rigorous training programs developed with industry leaders.</p>
-              <p>Our team brings together decades of experience in HR, education technology, and corporate training to create solutions that actually work in today's rapidly evolving job market.</p>
+              <p>At Zero7 Technologies, we're dedicated to bridging the gap between talent and opportunity.
+Founded in 2025, our mission is to empower job seekers, professionals with career gaps, and
+those looking to transition into new fields by equipping them with the skills and support they
+need to thrive. We are your all-in-one solution for career advancement and talent acquisition.</p>
+              <p>At Zero7 Technologies, we believe every career deserves a second chance and every talent
+deserves the right platform. Established in 2025, we specialize in IT & Non-IT Training, Payroll
+Process Outsourcing, Resume Marketing, and Campus Drives.</p>
+              <p>Our mission is to empower individuals with skills, confidence, and opportunities while supporting
+organizations with trained and reliable talent.</p>
             </div>
             <div className="image-container">
               <img src="https://images.unsplash.com/photo-1579389083078-4e7018379f7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Diverse team collaborating in modern office" />

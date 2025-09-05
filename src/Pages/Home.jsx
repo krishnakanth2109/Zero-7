@@ -3,11 +3,9 @@ import "./Home.css";
 import Context from "./Context.jsx";
 
 const images = [
-  "/imgg.png",
-  "/image1.jpg",
-  "/image2.jpg",
-  "/image3.jpg",
-  "/image4.jpg",
+  "/image13.jpg",
+  "/image14.jpg",
+  "/image15.jpg",
 ];
 
 const SLIDE_DURATION = 10000; // 10s per image

@@ -57,7 +57,7 @@ const NewBatches = () => {
       email: '',
       phone: '',
       selectedCourse: initialCourse || '',
-      programType: '',  // ✅ dropdown
+      programType: '',
       message: ''
     });
 
@@ -73,7 +73,7 @@ const NewBatches = () => {
       });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
       e.preventDefault();
 
       if (!formData.programType) {
@@ -81,21 +81,32 @@ const NewBatches = () => {
         return;
       }
 
-      console.log('Form submitted:', formData);
-      setSubmitted(true);
+      try {
+        const selectedCourseObj = coursesData.find(c => c.name === formData.selectedCourse);
 
-      setTimeout(() => {
-        setSubmitted(false);
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          selectedCourse: '',
-          programType: '',
-          message: ''
+        const payload = {
+          ...formData,
+          trainer: selectedCourseObj?.trainer || "",
+          date: selectedCourseObj?.date || "",
+          timings: selectedCourseObj?.timings || "",
+          duration: selectedCourseObj?.duration || ""
+        };
+
+        const response = await fetch("https://script.google.com/macros/s/AKfycbzXzDo0cVEMDIXaU3j-fxrW5Fqi7LggylggenCQHltP300R2PgK6H11YAdeYnpVfhVb/exec", {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" }
         });
-        onClose();
-      }, 3000);
+
+        const result = await response.json();
+        if (result.result === "success") {
+          setSubmitted(true);
+        } else {
+          alert("Error: " + result.message);
+        }
+      } catch (err) {
+        alert("Something went wrong. Try again.");
+      }
     };
 
     return (
@@ -172,7 +183,6 @@ const NewBatches = () => {
                   </select>
                 </div>
 
-                {/* ✅ Required Dropdown for Program Type */}
                 {formData.selectedCourse && (
                   <div className="form-group">
                     <label htmlFor="programType">Enrollment Type *</label>
@@ -219,7 +229,6 @@ const NewBatches = () => {
       <div className="batches-container">
         <h2 className="batches-title">New Batches</h2>
 
-        {/* Search Bar */}
         <div className="search-container">
           <div className="search-box">
             <input

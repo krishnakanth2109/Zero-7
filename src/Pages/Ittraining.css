@@ -1,5 +1,63 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
+/* Hero Banner */
+.it-hero {
+  position: relative;
+  width: 100%;
+  height: 50vh; /* half screen height */
+  overflow: hidden;
+}
+
+.it-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* makes sure image fills without distortion */
+}
+
+.it-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(243, 243, 243, 0.6); /* blue overlay */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #373737;
+  padding: 1rem;
+}
+
+.it-hero-overlay h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.it-hero-overlay p {
+  font-size: 1.2rem;
+  max-width: 700px;
+}
+
+/* Responsive Hero */
+@media (max-width: 768px) {
+  .it-hero {
+    height: 35vh;
+  }
+
+  .it-hero-overlay h1 {
+    font-size: 1.8rem;
+  }
+
+  .it-hero-overlay p {
+    font-size: 1rem;
+  }
+}
+
+
+
 /* Base Styles */
 .ittraining-container {
   max-width: 1200px;
@@ -8,12 +66,16 @@
   font-family: 'Poppins', sans-serif;
   background-color: #f9fafc;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+/* Page Header */
 .it-page-header {
   text-align: center;
   padding: 2rem 1rem;
-  margin-bottom: 40px;  /* was 80px, now half */
+  margin-bottom: 40px;  
 }
 
 .it-page-header h1 {
@@ -25,7 +87,6 @@
   background-clip: text;
   color: transparent;
   margin-bottom: 1rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .it-page-header p {
@@ -35,34 +96,16 @@
   margin: 0 auto;
   line-height: 1.6;
   font-weight: 500;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.it-programs-section h2 {
-  font-size: 1.8rem;
-  color: #2d3748;
-  margin: 2.5rem 0 1.5rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 2px solid #e2e8f0;
-  position: relative;
-}
-
-.it-programs-section h2::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100px;
-  height: 2px;
-  background: #38a169; /* Green for IT */
 }
 
 /* Course Grid Layout */
 .it-courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.8rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
   margin-top: 1.5rem;
+  justify-items: center;
+  transition: all 0.6s ease;
 }
 
 /* Course Card Styling */
@@ -72,7 +115,7 @@
   padding: 2rem 1.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 
               0 2px 4px -1px rgba(0, 0, 0, 0.02);
-  transition: all 0.3s ease;
+  transition: all 0.8s ease-in-out;
   border: 1px solid #edf2f7;
   display: flex;
   flex-direction: column;
@@ -80,13 +123,14 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+  animation: fadeUp 0.8s ease-in-out;
 }
 
 .it-course-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
               0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border-color: #c6f6d5;
+  border-color: #a9cae9;
 }
 
 .it-course-card::before {
@@ -96,7 +140,19 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #38a169, #48bb78);
+  background: linear-gradient(90deg, #2886de, #73a2cf);
+}
+
+/* Expanded State */
+.it-course-card.expanded {
+  grid-column: 1 / -1;
+  max-width: 1000px;
+  margin: 0 auto;
+  border: 2px solid #3182ce;
+  background: #fff;
+  transform: scale(1.02);
+  transition: all 1s ease-in-out;
+  animation: expandSmooth 1s ease-in-out;
 }
 
 /* Course Card Elements */
@@ -108,40 +164,76 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0fff4;
+  background: #eef6ff;
   border-radius: 50%;
-  color: #38a169;
+  color: #3182ce;
 }
 
 .it-course-title {
   font-size: 1.3rem;
   font-weight: 600;
   color: #2d3748;
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
 .it-course-description {
   font-size: 0.95rem;
   color: #718096;
-  margin-bottom: 1.5rem;
-  line-height: 1.5;
-  flex-grow: 1;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  text-align: center;
 }
-.it-course-price {
-  background: #3182ce;   /* blue background */
-  color: #fff;           /* white text */
-  padding: 0.5rem 1.2rem;
-  border-radius: 20px;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-  font-size: 1rem;
+
+/* Tech badges wrapper */
+.it-course-technologies {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0;
+  list-style: none; /* remove bullet points */
+}
+
+/* Individual badges */
+.it-tech-badge {
+  background: #e6f4ff; /* light blue default */
+  color: #0369a1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 5px;
+  transition: all 0.3s ease;
   display: inline-block;
 }
 
+/* Alternate colors for variety */
+.it-tech-badge:nth-child(2n) {
+  background: #e8fdee; /* light green */
+  color: #065f46;
+}
+
+.it-tech-badge:nth-child(3n) {
+  background: #fff5e6; /* soft orange */
+  color: #92400e;
+}
+
+.it-tech-badge:nth-child(4n) {
+  background: #fce7f3; /* soft pink */
+  color: #9d174d;
+}
+
+.it-tech-badge:hover {
+  background: #3182ce;
+  color: white;
+}
+
+/* Learn More Button */
 .it-learn-more-btn {
   background: white;
-  border: 2px solid #38a169;
-  color: #38a169;
+  border: 2px solid #3182ce;
+  color: #3182ce;
   padding: 0.6rem 1.8rem;
   border-radius: 30px;
   font-weight: 600;
@@ -153,7 +245,116 @@
 }
 
 .it-learn-more-btn:hover {
-  background: #38a169;
+  background: #3182ce;
   color: white;
   transform: translateY(-2px);
+}
+
+/* Expanded details */
+.it-course-details {
+  margin-top: 1.2rem;
+  background: #f1f9ff;
+  padding: 0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #3182ce;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 1s ease-in-out, opacity 1s ease-in-out, padding 0.8s ease-in-out;
+  text-align: center;
+}
+
+.it-course-card.expanded .it-course-details {
+  max-height: 800px;
+  opacity: 1;
+  padding: 1.5rem;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes expandSmooth {
+  from { transform: scale(0.98); opacity: 0.8; }
+  to { transform: scale(1.02); opacity: 1; }
+}
+
+/* Responsive Styles */
+/* @media (max-width: 1024px) {
+  .it-courses-grid { grid-template-columns: repeat(2, 1fr); }
+  .it-course-card.expanded { max-width: 90%; }
+}
+
+@media (max-width: 768px) {
+  .it-courses-grid { grid-template-columns: 1fr; }
+  .it-page-header h1 { font-size: 2rem; }
+  .it-course-card { max-width: 95%; padding: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .it-page-header h1 { font-size: 1.6rem; }
+  .it-page-header p { font-size: 0.9rem; }
+  .it-course-card { padding: 1.2rem; max-width: 100%; }
+  .it-course-icon { font-size: 2.4rem; width: 60px; height: 60px; }
+  .it-learn-more-btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+  .it-course-details { font-size: 0.9rem; padding: 1rem; }
+} */
+
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .it-courses-grid { 
+    grid-template-columns: repeat(2, 1fr); 
+  }
+  .it-course-card.expanded { 
+    max-width: 96%; /* increased from 90% */
+  }
+}
+
+@media (max-width: 768px) {
+  .it-courses-grid { 
+    grid-template-columns: 1fr; 
+  }
+  .it-page-header h1 { 
+    font-size: 2.2rem; /* slightly larger */
+  }
+  .it-course-card { 
+    max-width: 98%; /* increased from 95% */
+    padding: 1.6rem; 
+  }
+}
+
+@media (max-width: 480px) {
+  .it-page-header h1 { 
+    font-size: 1.8rem; /* slightly larger */
+  }
+  .it-page-header p { 
+    font-size: 1rem; 
+  }
+  .it-course-card { 
+    padding: 1.4rem; 
+    max-width: 98%; /* increased from 100% */
+  }
+  .it-course-icon { 
+    font-size: 2.6rem; 
+    width: 65px; 
+    height: 65px; 
+  }
+  .it-learn-more-btn { 
+    padding: 0.55rem 1.2rem; 
+    font-size: 0.9rem; 
+  }
+  .it-course-details { 
+    font-size: 0.95rem; 
+    padding: 1.2rem; 
+  }
 }

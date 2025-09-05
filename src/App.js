@@ -16,6 +16,8 @@ import Ittraining from './Pages/Ittraining';
 import NonIttraining from './Pages/Nonittraining';
 import Footer from './Components/Footer';
 import NewBatches from './Pages/NewBatches';
+import Login from './Pages/admin/Login';
+
 
 // ✅ import the new page
 import CampusHiring from './Pages/CampusHiring';
@@ -45,6 +47,7 @@ function App() {
           <Route path="/faqs" element={<FAQs />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/college-connect" element={<CollegeConnect />} />
+          <Route path="/admin" element={<Login />} />
 
         </Routes>
       </div>

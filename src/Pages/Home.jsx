@@ -1,18 +1,60 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./Home.css";
 import Context from "./Context.jsx";
 
-const images = [
-  "/image13.jpg",
-  "/image14.jpg",
-  "/image15.jpg",
-];
+// Reusable FlipCard component
+const FlipCard = ({ image, title, children }) => {
+  const [tiltStyle, setTiltStyle] = useState({});
+  const [flipped, setFlipped] = useState(false);
 
-const SLIDE_DURATION = 10000; // 10s per image
+  const handleMouseMove = (e) => {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    const rotateY = (px - 0.5) * 12;
+    const rotateX = (0.5 - py) * 10;
+    setTiltStyle({
+      transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setTiltStyle({ transform: "rotateX(0deg) rotateY(0deg) scale(1)" });
+    setFlipped(false);
+  };
+
+  const handleMouseEnter = () => {
+    setFlipped(true);
+  };
+
+  return (
+    <div
+      className={`flip-card ${flipped ? "is-flipped" : ""}`}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onMouseEnter={handleMouseEnter}
+      tabIndex="0"
+      onFocus={() => setFlipped(true)}
+      onBlur={() => setFlipped(false)}
+    >
+      <div className="flip-card-inner" style={tiltStyle}>
+        <div className="flip-card-front">
+          <img src={image} alt={title} className="flip-card-image" />
+          <div className="flip-card-front-caption">
+            <h3>{title}</h3>
+          </div>
+        </div>
+
+        <div className="flip-card-back">
+          <div className="flip-card-back-content">{children}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Home = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -21,50 +63,11 @@ const Home = () => {
     purpose: "",
   });
 
-  const goToNext = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  const goToPrev = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    );
-  };
-
-  // Auto slide
-  useEffect(() => {
-    const timer = setTimeout(goToNext, SLIDE_DURATION);
-    return () => clearTimeout(timer);
-  }, [currentIndex]);
-
-  // Progress bar animation
-  useEffect(() => {
-    let start = Date.now();
-    let frame;
-
-    const animate = () => {
-      let elapsed = Date.now() - start;
-      let percentage = Math.min((elapsed / SLIDE_DURATION) * 100, 100);
-      setProgress(percentage);
-
-      if (percentage < 100) {
-        frame = requestAnimationFrame(animate);
-      }
-    };
-
-    animate();
-    return () => cancelAnimationFrame(frame);
-  }, [currentIndex]);
-
-  // Handle form input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submit
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form Submitted:", formData);
@@ -75,36 +78,76 @@ const Home = () => {
   };
 
   return (
-    <div>
-      {/* ✅ Hero Slider Section */}
-      <div className="slider">
-        <div className="progress-bar">
-          <div
-            className="progress-fill"
-            style={{ width: `${progress}%` }}
-          ></div>
+    <div className="home-root">
+      {/* Hero with background video only */}
+      <header className="video-hero" role="banner">
+        <video
+          className="hero-video"
+          src="/Logo video.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+      </header>
+
+      {/* Services Section */}
+      <section id="services" className="services-section">
+        <div className="container">
+          <h2 className="section-heading">Our Offerings</h2>
+          <p className="section-lead">Practical learning. Real-world outcomes.</p>
+
+          <div className="cards-grid">
+            <FlipCard image="/image13.jpg" title="Training & Upskilling">
+              <h3>Training & Upskilling</h3>
+              <p>
+                Customized programs, hands-on projects and placement support for
+                freshers & professionals.
+              </p>
+              <button className="card-btn" onClick={() => setShowForm(true)}>
+                Get Started
+              </button>
+            </FlipCard>
+
+            <FlipCard image="/image14.jpg" title="Recruitment">
+              <h3>Recruitment</h3>
+              <p>
+                End-to-end talent solutions for startups & enterprises —
+                screening, interviewing and onboarding.
+              </p>
+              <button className="card-btn" onClick={() => setShowForm(true)}>
+                Contact Sales
+              </button>
+            </FlipCard>
+
+            <FlipCard image="/image15.jpg" title="Career Coaching">
+              <h3>Career Coaching</h3>
+              <p>
+                1-on-1 mentoring, resume & interview prep to boost your career
+                trajectory.
+              </p>
+              <button className="card-btn" onClick={() => setShowForm(true)}>
+                Book Mentor
+              </button>
+            </FlipCard>
+          </div>
         </div>
+      </section>
 
-        {images.map((img, index) => (
-          <img
-            key={index}
-            src={img}
-            alt="slide"
-            className={`slider-image ${index === currentIndex ? "active" : ""}`}
-          />
-        ))}
-
-        <button className="prev" onClick={goToPrev}>❮</button>
-        <button className="next" onClick={goToNext}>❯</button>
-      </div>
-
-      {/* ✅ Keep Context (main content below hero) */}
+      {/* Keep Context */}
       <Context />
 
-      {/* ✅ Popup Form */}
+      {/* Popup Form */}
       {showForm && (
-        <div className="form-popup">
+        <div className="form-popup" role="dialog" aria-modal="true">
           <div className="form-container">
+            <button
+              className="form-close-x"
+              aria-label="Close"
+              onClick={() => setShowForm(false)}
+            >
+              ×
+            </button>
             <h3>Career Consultation Form</h3>
             <form onSubmit={handleSubmit}>
               <input

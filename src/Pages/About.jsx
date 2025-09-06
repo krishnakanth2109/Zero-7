@@ -1,14 +1,43 @@
-import React from 'react';
-import './About.css';
+import React, { useEffect, useState } from "react";
+import "./About.css";
 
 const About = () => {
+  const [stats, setStats] = useState({
+    careers: 0,
+    partners: 0,
+    retention: 0,
+  });
+
+  // Animate stats dynamically
+  useEffect(() => {
+    let careers = 0;
+    let partners = 0;
+    let retention = 0;
+
+    const interval = setInterval(() => {
+      if (careers < 5000) careers += 100;
+      if (partners < 120) partners += 5;
+      if (retention < 94) retention += 2;
+
+      setStats({
+        careers: careers > 5000 ? 5000 : careers,
+        partners: partners > 120 ? 120 : partners,
+        retention: retention > 94 ? 94 : retention,
+      });
+    }, 80);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="about-page">
       {/* Hero Section */}
       <section className="about-hero">
-        <div className="container">
-          <h1>About Our Mission & Impact</h1>
-          <p className="subheading">Building bridges between ambition and opportunity in the new world of work</p>
+        <div className="hero-overlay">
+          <h1>About Zero7 Technologies</h1>
+          <p className="subheading">
+            Building bridges between ambition and opportunity in the new world of work
+          </p>
         </div>
       </section>
 
@@ -18,18 +47,30 @@ const About = () => {
           <div className="section-content">
             <div className="text-content">
               <h2>Who We Are</h2>
-              <p>At Zero7 Technologies, we're dedicated to bridging the gap between talent and opportunity.
-Founded in 2025, our mission is to empower job seekers, professionals with career gaps, and
-those looking to transition into new fields by equipping them with the skills and support they
-need to thrive. We are your all-in-one solution for career advancement and talent acquisition.</p>
-              <p>At Zero7 Technologies, we believe every career deserves a second chance and every talent
-deserves the right platform. Established in 2025, we specialize in IT & Non-IT Training, Payroll
-Process Outsourcing, Resume Marketing, and Campus Drives.</p>
-              <p>Our mission is to empower individuals with skills, confidence, and opportunities while supporting
-organizations with trained and reliable talent.</p>
+              <p>
+                At <strong>Zero7 Technologies</strong>, we are more than just a workforce
+                solutions provider—we are career builders and innovation enablers.
+                Established in 2025, our mission is to empower job seekers, career
+                changers, and professionals with gaps to re-enter the job market with
+                confidence.
+              </p>
+              <p>
+                We specialize in <b>IT & Non-IT Training</b>, <b>Resume Marketing</b>,
+                <b> Payroll Process Outsourcing</b>, and <b>Campus Drives</b>. Our
+                unique approach blends human-centric mentoring with modern tools that
+                make careers future-proof.
+              </p>
+              <p>
+                With our dedicated team, strong industry partnerships, and
+                community-driven approach, we ensure that talent and opportunity find
+                their perfect match.
+              </p>
             </div>
             <div className="image-container">
-              <img src="https://images.unsplash.com/photo-1579389083078-4e7018379f7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Diverse team collaborating in modern office" />
+              <img
+                src="https://images.unsplash.com/photo-1579389083078-4e7018379f7e?auto=format&fit=crop&w=1200&q=80"
+                alt="Team collaboration"
+              />
             </div>
           </div>
         </div>
@@ -39,110 +80,114 @@ organizations with trained and reliable talent.</p>
       <section className="vision-values">
         <div className="container">
           <h2>Our Core Beliefs</h2>
-          <p className="section-intro">These principles guide every decision we make and relationship we build</p>
-          
+          <p className="section-intro">
+            These principles guide every step of our journey
+          </p>
+
           <div className="values-grid">
-            <div className="value-card">
-              <div className="icon-box">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1.06 13.54L7.4 12l1.41-1.41 2.12 2.12 4.24-4.24 1.41 1.41-5.64 5.66z"/>
-                </svg>
+            <div className="flip-card">
+              <div className="flip-card-inner">
+                <div className="flip-card-front">
+                  <img
+                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f"
+                    alt="Potential"
+                  />
+                </div>
+                <div className="flip-card-back">
+                  <h3>Potential Over Pedigree</h3>
+                  <p>
+                    We believe talent is everywhere. Our programs focus on
+                    nurturing hidden potential rather than just credentials.
+                  </p>
+                </div>
               </div>
-              <h3>Potential Over Pedigree</h3>
-              <p>We see beyond resumes to identify and develop raw talent. Our programs are designed to help people from all backgrounds succeed in high-growth careers.</p>
             </div>
-            
-            <div className="value-card">
-              <div className="icon-box">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm4 12h-4v3l-5-5 5-5v3h4v4z"/>
-                </svg>
+
+            <div className="flip-card">
+              <div className="flip-card-inner">
+                <div className="flip-card-front">
+                  <img
+                    src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d"
+                    alt="Partnership"
+                  />
+                </div>
+                <div className="flip-card-back">
+                  <h3>Partnership, Not Transactions</h3>
+                  <p>
+                    We build long-term relationships with individuals and
+                    organizations—success for us means sustainable growth for
+                    everyone involved.
+                  </p>
+                </div>
               </div>
-              <h3>Partnership, Not Transactions</h3>
-              <p>We measure success by long-term career growth and team retention—not just placement numbers. Our clients become collaborators in curriculum development.</p>
             </div>
-            
-            <div className="value-card">
-              <div className="icon-box">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                </svg>
+
+            <div className="flip-card">
+              <div className="flip-card-inner">
+                <div className="flip-card-front">
+                  <img
+                    src="https://images.unsplash.com/photo-1519389950473-47ba0277781c"
+                    alt="Data Meets Humanity"
+                  />
+                </div>
+                <div className="flip-card-back">
+                  <h3>Data Meets Humanity</h3>
+                  <p>
+                    We use analytics and market intelligence to empower careers,
+                    but we never forget the human story behind every number.
+                  </p>
+                </div>
               </div>
-              <h3>Data Meets Humanity</h3>
-              <p>While we leverage cutting-edge assessment tools and labor market analytics, we never forget that behind every data point is a human story.</p>
+            </div>
+
+            <div className="flip-card">
+              <div className="flip-card-inner">
+                <div className="flip-card-front">
+                  <img
+                    src="https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d"
+                    alt="Innovation"
+                  />
+                </div>
+                <div className="flip-card-back">
+                  <h3>Innovation at Core</h3>
+                  <p>
+                    Our solutions evolve with the future of work—ensuring that
+                    every professional stays relevant and every company stays
+                    competitive.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Leadership Section */}
-      <section className="leadership">
-        <div className="container">
-          <h2>Our Leadership</h2>
-          <p className="section-intro">The passionate minds building the future of work</p>
-          
-          <div className="founder-message">
-            <div className="founder-image">
-              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=334&q=80" alt="Rajesh Verma, Founder & CEO" />
-            </div>
-            <div className="founder-text">
-              <h3>Our Origin Story</h3>
-              <blockquote>
-                "After witnessing brilliant candidates get overlooked and companies struggle to find talent, I knew there had to be a better way. We're not just filling positions—we're creating economic mobility while solving critical business needs. Our alumni now lead teams at top companies, and that's the impact that keeps us going."
-              </blockquote>
-              <p className="founder-name">— Rajesh Verma, Founder & CEO</p>
-              <p className="founder-credentials">Former Head of Talent Development at TechMahindra | HR Innovator Award Winner 2022</p>
-            </div>
-          </div>
-          
-          <div className="team-grid">
-            <div className="team-member">
-              <div className="member-photo">
-                <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=334&q=80" alt="Priya Sharma" />
-              </div>
-              <h3>Priya Sharma</h3>
-              <p className="position">Chief Learning Officer</p>
-              <p className="bio">Designed award-winning curricula used by 50+ corporate partners. Believes learning should be as dynamic as the workplace.</p>
-            </div>
-            
-            <div className="team-member">
-              <div className="member-photo">
-                <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?ixlib=rb-1.2.1&auto=format&fit=crop&w=334&q=80" alt="Amit Patel" />
-              </div>
-              <h3>Amit Patel</h3>
-              <p className="position">Head of Strategic Partnerships</p>
-              <p className="bio">Connects top talent with innovative companies. Known for his uncanny ability to match culture fit.</p>
-            </div>
-            
-            <div className="team-member">
-              <div className="member-photo">
-                <img src="https://images.unsplash.com/photo-1573497620053-ea5300f94f21?ixlib=rb-1.2.1&auto=format&fit=crop&w=334&q=80" alt="Neha Gupta" />
-              </div>
-              <h3>Neha Gupta</h3>
-              <p className="position">Chief Operations Officer</p>
-              <p className="bio">Scales solutions without sacrificing quality. Her operational rigor ensures we deliver on every promise.</p>
-            </div>
-          </div>
-          
-          <div className="stats-bar">
-            <div className="stat-item">
-              <span className="stat-number">5,000+</span>
-              <span className="stat-label">Careers Transformed</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number">120+</span>
-              <span className="stat-label">Enterprise Partners</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number">94%</span>
-              <span className="stat-label">Placement Retention</span>
-            </div>
-          </div>
-          
-          <div className="cta-buttons">
-            <button className="primary-btn">Join Our Mission</button>
-            <button className="secondary-btn">See Open Roles</button>
-          </div>
+      {/* Stats Section */}
+      <section className="stats-bar">
+        <div className="stat-item">
+          <span className="stat-number">{stats.careers}+</span>
+          <span className="stat-label">Careers Transformed</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-number">{stats.partners}+</span>
+          <span className="stat-label">Enterprise Partners</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-number">{stats.retention}%</span>
+          <span className="stat-label">Placement Retention</span>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="cta-section">
+        <h2>Be Part of the Change</h2>
+        <p>
+          Whether you’re a job seeker or a business looking for top talent,
+          Zero7 Technologies is here to support your growth journey.
+        </p>
+        <div className="cta-buttons">
+          <button className="primary-btn">Join Our Mission</button>
+          <button className="secondary-btn">Explore Opportunities</button>
         </div>
       </section>
     </div>

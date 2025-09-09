@@ -20,8 +20,6 @@ import Login from './Pages/admin/Login';
 import BenchList from './Pages/BenchList';
 import FloatingWhatsApp from "./Components/FloatingWhatsApp"; // ✅
 
-
-// ✅ import the new page
 import CampusHiring from './Pages/CampusHiring';
 
 import './App.css';
@@ -39,7 +37,6 @@ function App() {
             <Route path="non-it-training" element={<NonIttraining />} />
             <Route path="payroll-services" element={<PayrollServices />} />
             <Route path="resume-marketing" element={<Resumemarketing />} />
-            {/* ✅ add campus hiring under services */}
             <Route path="campus-hiring" element={<CampusHiring />} />
           </Route>
           <Route path="/testimonials" element={<Testimonials />} />
@@ -51,15 +48,10 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/college-connect" element={<CollegeConnect />} />
           <Route path="/admin" element={<Login />} />
-          
-
         </Routes>
       </div>
-      {/* ✅ Footer stays global */}
       <Footer />
-
-            <FloatingWhatsApp /> {/* ✅ */}
-
+      <FloatingWhatsApp /> {/* ✅ */}
     </div>
   );
 }

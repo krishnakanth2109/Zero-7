@@ -15,6 +15,20 @@
   object-fit: cover; /* makes sure image fills the container */
 }
 
+.nonit-price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #e67e22;
+  margin-top: 10px;
+}
+
+.nonit-placement {
+  font-size: 0.95rem;
+  color: #2ecc71;
+  font-weight: 600;
+  margin-top: 5px;
+}
+
 .nonit-hero-overlay {
   position: absolute;
   top: 0;

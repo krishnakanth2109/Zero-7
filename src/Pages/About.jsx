@@ -89,7 +89,7 @@ const About = () => {
               <div className="flip-card-inner">
                 <div className="flip-card-front">
                   <img
-                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f"
+                    src="/img01.jpg"
                     alt="Potential"
                   />
                 </div>
@@ -107,7 +107,7 @@ const About = () => {
               <div className="flip-card-inner">
                 <div className="flip-card-front">
                   <img
-                    src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d"
+                    src="/img02.jpg"
                     alt="Partnership"
                   />
                 </div>
@@ -126,7 +126,7 @@ const About = () => {
               <div className="flip-card-inner">
                 <div className="flip-card-front">
                   <img
-                    src="https://images.unsplash.com/photo-1519389950473-47ba0277781c"
+                    src="/img03.jpg"
                     alt="Data Meets Humanity"
                   />
                 </div>
@@ -144,7 +144,7 @@ const About = () => {
               <div className="flip-card-inner">
                 <div className="flip-card-front">
                   <img
-                    src="https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d"
+                    src="/img04.jpg"
                     alt="Innovation"
                   />
                 </div>

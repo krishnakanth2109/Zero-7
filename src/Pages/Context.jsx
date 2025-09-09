@@ -51,19 +51,75 @@ export default function Context() {
           With over a decade of experience, we bridge the gap between talent and opportunity.
         </p>
       </div>
-
-      {/* Image Row */}
-      <div className="image-row">
-        <div className="image-box">
-          <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=500&q=80" alt="Team collaboration" />
-        </div>
-        <div className="image-box">
-          <img src="https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?auto=format&fit=crop&w=500&q=80" alt="Training session" />
-        </div>
-        <div className="image-box">
-          <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=500&q=80" alt="Career growth" />
-        </div>
+{/* Image Row with Flip Effect (Hover + Tap) */}
+<div className="image-row">
+  {/* Card 1 */}
+  <div
+    className="flip-card"
+    onClick={(e) => e.currentTarget.classList.toggle("is-flipped")}
+  >
+    <div className="flip-card-inner">
+      <div className="flip-card-front">
+        <img
+          src="/teamc.jpg"
+          alt="Team collaboration"
+        />
       </div>
+      <div className="flip-card-back">
+        <h3>Team Collaboration</h3>
+        <p>
+          We believe teamwork is the foundation of success, driving creativity
+          and innovation together.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {/* Card 2 */}
+  <div
+    className="flip-card"
+    onClick={(e) => e.currentTarget.classList.toggle("is-flipped")}
+  >
+    <div className="flip-card-inner">
+      <div className="flip-card-front">
+        <img
+          src="/training.jpeg"
+          alt="Training session"
+        />
+      </div>
+      <div className="flip-card-back">
+        <h3>Training Programs</h3>
+        <p>
+          We provide world-class training sessions to empower individuals with
+          new-age skills.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {/* Card 3 */}
+  <div
+    className="flip-card"
+    onClick={(e) => e.currentTarget.classList.toggle("is-flipped")}
+  >
+    <div className="flip-card-inner">
+      <div className="flip-card-front">
+        <img
+          src="/growth.jpg"
+          alt="Career growth"
+        />
+      </div>
+      <div className="flip-card-back">
+        <h3>Career Growth</h3>
+        <p>
+          We create opportunities for continuous career growth and future-ready
+          development.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
 
       <h2 className="section-title">What We Offer</h2>
 

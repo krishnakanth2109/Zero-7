@@ -66,37 +66,31 @@ const colleges = [
 
 // For Companies
 const companies = [
+  
   {
     title: "Bulk Fresher Hiring",
-    copy:
-      "High-intent batches from target campuses, filtered to your skill matrix.",
+    copy: "High-intent batches from target campuses, filtered to your skill matrix.",
     badge: "2–4 week cycle",
-    // career fair / conversation
-    img:
-      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1600&auto=format&fit=crop",
+    img: "/bulk.jpg", // ✅ from public folder
     icon: <FiBriefcase aria-hidden="true" />,
   },
   {
     title: "Pre-Screened Student Batches",
-    copy:
-      "Aptitude, coding, and communication screens before interview day.",
+    copy: "Aptitude, coding, and communication screens before interview day.",
     badge: "ready to deploy",
-    // coding test / IDE screen
-    img:
-      "https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1600&auto=format&fit=crop",
+    img: "/Batches.jpg",
     icon: <FiTrendingUp aria-hidden="true" />,
   },
   {
     title: "Custom Recruitment Events",
-    copy:
-      "Hackathons, case marathons, and assessment centers.",
+    copy: "Hackathons, case marathons, and assessment centers.",
     badge: "tailored events",
-    // hackathon environment
-    img:
-      "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop",
+    img: "/CRP.jpg",
     icon: <FiCalendar aria-hidden="true" />,
   },
 ];
+
+
 
 // Timeline (icons)
 const steps = [

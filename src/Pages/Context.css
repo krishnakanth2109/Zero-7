@@ -100,19 +100,20 @@
 /* Wrapper for row */
 .image-row {
   display: flex;
-  justify-content: center;
-  align-items: stretch;
-  flex-wrap: wrap; /* allow wrapping */
-  gap: 20px;       /* spacing between boxes */
+  justify-content: center;   /* Center horizontally */
+  align-items: center;       /* Center vertically */
+  flex-wrap: wrap;           /* allow wrapping */
+  gap: 20px;                 /* spacing between boxes */
   margin: 20px 0;
   padding: 0 10px;
+  text-align: center;        /* Ensure inner text stays centered */
 }
 
 /* Each box */
 .image-box {
-  flex: 1 1 calc(33.33% - 20px); /* 3 per row on large screens */
+  flex: 0 1 calc(33.33% - 20px); /* 3 per row on large screens */
   display: flex;
-  justify-content: center;
+  justify-content: center;       /* Center the flip card */
   align-items: center;
   max-width: 350px;
 }
@@ -136,18 +137,16 @@
 /* 📱 Responsive breakpoints */
 @media (max-width: 1024px) {
   .image-box {
-    flex: 1 1 calc(50% - 20px); /* 2 per row on tablets */
+    flex: 0 1 calc(50% - 20px); /* 2 per row on tablets */
   }
 }
 
 @media (max-width: 600px) {
   .image-box {
-    flex: 1 1 100%; /* 1 per row on mobile */
+    flex: 0 1 100%; /* 1 per row on mobile */
     max-width: 100%;
   }
 }
-
-
 
 
 /* Service Grid */

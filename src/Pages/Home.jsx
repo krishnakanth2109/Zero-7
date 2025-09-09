@@ -2,58 +2,6 @@ import React, { useState } from "react";
 import "./Home.css";
 import Context from "./Context.jsx";
 
-// Reusable FlipCard component
-const FlipCard = ({ image, title, children }) => {
-  const [tiltStyle, setTiltStyle] = useState({});
-  const [flipped, setFlipped] = useState(false);
-
-  const handleMouseMove = (e) => {
-    const el = e.currentTarget;
-    const rect = el.getBoundingClientRect();
-    const px = (e.clientX - rect.left) / rect.width;
-    const py = (e.clientY - rect.top) / rect.height;
-    const rotateY = (px - 0.5) * 12;
-    const rotateX = (0.5 - py) * 10;
-    setTiltStyle({
-      transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`,
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setTiltStyle({ transform: "rotateX(0deg) rotateY(0deg) scale(1)" });
-    setFlipped(false);
-  };
-
-  const handleMouseEnter = () => {
-    setFlipped(true);
-  };
-
-  return (
-    <div
-      className={`flip-card ${flipped ? "is-flipped" : ""}`}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      onMouseEnter={handleMouseEnter}
-      tabIndex="0"
-      onFocus={() => setFlipped(true)}
-      onBlur={() => setFlipped(false)}
-    >
-      <div className="flip-card-inner" style={tiltStyle}>
-        <div className="flip-card-front">
-          <img src={image} alt={title} className="flip-card-image" />
-          <div className="flip-card-front-caption">
-            <h3>{title}</h3>
-          </div>
-        </div>
-
-        <div className="flip-card-back">
-          <div className="flip-card-back-content">{children}</div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const Home = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -90,49 +38,6 @@ const Home = () => {
           playsInline
         />
       </header>
-
-      {/* Services Section */}
-      <section id="services" className="services-section">
-        <div className="container">
-          <h2 className="section-heading">Our Offerings</h2>
-          <p className="section-lead">Practical learning. Real-world outcomes.</p>
-
-          <div className="cards-grid">
-            <FlipCard image="/image13.jpg" title="Training & Upskilling">
-              <h3>Training & Upskilling</h3>
-              <p>
-                Customized programs, hands-on projects and placement support for
-                freshers & professionals.
-              </p>
-              <button className="card-btn" onClick={() => setShowForm(true)}>
-                Get Started
-              </button>
-            </FlipCard>
-
-            <FlipCard image="/image14.jpg" title="Recruitment">
-              <h3>Recruitment</h3>
-              <p>
-                End-to-end talent solutions for startups & enterprises —
-                screening, interviewing and onboarding.
-              </p>
-              <button className="card-btn" onClick={() => setShowForm(true)}>
-                Contact Sales
-              </button>
-            </FlipCard>
-
-            <FlipCard image="/image15.jpg" title="Career Coaching">
-              <h3>Career Coaching</h3>
-              <p>
-                1-on-1 mentoring, resume & interview prep to boost your career
-                trajectory.
-              </p>
-              <button className="card-btn" onClick={() => setShowForm(true)}>
-                Book Mentor
-              </button>
-            </FlipCard>
-          </div>
-        </div>
-      </section>
 
       {/* Keep Context */}
       <Context />

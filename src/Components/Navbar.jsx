@@ -24,16 +24,17 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
+        {/* ✅ Logo */}
         <Link to="/" className="navbar-logo">
           <img src="/Logo6.jpg" alt="Zero7 Technologies Logo" className="logo-img" />
         </Link>
 
-        {/* Mobile Menu Icon */}
+        {/* ✅ Mobile Menu Icon */}
         <div className="mobile-menu-icon" onClick={toggleMobileMenu}>
           <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} />
         </div>
 
-        {/* Navbar Links */}
+        {/* ✅ Navbar Links */}
         <ul className={`nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
           <li className="nav-item">
             <Link to="/" className="nav-links" onClick={closeMobileMenu}>
@@ -46,7 +47,7 @@ const Navbar = () => {
             </Link>
           </li>
 
-          {/* Services Dropdown */}
+          {/* ✅ Services Dropdown */}
           <li
             className="nav-item services-item"
             onMouseEnter={() => setIsServicesOpen(true)}
@@ -78,12 +79,20 @@ const Navbar = () => {
                   {isTrainingOpen && (
                     <ul className="training-dropdown">
                       <li>
-                        <Link to="/services/it-training" className="dropdown-link" onClick={closeMobileMenu}>
+                        <Link
+                          to="/services/it-training"
+                          className="dropdown-link"
+                          onClick={closeMobileMenu}
+                        >
                           IT Training
                         </Link>
                       </li>
                       <li>
-                        <Link to="/services/non-it-training" className="dropdown-link" onClick={closeMobileMenu}>
+                        <Link
+                          to="/services/non-it-training"
+                          className="dropdown-link"
+                          onClick={closeMobileMenu}
+                        >
                           Non-IT Training
                         </Link>
                       </li>
@@ -91,23 +100,36 @@ const Navbar = () => {
                   )}
                 </li>
                 <li>
-                  <Link to="/services/payroll-services" className="dropdown-link" onClick={closeMobileMenu}>
+                  <Link
+                    to="/services/payroll-services"
+                    className="dropdown-link"
+                    onClick={closeMobileMenu}
+                  >
                     Payroll Services
                   </Link>
                 </li>
                 <li>
-                  <Link to="/services/resume-marketing" className="dropdown-link" onClick={closeMobileMenu}>
+                  <Link
+                    to="/services/resume-marketing"
+                    className="dropdown-link"
+                    onClick={closeMobileMenu}
+                  >
                     Resume Marketing
                   </Link>
                 </li>
                 <li>
-                  <Link to="/services/campus-hiring" className="dropdown-link" onClick={closeMobileMenu}>
+                  <Link
+                    to="/services/campus-hiring"
+                    className="dropdown-link"
+                    onClick={closeMobileMenu}
+                  >
                     Campus Hiring
                   </Link>
                 </li>
               </ul>
             )}
           </li>
+
 
           <li className="nav-item">
             <Link to="/college-connect" className="nav-links" onClick={closeMobileMenu}>
@@ -125,10 +147,17 @@ const Navbar = () => {
             </Link>
           </li>
 
-          {/* ✅ Bench List Added */}
+          {/* ✅ Bench List */}
           <li className="nav-item">
             <Link to="/bench-list" className="nav-links" onClick={closeMobileMenu}>
               Bench List
+            </Link>
+          </li>
+
+          {/* ✅ New Current Hirings Page Link */}
+          <li className="nav-item">
+            <Link to="/current-hirings" className="nav-links" onClick={closeMobileMenu}>
+              Current Hirings
             </Link>
           </li>
 

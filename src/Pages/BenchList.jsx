@@ -143,7 +143,7 @@ const BenchList = () => {
           <div className="flip-card">
             <div className="flip-card-inner">
               <div className="flip-card-front">
-                <img src="https://source.unsplash.com/250x200/?career,job" alt="Faster Hiring" />
+                <img src="/faster.jpg" alt="Faster Hiring" />
                 <h3>Faster Hiring</h3>
               </div>
               <div className="flip-card-back">
@@ -154,7 +154,7 @@ const BenchList = () => {
           <div className="flip-card">
             <div className="flip-card-inner">
               <div className="flip-card-front">
-                <img src="https://source.unsplash.com/250x200/?network,business" alt="Trusted Network" />
+                <img src="/trusted.jpg" alt="Trusted Network" />
                 <h3>Trusted Network</h3>
               </div>
               <div className="flip-card-back">
@@ -165,7 +165,7 @@ const BenchList = () => {
           <div className="flip-card">
             <div className="flip-card-inner">
               <div className="flip-card-front">
-                <img src="https://source.unsplash.com/250x200/?support,team" alt="Support" />
+                <img src="/support.jpg" alt="Support" />
                 <h3>End-to-End Support</h3>
               </div>
               <div className="flip-card-back">

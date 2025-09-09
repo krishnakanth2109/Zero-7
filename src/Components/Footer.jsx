@@ -70,6 +70,7 @@ const Footer = () => {
       <div className="footer-bottom">
         <p>© 2025 Zero7 Technologies. All Rights Reserved.</p>
       </div>
+      
     </footer>
   );
 };

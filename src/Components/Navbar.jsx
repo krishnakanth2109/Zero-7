@@ -11,7 +11,6 @@ const Navbar = () => {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
-    // Close dropdowns when mobile menu is toggled
     if (!isMobileMenuOpen) {
       setIsServicesOpen(false);
       setIsTrainingOpen(false);
@@ -29,10 +28,12 @@ const Navbar = () => {
           <img src="/Logo6.jpg" alt="Zero7 Technologies Logo" className="logo-img" />
         </Link>
 
+        {/* Mobile Menu Icon */}
         <div className="mobile-menu-icon" onClick={toggleMobileMenu}>
           <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} />
         </div>
 
+        {/* Navbar Links */}
         <ul className={`nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
           <li className="nav-item">
             <Link to="/" className="nav-links" onClick={closeMobileMenu}>
@@ -101,7 +102,7 @@ const Navbar = () => {
                 </li>
                 <li>
                   <Link to="/services/campus-hiring" className="dropdown-link" onClick={closeMobileMenu}>
-                Campus Hiring
+                    Campus Hiring
                   </Link>
                 </li>
               </ul>
@@ -123,13 +124,19 @@ const Navbar = () => {
               Digital Courses
             </Link>
           </li>
+
+          {/* ✅ Bench List Added */}
+          <li className="nav-item">
+            <Link to="/bench-list" className="nav-links" onClick={closeMobileMenu}>
+              Bench List
+            </Link>
+          </li>
+
           <li className="nav-item">
             <Link to="/contact" className="nav-links" onClick={closeMobileMenu}>
               Contact Us
             </Link>
           </li>
-
-          {/* Blog link, no dropdown */}
           <li className="nav-item">
             <Link to="/blog" className="nav-links" onClick={closeMobileMenu}>
               Blog

@@ -56,8 +56,6 @@
   }
 }
 
-
-
 /* Base Styles */
 .ittraining-container {
   max-width: 1200px;
@@ -70,6 +68,131 @@
   flex-direction: column;
   align-items: center;
 }
+
+.it-programs-section {
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.section-heading {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #ff5722;
+}
+
+.section-subheading {
+  margin-bottom: 2rem;
+  color: #555;
+}
+
+.it-courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.it-course-card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+  position: relative;
+}
+
+.it-course-card:hover {
+  transform: translateY(-5px);
+}
+
+.it-course-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.it-course-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.it-course-description {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.price-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff5722, #ff9800);
+  color: #fff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.it-learn-more-btn {
+  margin-top: 0.5rem;
+  background: transparent;
+  border: 2px solid #ff5722;
+  color: #ff5722;
+  padding: 0.4rem 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.it-learn-more-btn:hover {
+  background: #ff5722;
+  color: #fff;
+}
+
+.it-course-details {
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.it-course-details h4 {
+  margin-top: 0.8rem;
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+  color: #ff5722;
+}
+
+.tech-badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.it-tech-badge {
+  background: #f1f1f1;
+  padding: 0.3rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+
+.placement-info {
+  margin-top: 1rem;
+}
+
+.placement-info ul {
+  list-style: none;
+  padding: 0;
+}
+
+.placement-info li {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+@media (max-width: 768px) {
+  .it-course-card {
+    padding: 1rem;
+  }
+}
+
+
 
 /* Page Header */
 .it-page-header {

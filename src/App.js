@@ -17,6 +17,8 @@ import NonIttraining from './Pages/Nonittraining';
 import Footer from './Components/Footer';
 import NewBatches from './Pages/NewBatches';
 import Login from './Pages/admin/Login';
+import BenchList from './Pages/BenchList';
+import FloatingWhatsApp from "./Components/FloatingWhatsApp"; // ✅
 
 
 // ✅ import the new page
@@ -43,16 +45,21 @@ function App() {
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/digital-courses" element={<DigitalCourses />} />
           <Route path="/new-batches" element={<NewBatches />} />
+          <Route path="/bench-list" element={<BenchList />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/faqs" element={<FAQs />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/college-connect" element={<CollegeConnect />} />
           <Route path="/admin" element={<Login />} />
+          
 
         </Routes>
       </div>
       {/* ✅ Footer stays global */}
       <Footer />
+
+            <FloatingWhatsApp /> {/* ✅ */}
+
     </div>
   );
 }

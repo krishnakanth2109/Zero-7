@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./AdminItPrograms.css"; // ✅ we'll style it here
+import "./AdminItPrograms.css";
 
 const API_URL = "http://localhost:5000/api/it-programs";
 

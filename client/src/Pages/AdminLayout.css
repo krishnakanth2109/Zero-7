@@ -1,0 +1,11 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-content {
+  flex: 1; /* takes remaining space */
+  background: #f3f4f6; /* light gray */
+  padding: 30px;
+  overflow-y: auto;
+}

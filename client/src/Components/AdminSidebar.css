@@ -1,0 +1,106 @@
+/* Sidebar container */
+.admin-sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background: #1f2937;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+}
+
+/* Sidebar header */
+.admin-sidebar-header {
+  padding: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  border-bottom: 1px solid #374151;
+  text-align: center;
+}
+
+/* Navigation links */
+.sidebar-link {
+  display: block;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #d1d5db;
+  font-size: 15px;
+  margin-bottom: 4px;
+  transition: background 0.2s;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Hover effect */
+.sidebar-link:hover {
+  background: #374151;
+  color: #fff;
+}
+
+/* Active route */
+.sidebar-link.active {
+  background: #4b5563;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Services header */
+.services-header {
+  border-radius: 0; /* remove button corners */
+  display: flex; /* ensure flex layout */
+  justify-content: space-between; /* text left, arrow right */
+  align-items: center; /* vertically center arrow with text */
+  padding-right: 16px; /* make arrow fully at the right */
+}
+
+/* Optional: reduce arrow size if needed */
+.services-header svg {
+  flex-shrink: 0; /* keep arrow from shrinking */
+}
+
+/* Dropdown submenu */
+.submenu {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+  margin-left: 12px; /* indent submenu */
+}
+
+/* Submenu links smaller font */
+.submenu .sidebar-link {
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+/* Dropdown container full width */
+.dropdown-container {
+  width: 100%;
+}
+
+/* Rotate arrow when dropdown is open */
+.dropdown-arrow {
+  transition: transform 0.3s ease;
+}
+
+.dropdown-arrow.rotate {
+  transform: rotate(180deg);
+}
+
+/* Optional: submenu slide-down animation */
+.submenu {
+  animation: slideDown 0.3s ease forwards;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

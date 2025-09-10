@@ -8,7 +8,11 @@ import nonItProgramsRoutes from "./routes/nonItPrograms.js";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ["https://zero7.onrender.com", "https://zero7.netlify.app", "http://localhost:3000"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // ✅ Routes

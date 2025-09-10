@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./css/Login.css";
-import AdminItPrograms from "../AdminItPrograms";
 
 
 const Login = () => {

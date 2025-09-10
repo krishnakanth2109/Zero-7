@@ -3,7 +3,6 @@ import { FaWhatsapp } from "react-icons/fa";
 import "./FloatingWhatsApp.css";
 
 const FloatingWhatsApp = () => {
-  const phoneNumber = "+91 891901095 ";
   const message = "Hi there, I want to ask about your services.";
   const url = `https://wa.me/${+918919801095}?text=${encodeURIComponent(message)}`;
 

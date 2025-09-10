@@ -2,16 +2,21 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./Ittraining.css";
 
+// ✅ Use env variable with fallback
+const API_URL = `${
+  process.env.REACT_APP_API_URL || "http://localhost:5000/api"
+}/it-programs`;
+
 const Ittraining = () => {
   const [programs, setPrograms] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
   const cardRefs = useRef({});
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/it-programs")
-
-      .then(res => setPrograms(res.data))
-      .catch(err => console.error(err));
+    axios
+      .get(API_URL)
+      .then((res) => setPrograms(res.data))
+      .catch((err) => console.error("Error fetching IT programs:", err));
   }, []);
 
   const toggleExpand = (id) => {
@@ -30,7 +35,8 @@ const Ittraining = () => {
         <div className="it-hero-overlay">
           <h1>IT Training & Placement Services</h1>
           <p>
-            Learn industry-ready skills with certification support, real-world projects, and guaranteed interview opportunities.
+            Learn industry-ready skills with certification support, real-world
+            projects, and guaranteed interview opportunities.
           </p>
         </div>
       </section>
@@ -39,7 +45,8 @@ const Ittraining = () => {
       <section className="it-programs-section">
         <h2 className="section-heading">Our Training Programs</h2>
         <p className="section-subheading">
-          Explore our specialized IT training courses designed with placement-focused outcomes.
+          Explore our specialized IT training courses designed with
+          placement-focused outcomes.
         </p>
 
         <div className="it-courses-grid">
@@ -47,7 +54,9 @@ const Ittraining = () => {
             <div
               key={course._id}
               ref={(el) => (cardRefs.current[course._id] = el)}
-              className={`it-course-card ${expandedId === course._id ? "expanded" : ""}`}
+              className={`it-course-card ${
+                expandedId === course._id ? "expanded" : ""
+              }`}
             >
               <div className="it-course-icon">{course.icon}</div>
               <h3 className="it-course-title">{course.title}</h3>

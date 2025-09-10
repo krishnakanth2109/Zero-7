@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./AdminNonItPrograms.css";
 
-const API_URL = "http://localhost:5000/api/non-it-programs";
+const API_URL = `${
+  process.env.REACT_APP_API_URL || "http://localhost:5000/api"
+}/non-it-programs`;
 
 const AdminNonItPrograms = () => {
   const [programs, setPrograms] = useState([]);

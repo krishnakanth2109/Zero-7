@@ -25,13 +25,17 @@ export default function AdminSidebar() {
       <div className="admin-sidebar-header">Admin Panel</div>
 
       <nav>
+        {/* Dashboard */}
         <Link
           to="/admin/dashboard"
-          className={`sidebar-link ${isActive("/admin/dashboard") ? "active" : ""}`}
+          className={`sidebar-link ${
+            isActive("/admin/dashboard") ? "active" : ""
+          }`}
         >
           Dashboard
         </Link>
 
+        {/* Services Dropdown */}
         <div className="dropdown-container">
           <div
             onClick={() => setOpenServices(!openServices)}
@@ -50,19 +54,31 @@ export default function AdminSidebar() {
             <div className="submenu">
               <Link
                 to="/admin/it-programs"
-                className={`sidebar-link ${isActive("/admin/it-programs") ? "active" : ""}`}
+                className={`sidebar-link ${
+                  isActive("/admin/it-programs") ? "active" : ""
+                }`}
               >
                 IT Services
               </Link>
               <Link
                 to="/admin/non-it-programs"
-                className={`sidebar-link ${isActive("/admin/non-it-programs") ? "active" : ""}`}
+                className={`sidebar-link ${
+                  isActive("/admin/non-it-programs") ? "active" : ""
+                }`}
               >
                 Non IT Services
               </Link>
             </div>
           )}
         </div>
+
+        {/* ✅ Admin Forms Link (new) */}
+        <Link
+          to="/admin/forms"
+          className={`sidebar-link ${isActive("/admin/forms") ? "active" : ""}`}
+        >
+          Form Submissions
+        </Link>
       </nav>
     </aside>
   );

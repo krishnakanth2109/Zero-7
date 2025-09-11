@@ -25,6 +25,7 @@ import AdminLayout from "./Pages/AdminLayout";
 import AdminItPrograms from './Pages/AdminItPrograms';
 import AdminDashboard from './Pages/AdminDashboard';
 import AdminNonItPrograms from './Pages/AdminNonItPrograms';
+import AdminForms from "./Components/AdminHomeForm"; 
 
 // ✅ Other Pages
 import CurrentHirings from "./Pages/CurrentHirings";
@@ -67,6 +68,7 @@ function App() {
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/it-programs" element={<AdminItPrograms />} />
             <Route path="/admin/non-it-programs" element={<AdminNonItPrograms />} />
+            <Route path="/admin/forms" element={<AdminForms />} />
           </Route>
         </Routes>
       </div>

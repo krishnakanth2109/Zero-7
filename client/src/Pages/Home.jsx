@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import "./Home.css";
 import Context from "./Context.jsx";
+import axios from "axios";
+
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 const Home = () => {
   const [showForm, setShowForm] = useState(false);
@@ -10,19 +13,30 @@ const Home = () => {
     email: "",
     purpose: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Submitted:", formData);
+    setLoading(true);
 
-    alert("Form submitted successfully! Manager will be notified.");
-    setShowForm(false);
-    setFormData({ name: "", number: "", email: "", purpose: "" });
+    try {
+      // ✅ Send form data to backend
+      await axios.post(`${API_URL}/forms`, formData);
+
+      alert("✅ Form submitted successfully! Manager will be notified.");
+      setShowForm(false);
+      setFormData({ name: "", number: "", email: "", purpose: "" });
+    } catch (error) {
+      console.error("❌ Form submission error:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -87,8 +101,8 @@ const Home = () => {
                 required
               ></textarea>
 
-              <button type="submit" className="submit-btn">
-                Submit
+              <button type="submit" className="submit-btn" disabled={loading}>
+                {loading ? "Submitting..." : "Submit"}
               </button>
               <button
                 type="button"

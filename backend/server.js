@@ -8,12 +8,25 @@ import nonItProgramsRoutes from "./routes/nonItPrograms.js";
 dotenv.config();
 
 const app = express();
-app.use(cors({
-  origin: ["https://zero7-lw66.onrender.com", "https://zero7tech.netlify.app", "http://localhost:3000"],
-  credentials: true
-}));
+
+// ✅ CORS setup
+app.use(
+  cors({
+    origin: [
+      "https://zero7-lw66.onrender.com", // backend on Render
+      "https://zero7tech.netlify.app",   // frontend on Netlify
+      "http://localhost:3000"            // local dev
+    ],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
+
+// ✅ Root route (for Render homepage)
+app.get("/", (req, res) => {
+  res.send("🚀 Zero7 API is running! Try /api/it-programs or /api/non-it-programs");
+});
 
 // ✅ Routes
 app.use("/api/it-programs", itProgramsRoutes);
@@ -21,9 +34,16 @@ app.use("/api/non-it-programs", nonItProgramsRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+// ✅ MongoDB connection
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log("✅ MongoDB Connected");
-    app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+    app.listen(PORT, () =>
+      console.log(`🚀 Server running on port ${PORT}`)
+    );
   })
-  .catch(err => console.error("❌ MongoDB error:", err));
+  .catch((err) => console.error("❌ MongoDB error:", err));

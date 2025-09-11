@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
+import { MaterialReactTable } from "material-react-table";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
@@ -9,10 +9,10 @@ const AdminHomeForm = () => {
 
   const columns = useMemo(
     () => [
-      { accessorKey: "name", header: "Name", size: 200 },
-      { accessorKey: "email", header: "Email", size: 250 },
+      { accessorKey: "name", header: "Name", size: 150 },
+      { accessorKey: "number", header: "Phone Number", size: 150 },
+      { accessorKey: "email", header: "Email", size: 200 },
       { accessorKey: "purpose", header: "Purpose", size: 200 },
-      { accessorKey: "message", header: "Message", size: 300 },
       {
         accessorFn: (row) => new Date(row.createdAt),
         id: "createdAt",
@@ -32,8 +32,7 @@ const AdminHomeForm = () => {
     const fetchForms = async () => {
       try {
         const res = await axios.get(`${API_URL}/forms`);
-        const initialData = res.data.map((form) => ({ ...form, highlighted: false }));
-        setForms(initialData);
+        setForms(res.data); // Assuming res.data is an array of FormSubmission
       } catch (err) {
         console.error("Failed to fetch forms:", err);
       }
@@ -41,16 +40,16 @@ const AdminHomeForm = () => {
     fetchForms();
   }, []);
 
-  const table = useMaterialReactTable({
-    columns,
-    data: forms,
-    enableRowSelection: false,
-    enableGlobalFilter: true,
-    enableColumnOrdering: true,
-    positionToolbarAlertBanner: "bottom",
-  });
-
-  return <MaterialReactTable table={table} />;
+  return (
+    <MaterialReactTable
+      columns={columns}
+      data={forms}
+      enableRowSelection={false}
+      enableGlobalFilter
+      enableColumnOrdering
+      positionToolbarAlertBanner="bottom"
+    />
+  );
 };
 
 export default AdminHomeForm;

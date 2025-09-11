@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { 
   FaCheckCircle, 
   FaRocket, 
@@ -11,6 +12,9 @@ import {
   FaUniversity 
 } from "react-icons/fa";
 import "./Context.css";
+import teamc from "../assets/teamc.jpg";
+
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 export default function Context() {
   // State for popup form
@@ -22,24 +26,31 @@ export default function Context() {
     purpose: "",
   });
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data Submitted:", formData);
+    setLoading(true);
 
-    // Reset & close popup
-    setFormData({ name: "", number: "", email: "", purpose: "" });
-    setShowForm(false);
+    try {
+      await axios.post(`${API_URL}/forms`, formData);
+      // Reset form
+      setFormData({ name: "", number: "", email: "", purpose: "" });
+      setShowForm(false);
 
-    // Show success message below consultation
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 5000);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 5000);
+    } catch (err) {
+      console.error("❌ Error submitting form:", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,75 +62,45 @@ export default function Context() {
           With over a decade of experience, we bridge the gap between talent and opportunity.
         </p>
       </div>
-{/* Image Row with Flip Effect (Hover + Tap) */}
-<div className="image-row">
-  {/* Card 1 */}
-  <div
-    className="flip-card"
-    onClick={(e) => e.currentTarget.classList.toggle("is-flipped")}
-  >
-    <div className="flip-card-inner">
-      <div className="flip-card-front">
-        <img
-          src="/teamc.jpg"
-          alt="Team collaboration"
-        />
-      </div>
-      <div className="flip-card-back">
-        <h3>Team Collaboration</h3>
-        <p>
-          We believe teamwork is the foundation of success, driving creativity
-          and innovation together.
-        </p>
-      </div>
-    </div>
-  </div>
 
-  {/* Card 2 */}
-  <div
-    className="flip-card"
-    onClick={(e) => e.currentTarget.classList.toggle("is-flipped")}
-  >
-    <div className="flip-card-inner">
-      <div className="flip-card-front">
-        <img
-          src="/training.jpeg"
-          alt="Training session"
-        />
-      </div>
-      <div className="flip-card-back">
-        <h3>Training Programs</h3>
-        <p>
-          We provide world-class training sessions to empower individuals with
-          new-age skills.
-        </p>
-      </div>
-    </div>
-  </div>
+      {/* Image Row with Flip Effect */}
+      <div className="image-row">
+        <div className="flip-card" onClick={(e) => e.currentTarget.classList.toggle("is-flipped")}>
+          <div className="flip-card-inner">
+            <div className="flip-card-front">
+              <img src={teamc} alt="Team collaboration" />
+            </div>
+            <div className="flip-card-back">
+              <h3>Team Collaboration</h3>
+              <p>We believe teamwork is the foundation of success, driving creativity and innovation together.</p>
+            </div>
+          </div>
+        </div>
 
-  {/* Card 3 */}
-  <div
-    className="flip-card"
-    onClick={(e) => e.currentTarget.classList.toggle("is-flipped")}
-  >
-    <div className="flip-card-inner">
-      <div className="flip-card-front">
-        <img
-          src="/growth.jpg"
-          alt="Career growth"
-        />
-      </div>
-      <div className="flip-card-back">
-        <h3>Career Growth</h3>
-        <p>
-          We create opportunities for continuous career growth and future-ready
-          development.
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
+        <div className="flip-card" onClick={(e) => e.currentTarget.classList.toggle("is-flipped")}>
+          <div className="flip-card-inner">
+            <div className="flip-card-front">
+              <img src="/training.jpeg" alt="Training session" />
+            </div>
+            <div className="flip-card-back">
+              <h3>Training Programs</h3>
+              <p>We provide world-class training sessions to empower individuals with new-age skills.</p>
+            </div>
+          </div>
+        </div>
 
+        <div className="flip-card" onClick={(e) => e.currentTarget.classList.toggle("is-flipped")}>
+          <div className="flip-card-inner">
+            <div className="flip-card-front">
+              <img src="/growth.jpg" alt="Career growth" />
+            </div>
+            <div className="flip-card-back">
+              <h3>Career Growth</h3>
+              <p>We create opportunities for continuous career growth and future-ready development.</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <h2 className="section-title">What We Offer</h2>
 
@@ -295,7 +276,9 @@ export default function Context() {
                 ></textarea>
 
                 <div className="form-actions">
-                  <button type="submit" className="btn-primary">Submit</button>
+                  <button type="submit" className="btn-primary" disabled={loading}>
+                    {loading ? "Submitting..." : "Submit"}
+                  </button>
                   <button type="button" className="btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
                 </div>
               </form>
@@ -313,7 +296,7 @@ export default function Context() {
           {/* Testimonial 1 */}
           <div className="testimonial-card" style={{animationDelay: '0.1s'}}>
             <div className="testimonial-image">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=300&q=80" alt="Rahul Sharma" />
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Rahul Sharma" />
               <div className="quote-icon">"</div>
             </div>
             <div className="testimonial-content">
@@ -331,7 +314,7 @@ export default function Context() {
           {/* Testimonial 2 */}
           <div className="testimonial-card" style={{animationDelay: '0.2s'}}>
             <div className="testimonial-image">
-              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=300&q=80" alt="Priya Mehta" />
+              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Priya Mehta" />
               <div className="quote-icon">"</div>
             </div>
             <div className="testimonial-content">
@@ -349,7 +332,7 @@ export default function Context() {
           {/* Testimonial 3 */}
           <div className="testimonial-card" style={{animationDelay: '0.3s'}}>
             <div className="testimonial-image">
-              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=300&q=80" alt="Arjun Kapoor" />
+              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Arjun Kapoor" />
               <div className="quote-icon">"</div>
             </div>
             <div className="testimonial-content">
@@ -365,8 +348,6 @@ export default function Context() {
             </div>
           </div>
         </div>
-
-        
       </div>
     </section>
   );

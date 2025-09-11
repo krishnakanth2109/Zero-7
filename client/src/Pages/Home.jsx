@@ -3,7 +3,7 @@ import "./Home.css";
 import Context from "./Context.jsx";
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000/api";
 
 const Home = () => {
   const [showForm, setShowForm] = useState(false);

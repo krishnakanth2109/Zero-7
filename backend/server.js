@@ -1,3 +1,4 @@
+// server.js
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -8,7 +9,7 @@ import { Server } from "socket.io";
 // Routes
 import itProgramsRoutes from "./routes/itPrograms.js";
 import nonItProgramsRoutes from "./routes/nonItPrograms.js";
-import formRoutes from "./routes/formRoutes.js"; // ✅ new
+import formRoutes from "./routes/formRoutes.js";
 
 dotenv.config();
 
@@ -19,8 +20,8 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
-      "https://zero7-lw66.onrender.com", // backend
-      "https://zero7tech.netlify.app",   // frontend
+      "https://zero7-lw66.onrender.com", // backend host
+      "https://zero7tech.netlify.app",   // frontend host
       "http://localhost:3000",           // local dev
     ],
     methods: ["GET", "POST"],
@@ -28,7 +29,7 @@ const io = new Server(server, {
   },
 });
 
-// ✅ Make io accessible inside routes
+// ✅ Make io accessible in routes
 app.set("io", io);
 
 // ✅ Middleware
@@ -43,26 +44,25 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json()); // <-- important for req.body
 
 // ✅ Root route
 app.get("/", (req, res) => {
-  res.send("🚀 Zero7 API is running! Try /api/it-programs, /api/non-it-programs, or /api/forms");
+  res.send(
+    "🚀 Zero7 API is running!"
+  );
 });
 
 // ✅ Routes
 app.use("/api/it-programs", itProgramsRoutes);
 app.use("/api/non-it-programs", nonItProgramsRoutes);
-app.use("/api/forms", formRoutes); // ✅ new
+app.use("/api/forms", formRoutes);
 
 // ✅ MongoDB connection
 const PORT = process.env.PORT || 5000;
 
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB Connected");
 
@@ -72,11 +72,11 @@ mongoose
   })
   .catch((err) => console.error("❌ MongoDB error:", err));
 
-// ✅ Socket.io connection log
+// ✅ Socket.io connection logs
 io.on("connection", (socket) => {
-  console.log("⚡ Client connected");
+  console.log("⚡ Client connected:", socket.id);
 
   socket.on("disconnect", () => {
-    console.log("❌ Client disconnected");
+    console.log("❌ Client disconnected:", socket.id);
   });
 });

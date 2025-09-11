@@ -60,6 +60,17 @@
   flex-shrink: 0; /* keep arrow from shrinking */
 }
 
+.notification-badge {
+  background-color: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 50%;
+  margin-left: 8px;
+}
+
+
 /* Dropdown submenu */
 .submenu {
   display: flex;

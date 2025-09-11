@@ -1,82 +1,132 @@
-/* ✅ Container */
+/* Container */
 .login-container {
+  display: flex;
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #ffffff;
+  transition: background 0.3s ease;
+}
+
+/* Left side - image */
+.login-left {
+  flex: 1;
+  background: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: #f4f6f8;
-  font-family: "Segoe UI", Tahoma, sans-serif;
+  overflow: hidden;
+  transition: transform 0.3s ease;
 }
 
-/* ✅ Login Box */
-.login-box {
-  background: #fff;
-  padding: 40px 30px;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+.login-left img {
   width: 100%;
-  max-width: 400px;
+  height: 80%;
+  padding-left: 40px;
+  object-fit: cover;
+  filter: brightness(0.85);
+  transition: transform 0.3s ease;
 }
 
-/* ✅ Title */
+/* Right side - login form container */
+.login-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: #ffffff; /* subtle contrast with left side */
+  transition: background 0.3s ease;
+}
+
+/* Form styling with card shadow and hover effect */
+.login-form {
+  width: 100%;
+  height: 80%;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 
+              0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: left;
+}
+
+.login-form:hover {
+  transform: translateY(-8px); /* lifts slightly */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 
+              0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Form Title */
 .login-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
+  font-size: 26px;
+  color: black;
+  font-weight: 600;
+  transition: color 0.3s ease;
 }
 
-/* ✅ Input Fields */
+/* Input fields */
 .input-group {
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  text-align: left; 
 }
 
 .input-group label {
-  display: block;
+  margin-bottom: 6px;
+  margin-right: 480px;
   font-size: 14px;
-  color: #555;
-  margin-bottom: 8px;
+  color: black;
+  transition: color 0.3s ease;
+  text-align: left;
 }
 
+/* Premium card-like input */
 .input-group input {
-  width: 100%;
-  padding: 12px 14px;
+  padding: 12px;
+  border: 2px solid #fff; /* thicker border */
+  border-radius: 10px;
+  outline: none;
   font-size: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  transition: border-color 0.3s ease;
+  transition: 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.10); /* subtle inner shadow */
+  background: #fff;
 }
 
 .input-group input:focus {
   border-color: #007bff;
-  outline: none;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.2), inset 0 2px 4px rgba(0,0,0,0.05);
+  transform: scale(1.02);
 }
 
-/* ✅ Buttons */
+/* Button with hover animation */
 .login-btn {
   width: 100%;
-  background: #007bff;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 500;
   padding: 12px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: #fff;
   border: none;
-  border-radius: 8px;
+  font-size: 16px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .login-btn:hover {
-  background: #0056b3;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+  background: linear-gradient(135deg, #0056b3, #007bff);
 }
 
-/* ✅ Links */
+/* Links */
 .forgot-link,
 .back-to-login {
-  text-align: center;
-  display: block;
   margin-top: 15px;
+  text-align: center;
   font-size: 14px;
   color: #007bff;
   cursor: pointer;
@@ -86,20 +136,35 @@
 .forgot-link:hover,
 .back-to-login:hover {
   color: #0056b3;
+  text-decoration: underline;
 }
 
-/* ✅ Responsive */
-@media (max-width: 480px) {
-  .login-box {
-    padding: 30px 20px;
+/* Error */
+.error-text {
+  color: red;
+  font-size: 13px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .login-container {
+    flex-direction: column;
   }
 
-  .login-title {
-    font-size: 20px;
+  .login-left,
+  .login-right {
+    flex: none;
+    width: 100%;
+    min-height: 250px;
   }
 
-  .login-btn {
-    font-size: 14px;
-    padding: 10px;
+  .login-left img {
+    height: 250px;
+  }
+
+  .login-right {
+    padding: 20px;
   }
 }

@@ -1,37 +1,43 @@
-import React from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
-import Navbar from './Components/Navbar';
-import Home from './Pages/Home';
-import About from './Pages/About';
-import Services from './Pages/Services';
-import Testimonials from './Pages/Testimonials';
-import Blog from './Pages/Blog';
-import FAQs from './Pages/FAQs';
-import Contact from './Pages/Contact';
+import React from "react";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import Navbar from "./Components/Navbar";
+import Home from "./Pages/Home";
+import About from "./Pages/About";
+import Services from "./Pages/Services";
+import Testimonials from "./Pages/Testimonials";
+import Blog from "./Pages/Blog";
+import FAQs from "./Pages/FAQs";
+import Contact from "./Pages/Contact";
 import CollegeConnect from "./Pages/CollegeConnect";
-import PayrollServices from './Pages/PayrollServices';
-import Resumemarketing from './Pages/Resumemarketing';
-import DigitalCourses from './Pages/DigitalCourses';
-import Ittraining from './Pages/Ittraining';  
-import NonIttraining from './Pages/Nonittraining';
-import NewBatches from './Pages/NewBatches';
-import Login from './Pages/admin/Login';
-import BenchList from './Pages/BenchList';
-import FloatingWhatsApp from "./Components/FloatingWhatsApp"; 
-import Footer from './Components/Footer';
+import PayrollServices from "./Pages/PayrollServices";
+import Resumemarketing from "./Pages/Resumemarketing";
+import DigitalCourses from "./Pages/DigitalCourses";
+import Ittraining from "./Pages/Ittraining";
+import NonIttraining from "./Pages/Nonittraining";
+import NewBatches from "./Pages/NewBatches";
+import Login from "./Pages/admin/Login";
+import BenchList from "./Pages/BenchList";
+import FloatingWhatsApp from "./Components/FloatingWhatsApp";
+import Footer from "./Components/Footer";
 
 // ✅ Admin Layout & Pages
 import AdminLayout from "./Pages/AdminLayout";
-import AdminItPrograms from './Pages/AdminItPrograms';
-import AdminDashboard from './Pages/AdminDashboard';
-import AdminNonItPrograms from './Pages/AdminNonItPrograms';
-import AdminForms from "./Components/AdminHomeForm"; 
+import AdminItPrograms from "./Pages/AdminItPrograms";
+import AdminDashboard from "./Pages/AdminDashboard";
+import AdminNonItPrograms from "./Pages/AdminNonItPrograms";
+import AdminForms from "./Components/AdminHomeForm";
 
 // ✅ Other Pages
 import CurrentHirings from "./Pages/CurrentHirings";
-import CampusHiring from "./Pages/CampusHiring"; 
+import CampusHiring from "./Pages/CampusHiring";
 
-import './App.css';
+import "./App.css";
+
+// 🔒 PrivateRoute wrapper
+const PrivateRoute = ({ children }) => {
+  const isAdmin = localStorage.getItem("isAdmin");
+  return isAdmin ? children : <Navigate to="/admin" />;
+};
 
 function App() {
   const location = useLocation();
@@ -62,12 +68,23 @@ function App() {
           <Route path="/college-connect" element={<CollegeConnect />} />
           <Route path="/current-hirings" element={<CurrentHirings />} />
 
-          {/* Admin Pages - use AdminLayout */}
+          {/* Admin Login Page (Public) */}
           <Route path="/admin" element={<Login />} />
-          <Route element={<AdminLayout />}>
+
+          {/* Admin Protected Pages */}
+          <Route
+            element={
+              <PrivateRoute>
+                <AdminLayout />
+              </PrivateRoute>
+            }
+          >
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/it-programs" element={<AdminItPrograms />} />
-            <Route path="/admin/non-it-programs" element={<AdminNonItPrograms />} />
+            <Route
+              path="/admin/non-it-programs"
+              element={<AdminNonItPrograms />}
+            />
             <Route path="/admin/forms" element={<AdminForms />} />
           </Route>
         </Routes>

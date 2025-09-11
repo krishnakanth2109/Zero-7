@@ -1,17 +1,23 @@
 import React, { useState } from "react";
 import "./css/Login.css";
 
-
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [error, setError] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
-    alert(`Logging in with Email: ${email}`);
-    // Add your API login call here
+    setError("");
+
+    if (email === "admin@gmail.com" && password === "admin123") {
+      localStorage.setItem("isAdmin", "true");
+      window.location.href = "/admin/dashboard";
+    } else {
+      setError("Invalid email or password");
+    }
   };
 
   const handleForgotPassword = (e) => {
@@ -23,12 +29,18 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <div className="login-box">
-        
-        <h2 className="login-title">Admin Login</h2>
-        
+      <div className="login-left">
+        <img
+          src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80"
+          alt="Login Illustration"
+        />
+      </div>
+
+      <div className="login-right">
         {!showForgotPassword ? (
-          <form onSubmit={handleLogin}>
+          <form className="login-form" onSubmit={handleLogin}>
+            <h2 className="login-title">Zero 7 Technologies <br/>Admin Login</h2>
+
             <div className="input-group">
               <label>Email Address</label>
               <input
@@ -51,16 +63,25 @@ const Login = () => {
               />
             </div>
 
-            <button type="submit" className="login-btn">Login</button>
+            {error && <p className="error-text">{error}</p>}
 
-            <p className="forgot-link" onClick={() => setShowForgotPassword(true)}>
+            <button type="submit" className="login-btn">
+              Login
+            </button>
+
+            <p
+              className="forgot-link"
+              onClick={() => setShowForgotPassword(true)}
+            >
               Forgot Password?
             </p>
           </form>
         ) : (
-          <form onSubmit={handleForgotPassword}>
+          <form className="login-form" onSubmit={handleForgotPassword}>
+            <h2 className="login-title">Reset Password</h2>
+
             <div className="input-group">
-              <label>Enter your email to reset password</label>
+              <label>Enter your email</label>
               <input
                 type="email"
                 placeholder="Enter your email"
@@ -70,8 +91,14 @@ const Login = () => {
               />
             </div>
 
-            <button type="submit" className="login-btn">Send Reset Link</button>
-            <p className="back-to-login" onClick={() => setShowForgotPassword(false)}>
+            <button type="submit" className="login-btn">
+              Send Reset Link
+            </button>
+
+            <p
+              className="back-to-login"
+              onClick={() => setShowForgotPassword(false)}
+            >
               Back to Login
             </p>
           </form>

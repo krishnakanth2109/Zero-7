@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
-  origin: ["https://zero7-lw66.onrender.com", "https://zero7.netlify.app", "http://localhost:3000"],
+  origin: ["https://zero7-lw66.onrender.com", "https://zero7tech.netlify.app", "http://localhost:3000"],
   credentials: true
 }));
 

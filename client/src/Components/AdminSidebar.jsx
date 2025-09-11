@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
-import "./AdminSidebar.css";
 import axios from "axios";
 import { io } from "socket.io-client";
+import "./AdminSidebar.css";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
@@ -32,7 +32,7 @@ export default function AdminSidebar() {
     const fetchNewForms = async () => {
       try {
         const res = await axios.get(`${API_URL}/forms/count-new`);
-        setNewCount(res.data.count || 0);
+        setNewCount(res.data.count ?? 0);
       } catch (err) {
         console.error("Failed to fetch form count:", err);
       }
@@ -45,7 +45,7 @@ export default function AdminSidebar() {
     if (location.pathname === "/admin/forms") {
       setNewCount(0);
     }
-  }, [location.pathname]); // ✅ fixed ESLint warning
+  }, [location.pathname]);
 
   // Setup socket for live updates
   useEffect(() => {
@@ -53,7 +53,6 @@ export default function AdminSidebar() {
     socket.on("newFormSubmission", () => {
       setNewCount((prev) => prev + 1);
     });
-
     return () => socket.disconnect();
   }, []);
 
@@ -109,9 +108,9 @@ export default function AdminSidebar() {
           className={`sidebar-link ${isActive("/admin/forms") ? "active" : ""}`}
         >
           Form Submissions
-          {newCount > 0 && (
-            <span className="notification-badge">{newCount}</span>
-          )}
+          <span className={`notification-badge ${newCount === 0 ? "zero" : ""}`}>
+            {newCount}
+          </span>
         </Link>
       </nav>
     </aside>

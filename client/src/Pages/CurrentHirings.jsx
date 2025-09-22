@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Briefcase, User, Phone, Mail, MapPin, FileText, DollarSign, Clock } from "lucide-react";
 import "./CurrentHirings.css";
 
+const API_URL = "http://localhost:5000"; // Your backend server URL
+
 const CurrentHirings = () => {
+  const [jobPositions, setJobPositions] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     contact: "",
@@ -24,6 +28,20 @@ const CurrentHirings = () => {
 
   const [selectedJobIndex, setSelectedJobIndex] = useState(null);
 
+  // Fetch job positions from the backend when the component mounts
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/jobs`);
+        setJobPositions(response.data);
+      } catch (error) {
+        console.error("Error fetching job positions:", error);
+        alert("Could not fetch job listings. Please try again later.");
+      }
+    };
+    fetchJobs();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "resume") {
@@ -33,17 +51,36 @@ const CurrentHirings = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Form submitted successfully! ✅");
-    console.log("Form Data:", formData);
-    setFormData({
-      name: "",
-      contact: "",
-      email: "",
-      location: "",
-      resume: null,
-    });
+    const enrollmentData = new FormData();
+    enrollmentData.append("name", formData.name);
+    enrollmentData.append("contact", formData.contact);
+    enrollmentData.append("email", formData.email);
+    enrollmentData.append("location", formData.location);
+    enrollmentData.append("resume", formData.resume);
+
+    try {
+      await axios.post(`${API_URL}/api/enrollments`, enrollmentData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      alert("Enrollment form submitted successfully! ✅");
+      console.log("Enrollment Data:", formData);
+      setFormData({
+        name: "",
+        contact: "",
+        email: "",
+        location: "",
+        resume: null,
+      });
+      // Clear the file input manually
+      e.target.reset();
+    } catch (error) {
+      console.error("Error submitting enrollment form:", error);
+      alert("Failed to submit enrollment form. Please check the console for details.");
+    }
   };
 
   const handleApplyChange = (e) => {
@@ -55,42 +92,51 @@ const CurrentHirings = () => {
     }
   };
 
-  const handleApplySubmit = (e) => {
+  const handleApplySubmit = async (e) => {
     e.preventDefault();
-    const job = jobPositions[selectedJobIndex];
-    alert(`Application submitted for ${job.role} ✅`);
-    console.log("Application Data:", applyData);
-    setApplyData({
-      name: "",
-      contact: "",
-      email: "",
-      experience: "",
-      currentSalary: "",
-      expectedSalary: "",
-      location: "",
-      resume: null,
-    });
-    setSelectedJobIndex(null);
-  };
+    if (selectedJobIndex === null) return;
 
-  const jobPositions = [
-    { role: "Frontend Developer", exp: "0-2 yrs", skills: "React, JS, HTML, CSS", salary: "3-4 LPA", location: "Hyderabad" },
-    { role: "Backend Developer", exp: "1-3 yrs", skills: "Node.js, Express, MongoDB", salary: "4-6 LPA", location: "Hyderabad" },
-    { role: "Full Stack Developer", exp: "0-2 yrs", skills: "MERN Stack", salary: "3.5-5 LPA", location: "Bangalore" },
-    { role: "Java Developer", exp: "1-2 yrs", skills: "Core Java, Spring Boot", salary: "4-6 LPA", location: "Pune" },
-    { role: "Python Developer", exp: "0-2 yrs", skills: "Django, Flask, APIs", salary: "3-5 LPA", location: "Chennai" },
-    { role: "Mobile App Developer", exp: "0-2 yrs", skills: "React Native, Flutter", salary: "3-4.5 LPA", location: "Remote" },
-    { role: "UI/UX Designer", exp: "0-2 yrs", skills: "Figma, Adobe XD", salary: "3-4 LPA", location: "Hyderabad" },
-    { role: "Cloud Engineer", exp: "1-2 yrs", skills: "AWS, Azure", salary: "5-7 LPA", location: "Bangalore" },
-    { role: "Data Analyst", exp: "0-2 yrs", skills: "SQL, Excel, Power BI", salary: "3-4.5 LPA", location: "Hyderabad" },
-    { role: "QA Tester", exp: "0-2 yrs", skills: "Manual, Automation", salary: "3-4 LPA", location: "Pune" },
-  ];
+    const job = jobPositions[selectedJobIndex];
+    const applicationData = new FormData();
+    applicationData.append("jobId", job._id);
+    applicationData.append("name", applyData.name);
+    applicationData.append("contact", applyData.contact);
+    applicationData.append("email", applyData.email);
+    applicationData.append("experience", applyData.experience);
+    applicationData.append("currentSalary", applyData.currentSalary);
+    applicationData.append("expectedSalary", applyData.expectedSalary);
+    applicationData.append("location", applyData.location);
+    applicationData.append("resume", applyData.resume);
+
+    try {
+      await axios.post(`${API_URL}/api/applications`, applicationData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      alert(`Application submitted for ${job.role} ✅`);
+      console.log("Application Data:", applyData);
+      setApplyData({
+        name: "",
+        contact: "",
+        email: "",
+        experience: "",
+        currentSalary: "",
+        expectedSalary: "",
+        location: "",
+        resume: null,
+      });
+      setSelectedJobIndex(null);
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      alert("Failed to submit application. Please check the console for details.");
+    }
+  };
 
   return (
     <div className="current-hirings-page">
       {/* Hero Section */}
       <section className="hero-section">
-        {/* <img src="/hero-hiring.jpg" alt="Hiring Banner" className="hero-image" /> */}
         <div className="hero-overlay">
           <h1>Current Hirings</h1>
           <p>Join the best companies through Zero7 Technologies</p>
@@ -135,7 +181,7 @@ const CurrentHirings = () => {
           </thead>
           <tbody>
             {jobPositions.map((job, index) => (
-              <React.Fragment key={index}>
+              <React.Fragment key={job._id || index}>
                 <tr>
                   <td>{job.role}</td>
                   <td>{job.exp}</td>

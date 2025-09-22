@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./pages/AdminLogin.css";
 
 
 const AdminLogin = ({ onLogin }) => {

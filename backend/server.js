@@ -5,16 +5,25 @@ import cors from "cors";
 import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Routes
+// Routes - Now using import
 import itProgramsRoutes from "./routes/itPrograms.js";
 import nonItProgramsRoutes from "./routes/nonItPrograms.js";
 import formRoutes from "./routes/formRoutes.js";
-
+import jobsRoutes from './routes/jobs.js'; // <-- Changed
+import enrollmentsRoutes from './routes/enrollments.js'; // <-- Changed
+import applicationsRoutes from './routes/applications.js'; // <-- Changed
+import batchRoutes from './routes/batches.js';
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+// Helper for __dirname in ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ✅ Socket.io setup
 const io = new Server(server, {
@@ -43,7 +52,8 @@ app.use(
     credentials: true,
   })
 );
-
+// Use path.join to create an absolute path for serving static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json()); // <-- important for req.body
 
 // ✅ Root route
@@ -57,7 +67,10 @@ app.get("/", (req, res) => {
 app.use("/api/it-programs", itProgramsRoutes);
 app.use("/api/non-it-programs", nonItProgramsRoutes);
 app.use("/api/forms", formRoutes);
-
+app.use('/api/jobs', jobsRoutes); // <-- Changed
+app.use('/api/enrollments', enrollmentsRoutes); // <-- Changed
+app.use('/api/applications', applicationsRoutes); // <-- Changed
+app.use('/api/batches', batchRoutes);
 // ✅ MongoDB connection
 const PORT = process.env.PORT || 5000;
 

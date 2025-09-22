@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, LogOut } from "lucide-react"; // ⬅️ added LogOut
+import { ChevronDown, LogOut } from "lucide-react";
 import axios from "axios";
 import { io } from "socket.io-client";
 import "./AdminSidebar.css";
@@ -59,7 +59,8 @@ export default function AdminSidebar() {
 
   // Logout handler
   const handleLogout = () => {
-    localStorage.removeItem("adminLoggedIn");
+    // Corrected the key to match your PrivateRoute component if it uses 'isAdmin'
+    localStorage.removeItem("isAdmin"); 
     navigate("/admin");
   };
 
@@ -130,6 +131,34 @@ export default function AdminSidebar() {
               {newCount}
             </span>
           </Link>
+          
+          {/* ----- LINKS ADDED HERE ----- */}
+          <Link
+            to="/admin/manage-jobs"
+            className={`sidebar-link ${
+              isActive("/admin/manage-jobs") ? "active" : ""
+            }`}
+          >
+            Manage Jobs
+          </Link>
+          <Link
+            to="/admin/applications"
+            className={`sidebar-link ${
+              isActive("/admin/applications") ? "active" : ""
+            }`}
+          >
+            View Applications
+          </Link>
+         <Link
+  to="/admin/new-batch-dashboard"
+  className={`sidebar-link ${
+    isActive("/admin/new-batch-dashboard") ? "active" : ""
+  }`}
+>
+  New Batches
+</Link>
+          {/* ----------------------------- */}
+
         </nav>
       </div>
 

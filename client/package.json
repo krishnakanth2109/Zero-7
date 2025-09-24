@@ -18,6 +18,7 @@
     "axios": "^1.12.2",
     "emailjs-com": "^3.2.0",
     "framer-motion": "^12.23.12",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.539.0",
     "mammoth": "^1.10.0",
     "material-react-table": "^3.2.1",
@@ -60,8 +61,6 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
-    "html-webpack-plugin": "^5.6.4",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.12"
+    "html-webpack-plugin": "^5.6.4"
   }
 }

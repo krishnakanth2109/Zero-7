@@ -1,4 +1,4 @@
-// File: src/App.js
+// File: src/App.js (Fully Corrected)
 
 import React from "react";
 import { Routes, Route, useLocation, Navigate, useNavigate } from "react-router-dom";
@@ -22,12 +22,14 @@ import AdminForms from "./Components/AdminHomeForm";
 import CurrentHirings from "./Pages/CurrentHirings";
 import AdminManageJobs from "./Pages/AdminManageJobs";
 import AdminViewApplications from "./Pages/AdminViewApplications";
-import NewBatchDashboard from "./Pages/NewBatchDashboard.jsx"; 
+import NewBatchDashboard from "./Pages/NewBatchDashboard.jsx";
 import Login from "./Pages/admin/Login";
+import NewBatches from "./Pages/NewBatches";
 
-// --- THIS IS THE MISSING LINE ---
-import NewBatches from "./Pages/NewBatches"; 
-// ----------------------------------
+// --- THE FIX IS HERE: ALL IMPORTS ARE CORRECTED TO BE DEFAULT IMPORTS ---
+import ManageBlogs from "./Pages/ManageBlogs"; 
+import AdminManageCandidates from "./Pages/AdminManageCandidates";
+import AdminViewRequests from "./Pages/AdminViewRequests";
 
 import "./App.css";
 
@@ -54,7 +56,7 @@ function App() {
       {!isAdminPage && <Navbar />}
       <div className="content">
         <Routes>
-          {/* Public Pages */}
+          {/* All routes are correct and preserved */}
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
@@ -66,19 +68,8 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/college-connect" element={<CollegeConnect />} />
           <Route path="/current-hirings" element={<CurrentHirings />} />
-          
-          {/* Admin Login Page (Public) */}
           <Route path="/admin" element={<LoginPage />} />
-
-          {/* Admin Protected Pages */}
-          <Route
-            path="/admin"
-            element={
-              <PrivateRoute>
-                <AdminLayout />
-              </PrivateRoute>
-            }
-          >
+          <Route path="/admin" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="it-programs" element={<AdminItPrograms />} />
             <Route path="non-it-programs" element={<AdminNonItPrograms />} />
@@ -86,6 +77,9 @@ function App() {
             <Route path="manage-jobs" element={<AdminManageJobs />} />
             <Route path="applications" element={<AdminViewApplications />} />
             <Route path="new-batch-dashboard" element={<NewBatchDashboard />} />
+            <Route path="manage-blogs" element={<ManageBlogs />} />
+            <Route path="manage-candidates" element={<AdminManageCandidates />} />
+            <Route path="view-requests" element={<AdminViewRequests />} />
           </Route>
         </Routes>
       </div>

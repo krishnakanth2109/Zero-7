@@ -1,26 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-// import './AdminManageJobs.css'; // We will create this for styling
+// File: src/Pages/AdminManageJobs.jsx (Fully Corrected)
 
-const API_URL = "http://localhost:5000"; // Your backend server URL
+import React, { useState, useEffect } from 'react';
+import api from '../api/axios'; // <-- CORRECT: Imports the central API connection
 
 const AdminManageJobs = () => {
     const [jobs, setJobs] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [formState, setFormState] = useState({
-        role: '',
-        exp: '',
-        skills: '',
-        salary: '',
-        location: ''
-    });
+    const [formState, setFormState] = useState({ role: '', exp: '', skills: '', salary: '', location: '' });
 
-    // Fetch all jobs from the backend when the component loads
     const fetchJobs = async () => {
         try {
             setIsLoading(true);
-            const response = await axios.get(`${API_URL}/api/jobs`);
+            // CORRECT: Uses the central 'api' object
+            const response = await api.get('/jobs');
             setJobs(response.data);
         } catch (err) {
             setError('Could not fetch jobs. Please try again later.');
@@ -34,23 +27,17 @@ const AdminManageJobs = () => {
         fetchJobs();
     }, []);
 
-    // Handle changes in the form inputs
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormState(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        setFormState(prevState => ({ ...prevState, [name]: value }));
     };
 
-    // Handle the form submission to add a new job
     const handleAddJob = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${API_URL}/api/jobs`, formState);
-            // Add the new job to the top of the list for immediate UI update
+            // CORRECT: Uses the central 'api' object
+            const response = await api.post('/jobs', formState);
             setJobs([response.data, ...jobs]);
-            // Reset the form
             setFormState({ role: '', exp: '', skills: '', salary: '', location: '' });
             alert('Job added successfully!');
         } catch (err) {
@@ -59,12 +46,11 @@ const AdminManageJobs = () => {
         }
     };
 
-    // Handle the deletion of a job
     const handleDeleteJob = async (jobId) => {
         if (window.confirm('Are you sure you want to delete this job posting?')) {
             try {
-                await axios.delete(`${API_URL}/api/jobs/${jobId}`);
-                // Filter out the deleted job for immediate UI update
+                // CORRECT: Uses the central 'api' object
+                await api.delete(`/jobs/${jobId}`);
                 setJobs(jobs.filter(job => job._id !== jobId));
                 alert('Job deleted successfully!');
             } catch (err) {
@@ -74,9 +60,9 @@ const AdminManageJobs = () => {
         }
     };
 
+    // Your JSX is preserved
     return (
         <div className="admin-manage-jobs">
-            {/* Form to Add a New Job */}
             <div className="form-container card">
                 <h2>Add New Job Posting</h2>
                 <form onSubmit={handleAddJob} className="add-job-form">
@@ -88,8 +74,6 @@ const AdminManageJobs = () => {
                     <button type="submit">Add Job</button>
                 </form>
             </div>
-
-            {/* Table of Existing Jobs */}
             <div className="listings-container card">
                 <h2>Current Job Listings</h2>
                 {isLoading && <p>Loading jobs...</p>}

@@ -11,8 +11,6 @@ const itCourses = [
   { 
     title: "Full Stack Development", 
     desc: "Master front-end and back-end technologies", 
-    price: "₹15,000", 
-    originalPrice: "₹25,000",
     icon: <FaLaptopCode />, 
     category: "IT",
     rating: 4.7,
@@ -32,8 +30,6 @@ const itCourses = [
   { 
     title: "Cloud & DevOps", 
     desc: "Learn cloud infrastructure and CI/CD pipelines", 
-    price: "₹40,000", 
-    originalPrice: "₹55,000",
     icon: <FaCloud />, 
     category: "IT",
     rating: 4.6,
@@ -53,8 +49,6 @@ const itCourses = [
   { 
     title: "Data Science & AI", 
     desc: "Explore machine learning and data analysis", 
-    price: "₹45,000", 
-    originalPrice: "₹70,000",
     icon: <FaChartLine />, 
     category: "IT",
     rating: 4.9,
@@ -74,8 +68,6 @@ const itCourses = [
   { 
     title: "Software Testing", 
     desc: "Become an expert in QA and automation", 
-    price: "₹30,000", 
-    originalPrice: "₹40,000",
     icon: <FaBug />, 
     category: "IT",
     rating: 4.5,
@@ -91,6 +83,44 @@ const itCourses = [
       "Industry-level project training",
       "Automation best practices"
     ]
+  },
+  { 
+    title: "Cybersecurity", 
+    desc: "Defend against modern cyber threats", 
+    icon: <FaBug />, 
+    category: "IT",
+    rating: 4.8,
+    reviews: 890,
+    duration: "5 months",
+    level: "Intermediate",
+    subtitles: true,
+    bestseller: true,
+    updated: "Updated Sep 2025",
+    moreInfo: [
+      "Network Security & Firewalls",
+      "Ethical Hacking & Pen Testing",
+      "Incident Response & Risk Management",
+      "Security Certifications Prep"
+    ]
+  },
+  { 
+    title: "Mobile App Development", 
+    desc: "Build modern apps for Android & iOS", 
+    icon: <FaLaptopCode />, 
+    category: "IT",
+    rating: 4.6,
+    reviews: 780,
+    duration: "6 months",
+    level: "Intermediate",
+    subtitles: true,
+    bestseller: false,
+    updated: "Updated Sep 2025",
+    moreInfo: [
+      "React Native, Flutter",
+      "App Deployment on Play Store & App Store",
+      "API Integration & Push Notifications",
+      "Performance Optimization"
+    ]
   }
 ];
 
@@ -99,8 +129,6 @@ const nonItCourses = [
   { 
     title: "HR Management", 
     desc: "Modern HR practices and talent management", 
-    price: "₹25,000", 
-    originalPrice: "₹35,000",
     icon: <FaUsers />, 
     category: "Non-IT",
     rating: 4.6,
@@ -120,8 +148,6 @@ const nonItCourses = [
   { 
     title: "Digital Marketing", 
     desc: "Master SEO, social media, and online campaigns", 
-    price: "₹28,000", 
-    originalPrice: "₹40,000",
     icon: <FaMobileAlt />, 
     category: "Non-IT",
     rating: 4.7,
@@ -141,8 +167,6 @@ const nonItCourses = [
   { 
     title: "Business Analysis", 
     desc: "Develop strategic business insights", 
-    price: "₹32,000", 
-    originalPrice: "₹45,000",
     icon: <FaBriefcase />, 
     category: "Non-IT",
     rating: 4.4,
@@ -162,8 +186,6 @@ const nonItCourses = [
   { 
     title: "Finance & Payroll", 
     desc: "Financial management and payroll systems", 
-    price: "₹27,000", 
-    originalPrice: "₹38,000",
     icon: <FaMoneyBill />, 
     category: "Non-IT",
     rating: 4.3,
@@ -178,6 +200,44 @@ const nonItCourses = [
       "Payroll Processing",
       "Financial compliance & reporting",
       "Placement Assistance"
+    ]
+  },
+  { 
+    title: "Entrepreneurship", 
+    desc: "Learn how to start and scale businesses", 
+    icon: <FaBriefcase />, 
+    category: "Non-IT",
+    rating: 4.5,
+    reviews: 390,
+    duration: "5 months",
+    level: "Intermediate",
+    subtitles: true,
+    bestseller: true,
+    updated: "Updated Sep 2025",
+    moreInfo: [
+      "Business Models & Strategies",
+      "Fundraising & Investor Pitching",
+      "Marketing for Startups",
+      "Scaling Operations"
+    ]
+  },
+  { 
+    title: "Graphic Design", 
+    desc: "Master modern design tools & branding", 
+    icon: <FaMobileAlt />, 
+    category: "Non-IT",
+    rating: 4.7,
+    reviews: 640,
+    duration: "4 months",
+    level: "Beginner",
+    subtitles: true,
+    bestseller: false,
+    updated: "Updated Sep 2025",
+    moreInfo: [
+      "Photoshop, Illustrator, Figma",
+      "Logo & Branding Projects",
+      "UI/UX Design Basics",
+      "Portfolio Development"
     ]
   }
 ];
@@ -207,21 +267,40 @@ const StarRating = ({ rating }) => {
 // ================= DigitalCourses Main Component =================
 const DigitalCourses = () => {
   const [filter, setFilter] = useState("All");
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    contact: "",
+    message: ""
+  });
 
   const filteredCourses =
     filter === "All" ? allCourses : allCourses.filter(c => c.category === filter);
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    alert(`Request submitted for ${selectedCourse?.title}`);
+    setSelectedCourse(null);
+    setFormData({ name: "", email: "", contact: "", message: "" });
+  };
+
   return (
-    <div className="digital-courses-container">
+    <div className="digital-courses-container compact">
       {/* Header */}
-      <section className="course-section">
+      <section className="course-section compact">
         <h2>Our Training Programs</h2>
         <p className="subtitle">
           Choose from IT and Non-IT programs designed to upgrade your skills
         </p>
 
         {/* Filter Buttons */}
-        <div className="filter-buttons">
+        <div className="filter-buttons compact">
           {["All", "IT", "Non-IT"].map((cat, idx) => (
             <button
               key={idx}
@@ -235,7 +314,7 @@ const DigitalCourses = () => {
       </section>
 
       {/* Course Grid */}
-      <section className="course-section">
+      <section className="course-section compact">
         <div className="course-grid">
           {filteredCourses.map((course, idx) => (
             <div key={idx} className={`course-card ${course.category}`}>
@@ -247,13 +326,6 @@ const DigitalCourses = () => {
                 <div className="rating-container">
                   <StarRating rating={course.rating} />
                   <span className="reviews">({course.reviews.toLocaleString()})</span>
-                </div>
-                
-                <div className="course-footer">
-                  <div className="price-container">
-                    <span className="current-price">{course.price}</span>
-                    <span className="original-price">{course.originalPrice}</span>
-                  </div>
                 </div>
                 
                 {course.bestseller && (
@@ -287,7 +359,49 @@ const DigitalCourses = () => {
                 </div>
                 
                 <div className="hover-footer">
-                  <button className="add-to-cart-btn">Buy Course</button>
+                  {selectedCourse?.title === course.title ? (
+                    <form className="buy-form active" onSubmit={handleFormSubmit}>
+                      <label>Your Name</label>
+                      <input 
+                        type="text" 
+                        name="name" 
+                        placeholder="Enter your name" 
+                        value={formData.name} 
+                        onChange={handleInputChange}
+                        required
+                      />
+                      <label>Email</label>
+                      <input 
+                        type="email" 
+                        name="email" 
+                        placeholder="Enter your email" 
+                        value={formData.email} 
+                        onChange={handleInputChange}
+                        required
+                      />
+                      <label>Contact</label>
+                      <input 
+                        type="text" 
+                        name="contact" 
+                        placeholder="Enter your contact" 
+                        value={formData.contact} 
+                        onChange={handleInputChange}
+                        required
+                      />
+                      <label>Message</label>
+                      <textarea 
+                        name="message" 
+                        placeholder="Your Message" 
+                        value={formData.message} 
+                        onChange={handleInputChange}
+                      ></textarea>
+                      <button type="submit" className="submit-btn">Submit</button>
+                    </form>
+                  ) : (
+                    <button className="add-to-cart-btn" onClick={() => setSelectedCourse(course)}>
+                      Buy Course
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

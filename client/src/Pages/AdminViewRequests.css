@@ -1,0 +1,759 @@
+/* File: src/Pages/AdminViewRequests.css */
+
+/* =========================================
+   Main Container and Header
+========================================= */
+.requests-container {
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9fafb; /* A light grey background */
+}
+
+.requests-container h2 {
+  font-size: 1.8rem;
+  color: #1f2937; /* Dark blue-grey text */
+  margin-bottom: 25px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 10px;
+}
+
+/* =========================================
+   Table Wrapper for Responsiveness
+========================================= */
+.requests-table-wrapper {
+  width: 100%;
+  overflow-x: auto; /* Crucial for making the table scroll on small screens */
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* =========================================
+   Table Styling
+========================================= */
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px; /* Ensures columns don't get too squished before scrolling */
+}
+
+.requests-table th,
+.requests-table td {
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb; /* Light grey border */
+}
+
+/* Table Header */
+.requests-table thead {
+  background-color: #f3f4f6; /* Very light grey for the header */
+}
+
+.requests-table th {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4b5563; /* Medium grey text */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Table Body */
+.requests-table tbody tr {
+  transition: background-color 0.2s ease-in-out;
+}
+
+.requests-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.requests-table td {
+  color: #374151; /* Darker grey for content */
+  font-size: 0.95rem;
+}
+
+/* Special styling for the long 'Requirement' column */
+.requirement-cell {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================================
+   Action Button in Table
+========================================= */
+.view-details-btn {
+  background-color: #3b82f6; /* A nice blue */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.view-details-btn:hover {
+  background-color: #2563eb; /* A darker blue on hover */
+}
+
+/* =========================================
+   Modal (Popup) for Details
+========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(17, 24, 39, 0.7); /* Dark semi-transparent background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  position: relative;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #9ca3af;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  color: #1f2937;
+}
+
+.modal-content h3 {
+  font-size: 1.5rem;
+  color: #111827;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.modal-content p {
+  margin: 10px 0;
+  color: #4b5563;
+  line-height: 1.7;
+}
+
+.modal-content p strong {
+  color: #1f2937;
+  margin-right: 8px;
+}
+
+.modal-content hr {
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  margin: 20px 0;
+}
+
+.modal-content a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+.modal-content a:hover {
+  text-decoration: underline;
+}
+
+.modal-content small {
+  display: block;
+  margin-top: 20px;
+  text-align: right;
+  color: #6b7280;
+}
+
+/* NEW: Status Badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.status-approved {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-rejected {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* NEW: Action Buttons Container */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 150px;
+}
+
+.approve-reject-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+/* NEW: Approve Button */
+.approve-btn {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+}
+
+.approve-btn:hover:not(:disabled) {
+    background-color: #059669;
+}
+
+.approve-btn:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* NEW: Reject Button */
+.reject-btn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+}
+
+.reject-btn:hover:not(:disabled) {
+    background-color: #dc2626;
+}
+
+.reject-btn:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* NEW: Action Completed Text */
+.action-completed {
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-style: italic;
+    text-align: center;
+    display: block;
+}
+
+/* NEW: Modal Actions */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.modal-actions .approve-btn,
+.modal-actions .reject-btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+/* Update table header for new column */
+.requests-table th:nth-child(2) {
+    width: 100px;
+}
+
+.requests-table td:nth-child(2) {
+    text-align: center;
+}
+
+/* Update action column width */
+.requests-table th:last-child,
+.requests-table td:last-child {
+    width: 200px;
+}
+/* NEW: Row highlighting */
+.row-approved {
+    background-color: #f0fdf4 !important;
+}
+
+.row-rejected {
+    background-color: #fef2f2 !important;
+}
+
+.requests-table tbody tr.row-approved:hover,
+.requests-table tbody tr.row-rejected:hover {
+    background-color: #ecfdf5 !important;
+}
+
+.requests-table tbody tr.row-rejected:hover {
+    background-color: #fef2f2 !important;
+}
+
+/* NEW: Status Badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.status-approved {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-rejected {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* NEW: View Details Button */
+.view-details-btn {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    justify-content: center;
+}
+
+.view-details-btn:hover {
+    background-color: #2563eb;
+}
+
+/* NEW: Approve/Reject Buttons Container */
+.approve-reject-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.action-completed-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+/* NEW: Approve Button */
+.approve-btn {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+}
+
+.approve-btn:hover:not(:disabled) {
+    background-color: #059669;
+    transform: translateY(-1px);
+}
+
+.approve-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.approve-btn.active {
+    background-color: #059669;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.approve-btn.disabled {
+    background-color: #9ca3af;
+}
+
+/* NEW: Reject Button */
+.reject-btn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+}
+
+.reject-btn:hover:not(:disabled) {
+    background-color: #dc2626;
+    transform: translateY(-1px);
+}
+
+.reject-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.reject-btn.active {
+    background-color: #dc2626;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.reject-btn.disabled {
+    background-color: #9ca3af;
+}
+
+/* NEW: Loading state */
+.approve-btn.loading,
+.reject-btn.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Update table column widths */
+.requests-table th:nth-child(1),
+.requests-table td:nth-child(1) {
+    width: 120px; /* Date */
+}
+
+.requests-table th:nth-child(2),
+.requests-table td:nth-child(2) {
+    width: 100px; /* Status */
+    text-align: center;
+}
+
+.requests-table th:nth-child(7),
+.requests-table td:nth-child(7) {
+    width: 120px; /* Details column */
+}
+
+.requests-table th:nth-child(8),
+.requests-table td:nth-child(8) {
+    width: 200px; /* Actions column */
+}
+
+/* Modal Actions */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.modal-actions .approve-btn,
+.modal-actions .reject-btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+
+/* NEW: Center alignment classes */
+.text-center {
+    text-align: center !important;
+}
+
+.requests-table th,
+.requests-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* NEW: Full width View Details button */
+.view-details-btn.full-width {
+    width: 100%;
+    min-width: 120px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    justify-content: center;
+}
+
+/* Row highlighting */
+.row-approved {
+    background-color: #f0fdf4 !important;
+}
+
+.row-rejected {
+    background-color: #fef2f2 !important;
+}
+
+.requests-table tbody tr.row-approved:hover,
+.requests-table tbody tr.row-rejected:hover {
+    background-color: #ecfdf5 !important;
+}
+
+.requests-table tbody tr.row-rejected:hover {
+    background-color: #fef2f2 !important;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-block;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.status-approved {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-rejected {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* View Details Button */
+.view-details-btn {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+}
+
+.view-details-btn:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+/* Approve/Reject Buttons Container */
+.approve-reject-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.action-completed-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* Approve Button */
+.approve-btn {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 80px;
+    justify-content: center;
+}
+
+.approve-btn:hover:not(:disabled) {
+    background-color: #059669;
+    transform: translateY(-1px);
+}
+
+.approve-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.approve-btn.active {
+    background-color: #059669;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.approve-btn.disabled {
+    background-color: #9ca3af;
+}
+
+/* Reject Button */
+.reject-btn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 80px;
+    justify-content: center;
+}
+
+.reject-btn:hover:not(:disabled) {
+    background-color: #dc2626;
+    transform: translateY(-1px);
+}
+
+.reject-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.reject-btn.active {
+    background-color: #dc2626;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.reject-btn.disabled {
+    background-color: #9ca3af;
+}
+
+/* Loading state */
+.approve-btn.loading,
+.reject-btn.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Update table column widths */
+.requests-table th:nth-child(1),
+.requests-table td:nth-child(1) {
+    width: 120px; /* Date */
+}
+
+.requests-table th:nth-child(2),
+.requests-table td:nth-child(2) {
+    width: 100px; /* Status */
+}
+
+.requests-table th:nth-child(7),
+.requests-table td:nth-child(7) {
+    width: 140px; /* Details column - Increased width */
+}
+
+.requests-table th:nth-child(8),
+.requests-table td:nth-child(8) {
+    width: 200px; /* Actions column */
+}
+
+/* Table header center alignment */
+.requests-table th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Table cell center alignment */
+.requests-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Requirement cell with centered text */
+.requirement-cell {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+/* Modal Actions */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.modal-actions .approve-btn,
+.modal-actions .reject-btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+/* Ensure all content in table cells is centered */
+.requests-table td > * {
+    margin: 0 auto;
+}

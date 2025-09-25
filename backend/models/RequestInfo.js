@@ -13,6 +13,14 @@ const RequestInfoSchema = new Schema({
     numberOfPositions: { type: Number, required: true },
     budget: { type: String },
     notes: { type: String },
+    // --- ADDED ---
+    // Add status field to store the request's state
+    status: {
+        type: String,
+        required: true,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending',
+    },
 }, { timestamps: true });
 
 export default mongoose.model('RequestInfo', RequestInfoSchema);

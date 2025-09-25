@@ -33,25 +33,34 @@ export default function Context() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      await axios.post(`${API_URL}/forms`, formData);
-      // Reset form
-      setFormData({ name: "", number: "", email: "", purpose: "" });
-      setShowForm(false);
+  try {
+    await fetch("https://script.google.com/macros/s/AKfycbyO6KKlPrbsPzuVcWENBa-krCLHO-TcvCQsUSGLtzWTh-1PZUCRUry5M5M6JmvirbGa-g/exec", {
+      method: "POST",
+      mode: "no-cors", // Required because GAS doesn’t return CORS headers
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
 
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 5000);
-    } catch (err) {
-      console.error("❌ Error submitting form:", err);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Reset form
+    setFormData({ name: "", number: "", email: "", purpose: "" });
+    setShowForm(false);
+
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 5000);
+  } catch (err) {
+    console.error("❌ Error submitting form:", err);
+    alert("Something went wrong. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <section className="context-wrapper">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import heroImage from "../assets/clg-cnt.jpg";
 import "./CollegeConnect.css";
@@ -8,6 +8,54 @@ const CollegeConnect = () => {
 
   const handleContactRedirect = () => {
     navigate("/contact");
+  };
+
+  // --- Form State ---
+  const [formData, setFormData] = useState({
+    collegeName: "",
+    contactPerson: "",
+    email: "",
+    phone: "",
+    proposalType: "",
+    message: "",
+  });
+
+  const [status, setStatus] = useState(""); // For success/failure message
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("Submitting...");
+
+    const url = "https://script.google.com/macros/s/AKfycbxWj5ICteqi9nWgKMhY4z7ztj81QU3CSRQk_IXLXtu86McNdMx41aQapkZX1r6dUoYt/exec"; // Replace with your Web App URL
+
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+
+      if (data.status === "success") {
+        setStatus("Proposal submitted successfully!");
+        setFormData({
+          collegeName: "",
+          contactPerson: "",
+          email: "",
+          phone: "",
+          proposalType: "",
+          message: "",
+        });
+      } else {
+        setStatus("Failed to submit proposal.");
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("Error submitting proposal.");
+    }
   };
 
   return (
@@ -72,30 +120,63 @@ const CollegeConnect = () => {
       {/* Proposal Form */}
       <section className="proposal-form">
         <h2>College to Company Proposal Form</h2>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>College Name</label>
-            <input type="text" placeholder="Enter your college name" required />
+            <input
+              type="text"
+              name="collegeName"
+              placeholder="Enter your college name"
+              required
+              value={formData.collegeName}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="form-group">
             <label>Contact Person</label>
-            <input type="text" placeholder="Enter contact person name" required />
+            <input
+              type="text"
+              name="contactPerson"
+              placeholder="Enter contact person name"
+              required
+              value={formData.contactPerson}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="form-group">
             <label>Email</label>
-            <input type="email" placeholder="Enter your email" required />
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="form-group">
             <label>Phone</label>
-            <input type="tel" placeholder="Enter phone number" required />
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Enter phone number"
+              required
+              value={formData.phone}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="form-group">
             <label>Proposal Type</label>
-            <select required>
+            <select
+              name="proposalType"
+              required
+              value={formData.proposalType}
+              onChange={handleChange}
+            >
               <option value="">-- Select --</option>
               <option value="placements">Placements</option>
               <option value="technologies">Technologies</option>
@@ -106,10 +187,17 @@ const CollegeConnect = () => {
 
           <div className="form-group">
             <label>Message</label>
-            <textarea placeholder="Write your proposal..." required></textarea>
+            <textarea
+              name="message"
+              placeholder="Write your proposal..."
+              required
+              value={formData.message}
+              onChange={handleChange}
+            ></textarea>
           </div>
 
           <button type="submit" className="btn-primary">Submit Proposal</button>
+          {status && <p className="form-status">{status}</p>}
         </form>
       </section>
     </div>

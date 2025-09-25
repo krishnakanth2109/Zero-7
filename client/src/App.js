@@ -44,7 +44,7 @@ const LoginPage = () => {
   const navigate = useNavigate()
   useEffect(() => {
     const isAdmin = localStorage.getItem('isAdmin')
-    const hasToken = document.cookie.includes('token=')
+    const hasToken = Cookie.get('token')
 
     if (isAdmin && hasToken) {
       console.log('User already authenticated, redirecting to dashboard...')

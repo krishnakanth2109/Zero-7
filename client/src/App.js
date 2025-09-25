@@ -1,6 +1,6 @@
 // File: src/App.js (Fully Corrected)
 
-import React from 'react'
+import { useEffect } from 'react'
 import {
   Routes,
   Route,
@@ -42,6 +42,15 @@ import './App.css'
 
 const LoginPage = () => {
   const navigate = useNavigate()
+  useEffect(() => {
+    const isAdmin = localStorage.getItem('isAdmin')
+    const hasToken = document.cookie.includes('token=')
+
+    if (isAdmin && hasToken) {
+      console.log('User already authenticated, redirecting to dashboard...')
+      navigate('/admin/dashboard', { replace: true })
+    }
+  }, [navigate])
   const handleLoginSuccess = () => {
     localStorage.setItem('isAdmin', 'true')
     navigate('/admin/dashboard')

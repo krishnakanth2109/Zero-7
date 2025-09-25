@@ -1,18 +1,22 @@
 // AdminLayout.jsx
-import React from "react";
-import { Outlet } from "react-router-dom";
-import AdminSidebar from "../Components/AdminSidebar";
-import AdminNotifications from "../Components/AdminNotifications";
-import "./AdminLayout.css";
+import React from 'react'
+import { Outlet } from 'react-router-dom'
+import AdminSidebar from '../Components/AdminSidebar'
+import AdminHeader from '../Components/AdminHeader'
+import AdminNotifications from '../Components/AdminNotifications'
+import './AdminLayout.css'
 
 export default function AdminLayout() {
   return (
-    <div className="admin-layout">
+    <div className='admin-layout'>
       <AdminSidebar />
       <AdminNotifications /> {/* Always mounted */}
-      <main className="admin-content">
-        <Outlet />
-      </main>
+      <div className='flex-1 flex flex-col'>
+        <AdminHeader />
+        <main className='admin-content p-4'>
+          <Outlet />
+        </main>
+      </div>
     </div>
-  );
+  )
 }

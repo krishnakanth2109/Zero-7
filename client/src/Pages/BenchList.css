@@ -2,13 +2,16 @@
    GLOBAL
 =========================== */
 .bench-page {
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   color: #000000;
   line-height: 1.6;
   background: #f8fbff;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-weight: 600;
   margin-bottom: 15px;
 }
@@ -29,22 +32,23 @@ section {
   justify-content: center;
   text-align: center;
   overflow: hidden;
-  background: linear-gradient(rgba(111, 189, 235, 0.5), rgba(53, 139, 225, 0.5));
+  background: linear-gradient(
+    rgba(111, 189, 235, 0.5),
+    rgba(53, 139, 225, 0.5)
+  );
   background-attachment: fixed; /* Parallax effect */
 }
-
-
 
 .hero-section h1 {
   font-size: 4rem;
   margin-bottom: 20px;
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .hero-section p {
   font-size: 1.5rem;
   margin-bottom: 30px;
-  text-shadow: 1px 1px 6px rgba(0,0,0,0.5);
+  text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
 }
 
 .btn-gradient {
@@ -56,7 +60,7 @@ section {
   cursor: pointer;
   transition: 0.3s ease;
   font-size: 1.2rem;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
 .btn-gradient:hover {
@@ -164,10 +168,10 @@ section {
   padding: 15px;
   text-align: center;
   border-bottom: 1px solid #eee;
-  max-width: 200px;          /* 👈 limit column width */
-  white-space: nowrap;       /* 👈 single line */
-  overflow: hidden;          /* 👈 hide overflow */
-  text-overflow: ellipsis;   /* 👈 show ... */
+  max-width: 200px; /* 👈 limit column width */
+  white-space: nowrap; /* 👈 single line */
+  overflow: hidden; /* 👈 hide overflow */
+  text-overflow: ellipsis; /* 👈 show ... */
 }
 .candidate-table th {
   background: linear-gradient(45deg, #0f62fe, #00bfff);
@@ -338,7 +342,7 @@ section {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -350,7 +354,9 @@ section {
   border-radius: 12px;
   max-width: 500px;
   width: 90%;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  height: 90vh;
+  overflow-y: scroll;
 }
 .popup-form input,
 .popup-form textarea {
@@ -375,7 +381,9 @@ section {
   .stats-section {
     flex-direction: column;
   }
-  .info-cards, .process-steps, .testimonial-cards {
+  .info-cards,
+  .process-steps,
+  .testimonial-cards {
     flex-direction: column;
     align-items: center;
   }

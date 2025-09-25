@@ -99,7 +99,7 @@
 
 /* ================= Rating ================= */
 .rating-container {
-  display: flex;
+  display: flex ;
   align-items: center;
   justify-content: center;
   margin-bottom: 8px; 
@@ -254,6 +254,72 @@
 
 .add-to-cart-btn:hover {
   background: #1565c0;
+}
+
+/* ================= Inline Buy Form ================= */
+.buy-form {
+  margin-top: 12px;
+  background: #f5f9ff;
+  border: 1px solid #d0e2ff;
+  border-radius: 12px;
+  padding: 12px;
+  display: none; /* Hidden by default */
+  animation: slideDown 0.4s ease forwards;
+}
+
+.buy-form.active {
+  display: block;
+}
+
+.buy-form label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #0d47a1;
+  margin-bottom: 4px;
+}
+
+.buy-form input,
+.buy-form select {
+  width: 100%;
+  padding: 7px 10px;
+  margin-bottom: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.buy-form input:focus,
+.buy-form select:focus {
+  border-color: #0d47a1;
+  outline: none;
+}
+
+.buy-form .submit-btn {
+  background: #0d47a1;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+  width: 100%;
+}
+
+.buy-form .submit-btn:hover {
+  background: #1565c0;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ================= Responsive ================= */

@@ -1,25 +1,33 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Cookie from 'js-cookie'
+import React, { useState, useEffect } from 'react';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
+import Cookie from 'js-cookie';
 import './css/Login.css'
 
 const Login = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [resetEmail, setResetEmail] = useState('')
-  const [error, setError] = useState('')
-  const [showForgotPassword, setShowForgotPassword] = useState(false)
-  const navigate = useNavigate()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
+  const [error, setError] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(null); // 'superAdmin', 'admin', 'recruiter'
+  const [isLoading, setIsLoading] = useState(false); // For loading animation
+  const navigate = useNavigate();
+
+  // Function to determine if inputs should be blurred
+  const areInputsBlurred = selectedRole === null;
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    setError('')
-    
-    const payload = { email, password }
-    const url = process.env.REACT_APP_API_URL 
+    e.preventDefault();
+    setError('');
+    setIsLoading(true); // Start loading animation
+
+    const payload = { email, password, role: selectedRole }; // Include selected role
+    const url = process.env.REACT_APP_API_URL
       ? `${process.env.REACT_APP_API_URL}/auth`
-      : 'http://localhost:5000/api/auth'
-    
+      : 'http://localhost:5000/api/auth';
+
     const options = {
       method: 'POST',
       headers: {
@@ -27,94 +35,156 @@ const Login = () => {
         Accept: 'application/json',
       },
       body: JSON.stringify(payload),
-    }
-    
+    };
+
     try {
-      const response = await fetch(url, options)
-      const data = await response.json()
-      
-      // Check if login was successful
+      const response = await fetch(url, options);
+      const data = await response.json();
+
       if (response.ok && data.Token) {
-        // Store token and admin status
-        Cookie.set('token', data.Token, { expires: 1 })
-        localStorage.setItem('isAdmin', 'true')
-        console.log('Login successful, navigating to dashboard...')
-        navigate('/admin/dashboard')
+        Cookie.set('token', data.Token, { expires: 1 });
+        localStorage.setItem('isAdmin', 'true'); // This might need to be dynamic based on role
+        console.log('Login successful, navigating to dashboard...');
+        navigate('/admin/dashboard');
       } else {
-        // Handle login failure
-        setError(data.message || 'Login failed. Please check your credentials.')
+        setError(data.message || 'Login failed. Please check your credentials.');
       }
     } catch (err) {
-      console.error('Login error:', err)
-      setError('Network error. Please try again.')
+      console.error('Login error:', err);
+      setError('Network error. Please try again.');
+    } finally {
+      setIsLoading(false); // Stop loading animation
     }
-  }
+  };
 
   const handleForgotPassword = (e) => {
-    e.preventDefault()
-    alert(`Password reset link sent to: ${resetEmail}`)
-    setShowForgotPassword(false)
-    setResetEmail('')
-  }
+    e.preventDefault();
+    alert(`Password reset link sent to: ${resetEmail}`);
+    setShowForgotPassword(false);
+    setResetEmail('');
+  };
+
+  // Dynamic styling for login button
+  const getLoginButtonStyle = (role) => {
+    switch (role) {
+      case 'superAdmin':
+        return { backgroundColor: '#FF6347', color: 'white' }; // Tomato
+      case 'admin':
+        return { backgroundColor: '#4CAF50', color: 'white' }; // Green
+      case 'recruiter':
+        return { backgroundColor: '#FFD700', color: 'black' }; // Gold
+      default:
+        return {}; // Default style
+    }
+  };
 
   return (
-    <div className='login-container'>
-      <div className='login-left'>
+    <div className='login-page-container'>
+      {isLoading && (
+        <div className='loading-animation-overlay'>
+          <div className='spinner-loader'></div>
+        </div>
+      )}
+
+      <div className='login-graphic-section'>
         <img
-          src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80'
+          src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop'
           alt='Login Illustration'
+          className='login-illustration-image'
         />
       </div>
 
-      <div className='login-right'>
+      <div className='login-form-section'>
         {!showForgotPassword ? (
-          <form className='login-form' onSubmit={handleLogin}>
-            <h2 className='login-title'>
+          <form className='login-form-content' onSubmit={handleLogin}>
+            <h2 className='login-form-title'>
               Zero 7 Technologies <br />
-              Admin Login
+              Admin Dashboard Login
             </h2>
 
-            <div className='input-group'>
-              <label>Email Address</label>
+            <div className='role-selection-group'>
+              <button
+                type='button'
+                className={`role-select-button ${selectedRole === 'superAdmin' ? 'selected-role-super-admin' : ''}`}
+                onClick={() => setSelectedRole('superAdmin')}
+              >
+                Super Admin
+              </button>
+              <button
+                type='button'
+                className={`role-select-button ${selectedRole === 'admin' ? 'selected-role-admin' : ''}`}
+                onClick={() => setSelectedRole('admin')}
+              >
+                Admin
+              </button>
+              <button
+                type='button'
+                className={`role-select-button ${selectedRole === 'recruiter' ? 'selected-role-recruiter' : ''}`}
+                onClick={() => setSelectedRole('recruiter')}
+              >
+                Recruiter
+              </button>
+            </div>
+
+            <div className={`input-field-group ${areInputsBlurred ? 'blurred-input-state' : ''}`}>
+              <label htmlFor='email-input'>Email Address</label>
               <input
+                id='email-input'
                 type='email'
                 placeholder='Enter your email'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={areInputsBlurred}
               />
             </div>
 
-            <div className='input-group'>
-              <label>Password</label>
+            <div className={`input-field-group password-field-group ${areInputsBlurred ? 'blurred-input-state' : ''}`} style={{ position: "relative" }}>
+              <label htmlFor='password-input'>Password</label>
               <input
-                type='password'
-                placeholder='Enter your password'
+                id='password-input'
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                style={{ paddingRight: "35px" }}
+                disabled={areInputsBlurred}
               />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className='password-toggle-icon'
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
             </div>
 
-            {error && <p className='error-text'>{error}</p>}
+            {error && <p className='error-message-text'>{error}</p>}
 
-            <button type='submit' className='login-btn'>
-              Login
+            <button
+              type='submit'
+              className='submit-login-button'
+              style={getLoginButtonStyle(selectedRole)}
+              disabled={areInputsBlurred}
+            >
+              Sign In to Dashboard
             </button>
 
             <p
-              className='forgot-link'
-              onClick={() => setShowForgotPassword(true)}>
+              className='forgot-password-link'
+              onClick={() => setShowForgotPassword(true)}
+            >
               Forgot Password?
             </p>
           </form>
         ) : (
-          <form className='login-form' onSubmit={handleForgotPassword}>
-            <h2 className='login-title'>Reset Password</h2>
+          <form className='reset-password-form-content' onSubmit={handleForgotPassword}>
+            <h2 className='reset-password-title'>Reset Password</h2>
 
-            <div className='input-group'>
-              <label>Enter your email</label>
+            <div className='input-field-group'>
+              <label htmlFor='reset-email-input'>Enter your email</label>
               <input
+                id='reset-email-input'
                 type='email'
                 placeholder='Enter your email'
                 value={resetEmail}
@@ -123,20 +193,21 @@ const Login = () => {
               />
             </div>
 
-            <button type='submit' className='login-btn'>
+            <button type='submit' className='send-reset-link-button'>
               Send Reset Link
             </button>
 
             <p
-              className='back-to-login'
-              onClick={() => setShowForgotPassword(false)}>
+              className='back-to-login-link'
+              onClick={() => setShowForgotPassword(false)}
+            >
               Back to Login
             </p>
           </form>
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

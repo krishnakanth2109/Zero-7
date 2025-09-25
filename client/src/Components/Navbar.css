@@ -9,9 +9,16 @@
   z-index: 999;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
+.navbar img{
+  width: 250px;
+  height: 80px;
+  background-color: white !important;
+}
+
+
 
 .logo-img {
-  height: 70px;
+  height: 700px;
   width: auto;
   object-fit: contain;
   display: block;

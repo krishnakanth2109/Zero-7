@@ -39,6 +39,11 @@ import AdminManageCandidates from './Pages/AdminManageCandidates'
 import AdminViewRequests from './Pages/AdminViewRequests'
 
 import './App.css'
+import DigitalCourses from './Pages/DigitalCourses.jsx'
+import PayrollServices from './Pages/PayrollServices.jsx'
+import Resumemarketing from './Pages/Resumemarketing.jsx'
+import Ittraining from './Pages/Ittraining.jsx'
+import Nonittraining from './Pages/Nonittraining.jsx'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -86,6 +91,13 @@ function App() {
           <Route path='/contact' element={<Contact />} />
           <Route path='/college-connect' element={<CollegeConnect />} />
           <Route path='/current-hirings' element={<CurrentHirings />} />
+
+          <Route path='/digital-courses' element={<DigitalCourses/>} />
+          <Route path='/services/payroll-services' element={<PayrollServices/>} />
+          <Route path='/services/resume-marketing' element={<Resumemarketing/>} />
+          <Route path='/services/college-connect' element={<CollegeConnect/>} />
+          <Route path='/services/it-training' element={<Ittraining/>} />
+           <Route path='/services/non-it-training' element={<Nonittraining/>} />
           {/* Admin Login Route */}
           <Route path='/admin' element={<LoginPage />} />
           {/* Admin Protected Routes */}
@@ -104,6 +116,9 @@ function App() {
             <Route path='applications' element={<AdminViewApplications />} />
             <Route path='new-batch-dashboard' element={<NewBatchDashboard />} />
             <Route path='manage-blogs' element={<ManageBlogs />} />
+
+
+
             <Route
               path='manage-candidates'
               element={<AdminManageCandidates />}

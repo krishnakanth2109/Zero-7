@@ -3,7 +3,10 @@ import axios from "axios";
 import { Briefcase, User, Phone, Mail, MapPin, FileText, DollarSign, Clock } from "lucide-react";
 import "./CurrentHirings.css";
 
-const API_URL = "http://localhost:5000"; // Your backend server URL
+const API_URL = "http://localhost:5000"; 
+
+
+// Your backend server URL
 
 const CurrentHirings = () => {
   const [jobPositions, setJobPositions] = useState([]);
@@ -12,7 +15,7 @@ const CurrentHirings = () => {
     contact: "",
     email: "",
     location: "",
-    resume: null,
+    resume: "",
   });
 
   const [applyData, setApplyData] = useState({
@@ -42,46 +45,43 @@ const CurrentHirings = () => {
     fetchJobs();
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "resume") {
-      setFormData({ ...formData, resume: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  setFormData({ ...formData, [name]: value });
+};
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const enrollmentData = new FormData();
-    enrollmentData.append("name", formData.name);
-    enrollmentData.append("contact", formData.contact);
-    enrollmentData.append("email", formData.email);
-    enrollmentData.append("location", formData.location);
-    enrollmentData.append("resume", formData.resume);
 
-    try {
-      await axios.post(`${API_URL}/api/enrollments`, enrollmentData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      alert("Enrollment form submitted successfully! ✅");
-      console.log("Enrollment Data:", formData);
-      setFormData({
-        name: "",
-        contact: "",
-        email: "",
-        location: "",
-        resume: null,
-      });
-      // Clear the file input manually
-      e.target.reset();
-    } catch (error) {
-      console.error("Error submitting enrollment form:", error);
-      alert("Failed to submit enrollment form. Please check the console for details.");
-    }
-  };
+const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbzgsGoKMXRNJimjZpClBYG-d1kq4ylpyqucOkYjcpM38UqvfGvgpO1D3Zk_xV0RawJi/exec";  // replace with your script URL
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await fetch(GOOGLE_SHEETS_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    alert("Enrollment submitted successfully ✅");
+    setFormData({
+      name: "",
+      contact: "",
+      email: "",
+      location: "",
+      resume: "",
+    });
+  } catch (error) {
+    console.error("Error submitting enrollment:", error);
+    alert("Failed to submit enrollment ❌");
+  }
+};
+
+
+
+
 
   const handleApplyChange = (e) => {
     const { name, value, files } = e.target;
@@ -133,6 +133,8 @@ const CurrentHirings = () => {
     }
   };
 
+
+  
   return (
     <div className="current-hirings-page">
       {/* Hero Section */}
@@ -160,7 +162,7 @@ const CurrentHirings = () => {
           <input type="tel" name="contact" placeholder="Contact Number" value={formData.contact} onChange={handleChange} required />
           <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleChange} required />
           <input type="text" name="location" placeholder="Your Location" value={formData.location} onChange={handleChange} required />
-          <input type="file" name="resume" accept=".pdf,.doc,.docx" onChange={handleChange} required />
+          <input type="text" name="resume" placeholder="Give your Resume link" onChange={handleChange} required />
           <button type="submit">Submit</button>
         </form>
       </section>

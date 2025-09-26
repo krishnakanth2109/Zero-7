@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import Cookie from 'js-cookie'
 
 const AdminHeader = () => {
+  const [user, setUser] = useState({ email: '', role: '' })
   const [searchQuery, setSearchQuery] = useState('')
   const [showNotifications, setShowNotifications] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -47,6 +48,13 @@ const AdminHeader = () => {
 
   // Close dropdowns when clicking outside
   useEffect(() => {
+    const getCookieData = () => {
+      const userData = Cookie.get('user')
+      const payload = JSON.parse(userData)
+      setUser(payload)
+    }
+    getCookieData()
+
     const handleClickOutside = (event) => {
       if (
         notificationRef.current &&
@@ -204,9 +212,23 @@ const AdminHeader = () => {
             </div>
             <div className='hidden md:block text-left'>
               <div className='text-sm font-medium text-gray-900'>
-                Admin User
+                {user.role === 'superAdmin' ? 'superAdmin' : user.name}
               </div>
-              <div className='text-xs text-gray-500'>Administrator</div>
+              {user.role === 'superAdmin' && (
+                <span class='bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-red-900 dark:text-red-300'>
+                  {user.role}
+                </span>
+              )}
+              {user.role === 'manager' && (
+                <span class='bg-purple-100 text-purple-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-purple-900 dark:text-purple-300'>
+                  {user.role}
+                </span>
+              )}
+              {user.role === 'recruiter' && (
+                <span class='bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-green-900 dark:text-green-300'>
+                  {user.role}
+                </span>
+              )}
             </div>
             <svg
               className='w-4 h-4 text-gray-400'
@@ -221,7 +243,7 @@ const AdminHeader = () => {
           </button>
 
           {showUserMenu && (
-            <div className='absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50'>
+            <div className='absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50'>
               <div className='flex items-center p-4 border-b border-gray-200'>
                 <div className='flex-shrink-0'>
                   <img
@@ -232,11 +254,9 @@ const AdminHeader = () => {
                 </div>
                 <div className='ml-3 flex-1'>
                   <div className='text-sm font-medium text-gray-900'>
-                    Admin User
+                    {user.role === 'superAdmin' ? 'superAdmin' : user.name}
                   </div>
-                  <div className='text-sm text-gray-500'>
-                    admin@zero7tech.com
-                  </div>
+                  <p className='text-[12px] text-gray-500'>{user.email}</p>
                 </div>
               </div>
 

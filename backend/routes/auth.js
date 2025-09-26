@@ -55,24 +55,24 @@ router.post('/', async (request, response) => {
       response.status(401)
       response.send({ message: 'Invalid Password' })
     } else {
-      const payLoad = { email }
+      const payLoad = { email, role: 'superAdmin' }
       const token = jwtToken.sign(payLoad, process.env.MY_SECRET_KEY)
 
       // Prepare data for successful login template
-      const templateData = prepareSuccessLoginData(request, email)
-      const htmlContent = renderEmailTemplate('adminLoginAlert', templateData)
+      // const templateData = prepareSuccessLoginData(request, email)
+      // const htmlContent = renderEmailTemplate('adminLoginAlert', templateData)
 
-      const mailOptions = {
-        from: process.env.AUTH_MAIL,
-        to: isAdmin.email,
-        subject: '✅ Security Alert - Admin Login Successful',
-        text: `Admin successfully logged in: ${email}`,
-        html: htmlContent,
-      }
-      await transporter.sendMail(mailOptions)
+      // const mailOptions = {
+      //   from: process.env.AUTH_MAIL,
+      //   to: isAdmin.email,
+      //   subject: '✅ Security Alert - Admin Login Successful',
+      //   text: `Admin successfully logged in: ${email}`,
+      //   html: htmlContent,
+      // }
+      // await transporter.sendMail(mailOptions)
       console.log('Successful login alert email sent')
       response.status(200)
-      response.send({ message: 'Welcome Admin', Token: token })
+      response.send({ message: 'Welcome Admin', user: payLoad, Token: token })
     }
   }
 })
@@ -92,7 +92,7 @@ router.post('/register', async (request, response) => {
     })
     await admin.save()
     response.status(200)
-    response.send({ message: 'Welcome Admin', Token: token })
+    response.send({ message: 'Welcome Admin', token: token })
     response.send({ message: 'Admin Created' })
   }
 })

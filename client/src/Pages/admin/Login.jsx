@@ -1,32 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom';
-import Cookie from 'js-cookie';
+import React, { useState } from 'react'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
+import Cookie from 'js-cookie'
 import './css/Login.css'
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [resetEmail, setResetEmail] = useState('');
-  const [error, setError] = useState('');
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState(null); // 'superAdmin', 'admin', 'recruiter'
-  const [isLoading, setIsLoading] = useState(false); // For loading animation
-  const navigate = useNavigate();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [resetEmail, setResetEmail] = useState('')
+  const [error, setError] = useState('')
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [selectedRole, setSelectedRole] = useState(null) // 'superAdmin', 'admin', 'recruiter'
+  const [isLoading, setIsLoading] = useState(false) // For loading animation
+  const navigate = useNavigate()
 
   // Function to determine if inputs should be blurred
-  const areInputsBlurred = selectedRole === null;
+  const areInputsBlurred = selectedRole === null
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true); // Start loading animation
+    e.preventDefault()
+    setError('')
+    setIsLoading(true)
+    // Start loading animation
 
-    const payload = { email, password, role: selectedRole }; // Include selected role
+    const payload = { email, password } // Include selected role
+    let endPoint = ''
+    switch (selectedRole) {
+      case 'superAdmin':
+        endPoint = '/auth'
+        break
+      case 'admin':
+        endPoint = '/managers/login'
+        break
+      case 'recruiter':
+        endPoint = '/recruiters/login'
+        break
+      default:
+        break
+    }
     const url = process.env.REACT_APP_API_URL
-      ? `${process.env.REACT_APP_API_URL}/auth`
-      : 'http://localhost:5000/api/auth';
+      ? `${process.env.REACT_APP_API_URL}${endPoint}`
+      : `http://localhost:5000/api${endPoint}`
 
     const options = {
       method: 'POST',
@@ -35,48 +50,49 @@ const Login = () => {
         Accept: 'application/json',
       },
       body: JSON.stringify(payload),
-    };
+    }
 
     try {
-      const response = await fetch(url, options);
-      const data = await response.json();
+      const response = await fetch(url, options)
+      const data = await response.json()
 
-      if (response.ok && data.Token) {
-        Cookie.set('token', data.Token, { expires: 1 });
-        localStorage.setItem('isAdmin', 'true'); // This might need to be dynamic based on role
-        console.log('Login successful, navigating to dashboard...');
-        navigate('/admin/dashboard');
+      if (response.ok && data.token) {
+        Cookie.set('token', data.token, { expires: 1 })
+        Cookie.set('user', JSON.stringify(data.user), { expires: 1 })
+        console.log(data.user) // This might need to be dynamic based on role
+        console.log('Login successful, navigating to dashboard...')
+        navigate('/admin/dashboard')
       } else {
-        setError(data.message || 'Login failed. Please check your credentials.');
+        setError(data.message || 'Login failed. Please check your credentials.')
       }
     } catch (err) {
-      console.error('Login error:', err);
-      setError('Network error. Please try again.');
+      console.error('Login error:', err)
+      setError('Network error. Please try again.')
     } finally {
-      setIsLoading(false); // Stop loading animation
+      setIsLoading(false) // Stop loading animation
     }
-  };
+  }
 
   const handleForgotPassword = (e) => {
-    e.preventDefault();
-    alert(`Password reset link sent to: ${resetEmail}`);
-    setShowForgotPassword(false);
-    setResetEmail('');
-  };
+    e.preventDefault()
+    alert(`Password reset link sent to: ${resetEmail}`)
+    setShowForgotPassword(false)
+    setResetEmail('')
+  }
 
   // Dynamic styling for login button
   const getLoginButtonStyle = (role) => {
     switch (role) {
       case 'superAdmin':
-        return { backgroundColor: '#FF6347', color: 'white' }; // Tomato
+        return { backgroundColor: '#FF6347', color: 'white' } // Tomato
       case 'admin':
-        return { backgroundColor: '#4CAF50', color: 'white' }; // Green
+        return { backgroundColor: '#4CAF50', color: 'white' } // Green
       case 'recruiter':
-        return { backgroundColor: '#FFD700', color: 'black' }; // Gold
+        return { backgroundColor: '#FFD700', color: 'black' } // Gold
       default:
-        return {}; // Default style
+        return {} // Default style
     }
-  };
+  }
 
   return (
     <div className='login-page-container'>
@@ -105,28 +121,36 @@ const Login = () => {
             <div className='role-selection-group'>
               <button
                 type='button'
-                className={`role-select-button ${selectedRole === 'superAdmin' ? 'selected-role-super-admin' : ''}`}
-                onClick={() => setSelectedRole('superAdmin')}
-              >
+                className={`role-select-button ${
+                  selectedRole === 'superAdmin'
+                    ? 'selected-role-super-admin'
+                    : ''
+                }`}
+                onClick={() => setSelectedRole('superAdmin')}>
                 Super Admin
               </button>
               <button
                 type='button'
-                className={`role-select-button ${selectedRole === 'admin' ? 'selected-role-admin' : ''}`}
-                onClick={() => setSelectedRole('admin')}
-              >
+                className={`role-select-button ${
+                  selectedRole === 'admin' ? 'selected-role-admin' : ''
+                }`}
+                onClick={() => setSelectedRole('admin')}>
                 Admin
               </button>
               <button
                 type='button'
-                className={`role-select-button ${selectedRole === 'recruiter' ? 'selected-role-recruiter' : ''}`}
-                onClick={() => setSelectedRole('recruiter')}
-              >
+                className={`role-select-button ${
+                  selectedRole === 'recruiter' ? 'selected-role-recruiter' : ''
+                }`}
+                onClick={() => setSelectedRole('recruiter')}>
                 Recruiter
               </button>
             </div>
 
-            <div className={`input-field-group ${areInputsBlurred ? 'blurred-input-state' : ''}`}>
+            <div
+              className={`input-field-group ${
+                areInputsBlurred ? 'blurred-input-state' : ''
+              }`}>
               <label htmlFor='email-input'>Email Address</label>
               <input
                 id='email-input'
@@ -139,22 +163,25 @@ const Login = () => {
               />
             </div>
 
-            <div className={`input-field-group password-field-group ${areInputsBlurred ? 'blurred-input-state' : ''}`} style={{ position: "relative" }}>
+            <div
+              className={`input-field-group password-field-group ${
+                areInputsBlurred ? 'blurred-input-state' : ''
+              }`}
+              style={{ position: 'relative' }}>
               <label htmlFor='password-input'>Password</label>
               <input
                 id='password-input'
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder='Enter your password'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                style={{ paddingRight: "35px" }}
+                style={{ paddingRight: '35px' }}
                 disabled={areInputsBlurred}
               />
               <span
                 onClick={() => setShowPassword(!showPassword)}
-                className='password-toggle-icon'
-              >
+                className='password-toggle-icon'>
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
@@ -165,20 +192,20 @@ const Login = () => {
               type='submit'
               className='submit-login-button'
               style={getLoginButtonStyle(selectedRole)}
-              disabled={areInputsBlurred}
-            >
+              disabled={areInputsBlurred}>
               Sign In to Dashboard
             </button>
 
             <p
               className='forgot-password-link'
-              onClick={() => setShowForgotPassword(true)}
-            >
+              onClick={() => setShowForgotPassword(true)}>
               Forgot Password?
             </p>
           </form>
         ) : (
-          <form className='reset-password-form-content' onSubmit={handleForgotPassword}>
+          <form
+            className='reset-password-form-content'
+            onSubmit={handleForgotPassword}>
             <h2 className='reset-password-title'>Reset Password</h2>
 
             <div className='input-field-group'>
@@ -199,15 +226,14 @@ const Login = () => {
 
             <p
               className='back-to-login-link'
-              onClick={() => setShowForgotPassword(false)}
-            >
+              onClick={() => setShowForgotPassword(false)}>
               Back to Login
             </p>
           </form>
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

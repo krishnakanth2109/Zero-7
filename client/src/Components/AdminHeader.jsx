@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Cookie from 'js-cookie'
+import { PanelLeftClose, PanelRightClose } from 'lucide-react'
 
-const AdminHeader = () => {
+const AdminHeader = ({ toggleSidebar, isOpen }) => {
   const [user, setUser] = useState({ email: '', role: '' })
   const [searchQuery, setSearchQuery] = useState('')
   const [showNotifications, setShowNotifications] = useState(false)
@@ -99,10 +100,15 @@ const AdminHeader = () => {
   }
 
   return (
-    <header className='bg-white border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-40 shadow-sm'>
+    <header className='bg-white border-gray-200 p-3 flex items-center justify-around sticky top-0 left-0 z-40 shadow-sm'>
       {/* Left side - Search Bar */}
+      <div className='mr-2'>
+        <button type='button' onClick={toggleSidebar}>
+          {isOpen ? <PanelLeftClose /> : <PanelRightClose />}
+        </button>
+      </div>
       <div className='flex-1'>
-        <div className='w-72 max-md:w-48'>
+        <div className='w-72 max-md:w-32'>
           <input
             type='search'
             placeholder='search'
@@ -113,7 +119,7 @@ const AdminHeader = () => {
       </div>
 
       {/* Right side - Notifications and User Menu */}
-      <div className='flex items-center space-x-4'>
+      <div className='flex items-center gap-2'>
         {/* Notifications */}
         <div className='relative' ref={notificationRef}>
           <button

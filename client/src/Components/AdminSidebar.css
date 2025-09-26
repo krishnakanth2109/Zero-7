@@ -1,13 +1,12 @@
 /* Sidebar container */
 .admin-sidebar {
-  width: 250px;
   min-height: 100vh;
   background: #fff;
-  color:#020817;
+  color: #020817;
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* push logout button to bottom */
-  box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Sidebar header */
@@ -22,36 +21,36 @@
   gap: 10px;
 }
 
-.logo-img{
+.logo-img {
   width: 35px;
   height: 35px;
-  background: #DC2626;
+  background: #dc2626;
   border-radius: 12px;
 }
-.logo-img span{
+.logo-img span {
   font-size: 18px;
   color: #fff;
 }
-.logo-side-name{
+.logo-side-name {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
-.logo-side-name .head-name{
+.logo-side-name .head-name {
   color: #020817;
   font-size: 16px;
 }
-.logo-side-name .head-panel{
+.logo-side-name .head-panel {
   font-size: 12px;
-  color: #6474BB;
+  color: #6474bb;
   font-weight: 400;
 }
-.dashboard-cont{
+.dashboard-cont {
   display: flex;
   justify-content: space-between;
 }
 
-.dashboard-icon{
+.dashboard-icon {
   display: flex;
   gap: 10px;
 }
@@ -79,7 +78,7 @@
 
 /* Active route */
 .sidebar-link.active {
-  color: #DC2626;
+  color: #dc2626;
   font-weight: 500;
 }
 
@@ -113,9 +112,8 @@
   margin-left: 8px;
 }
 
-
 .logout-btn {
-  margin: 0 auto 40px auto; 
+  margin: 0 auto 40px auto;
   padding: 10px;
   width: 60%;
   background: rgb(255, 0, 0);
@@ -129,7 +127,6 @@
   background: rgb(9, 255, 0);
   color: black;
 }
-
 
 /* Dropdown submenu */
 .submenu {
@@ -174,4 +171,3 @@
     transform: translateY(0);
   }
 }
-

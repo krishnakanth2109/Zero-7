@@ -1,9 +1,4 @@
 .admin-layout {
   display: flex;
-  height: 100vh;
-}
-
-.admin-content {
-  background: #f3f4f6; /* light gray */
-  overflow-y: auto;
+  height: 90vh;
 }

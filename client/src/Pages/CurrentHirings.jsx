@@ -45,39 +45,9 @@ const CurrentHirings = () => {
     fetchJobs();
   }, []);
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
-  setFormData({ ...formData, [name]: value });
-};
 
 
-const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbzgsGoKMXRNJimjZpClBYG-d1kq4ylpyqucOkYjcpM38UqvfGvgpO1D3Zk_xV0RawJi/exec";  // replace with your script URL
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    await fetch(GOOGLE_SHEETS_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    alert("Enrollment submitted successfully ✅");
-    setFormData({
-      name: "",
-      contact: "",
-      email: "",
-      location: "",
-      resume: "",
-    });
-  } catch (error) {
-    console.error("Error submitting enrollment:", error);
-    alert("Failed to submit enrollment ❌");
-  }
-};
 
 
 
@@ -155,17 +125,7 @@ const handleSubmit = async (e) => {
       </section>
 
       {/* Enrollment */}
-      <section className="form-section">
-        <h2>Student Enrollment Form</h2>
-        <form onSubmit={handleSubmit} className="enrollment-form">
-          <input type="text" name="name" placeholder="Your Name" value={formData.name} onChange={handleChange} required />
-          <input type="tel" name="contact" placeholder="Contact Number" value={formData.contact} onChange={handleChange} required />
-          <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleChange} required />
-          <input type="text" name="location" placeholder="Your Location" value={formData.location} onChange={handleChange} required />
-          <input type="text" name="resume" placeholder="Give your Resume link" onChange={handleChange} required />
-          <button type="submit">Submit</button>
-        </form>
-      </section>
+
 
       {/* Job Listings */}
       <section className="jobs-section">

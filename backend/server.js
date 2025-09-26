@@ -23,6 +23,10 @@ import jobsRoutes from './routes/jobs.js' // <-- Changed
 import enrollmentsRoutes from './routes/enrollments.js' // <-- Changed
 import applicationsRoutes from './routes/applications.js' // <-- Changed
 import authRoutes from './routes/auth.js'
+import managerRoutes from './routes/manager.js'
+import recruiterRoutes from './routes/recruiter.js'
+import collegeConnectRoutes from './routes/collegeConnect.js'
+import registerDemoRoutes from './routes/registerDemo.js'
 
 const app = express()
 const server = http.createServer(app)
@@ -78,6 +82,10 @@ app.use('/api/jobs', jobsRoutes) // <-- Changed
 app.use('/api/enrollments', enrollmentsRoutes) // <-- Changed
 app.use('/api/applications', applicationsRoutes) // <-- Changed
 app.use('/api/auth', authRoutes)
+app.use('/api/managers', managerRoutes)
+app.use('/api/recruiters', recruiterRoutes)
+app.use('/api/college-connect', collegeConnectRoutes)
+app.use('/api/register-demo', registerDemoRoutes)
 // ✅ MongoDB connection
 const PORT = process.env.PORT || 5000
 

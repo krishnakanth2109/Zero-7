@@ -16,32 +16,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { useEffect, useState } from 'react'
 
 export default function AdminDashboard() {
-  const [showModal, setShowModal] = useState(false)
-
-  const [form, setForm] = useState({
-    candidate: '',
-    position: '',
-    Experience: '',
-    Location: '',
-    Skills: '',
-    Phone: '',
-    Status: '',
-  })
-
-  useEffect(() => {}, [])
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // handle form submission here
-    setShowModal(false)
-  }
   const applicationsTrend = [
     { month: 'Jan', applications: 45, interviews: 12, hired: 3 },
     { month: 'Feb', applications: 52, interviews: 18, hired: 5 },
@@ -154,121 +130,17 @@ export default function AdminDashboard() {
     },
   ]
 
-  const addCandidateForm = () => {
-    return (
-      <div className='fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-lg'>
-        <div className='bg-white rounded-xl p-6 w-full max-w-lg shadow-lg'>
-          <h2 className='text-xl font-bold mb-4'>Add Candidate</h2>
-          <form onSubmit={handleSubmit}>
-            <div className='grid grid-cols-2 gap-4'>
-              <div>
-                <label className='block text-sm font-medium mb-1'>
-                  Candidate Name
-                </label>
-                <input
-                  name='candidate'
-                  value={form.candidate}
-                  onChange={handleChange}
-                  className='w-full border rounded px-2 py-1'
-                  required
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium mb-1'>
-                  Position
-                </label>
-                <input
-                  name='position'
-                  value={form.position}
-                  onChange={handleChange}
-                  className='w-full border rounded px-2 py-1'
-                  required
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium mb-1'>
-                  Experience
-                </label>
-                <input
-                  name='experience'
-                  value={form.experience}
-                  onChange={handleChange}
-                  className='w-full border rounded px-2 py-1'
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium mb-1'>
-                  Location
-                </label>
-                <input
-                  name='location'
-                  value={form.location}
-                  onChange={handleChange}
-                  className='w-full border rounded px-2 py-1'
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium mb-1'>
-                  Skills (comma separated)
-                </label>
-                <input
-                  name='skills'
-                  value={form.skills}
-                  onChange={handleChange}
-                  className='w-full border rounded px-2 py-1'
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium mb-1'>Phone</label>
-                <input
-                  name='phone'
-                  value={form.phone}
-                  onChange={handleChange}
-                  className='w-full border rounded px-2 py-1'
-                />
-              </div>
-            </div>
-            <div className='flex justify-end gap-2 mt-6'>
-              <button
-                type='button'
-                className='px-4 py-2 rounded bg-gray-200'
-                onClick={() => setShowModal(false)}>
-                Cancel
-              </button>
-              <button
-                type='submit'
-                className='px-4 py-2 rounded bg-blue-600 text-white'>
-                Add
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='flex flex-col gap-4 overflow-auto'>
       <div className='admin-main flex-1 rounded-2xl p-6 border-border flex flex-col md:flex-row items-start md:items-center justify-between'>
         <div>
           <h1 className='text-3xl font-bold'>Welcome back!</h1>
           <span>Here&apos;s your recruitment dashboard today.</span>
         </div>
-        <div className='flex items-center gap-2'>
-          <button className='schedule-button flex items-center text-xs hover:cursor-pointer'>
-            <Calendar className='icons mr-1 ' /> Schedule Interview
-          </button>
-          <button
-            onClick={() => setShowModal(true)}
-            className='add-candidate flex items-center text-xs hover:cursor-pointer'>
-            <UsersRound className='icons mr-1 ' /> Add Candidate
-          </button>
-        </div>
       </div>
-      {showModal && addCandidateForm()}
       {/* Card Container */}
-      <div className='flex flex-wrap gap-2'>
-        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex-1 flex flex-col gap-1'>
+      <div className='flex flex-wrap gap-2 max-md:flex-col '>
+        <div className='bg-white rounded-2xl p-4 hover:shadow-xl max-md:w-[240px] flex-1 flex flex-col gap-1 '>
           {/* Icon with percent */}
           <div className='flex items-center justify-between'>
             <div className='bg-red-200 p-2 rounded-lg'>
@@ -284,7 +156,7 @@ export default function AdminDashboard() {
             <p className='text-sm text-[#64748b]'>vs Last week</p>
           </div>
         </div>
-        <div className='bg-white rounded-2xl flex-1 p-4 hover:shadow-xl flex flex-col gap-1 '>
+        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 max-md:w-[240px] flex-1 '>
           {/* Icon with percent */}
           <div className='flex items-center justify-between'>
             <div className='bg-red-200 p-2 rounded-lg'>
@@ -298,7 +170,7 @@ export default function AdminDashboard() {
             <p className='text-sm text-[#64748b]'>new this week</p>
           </div>
         </div>
-        <div className='bg-white rounded-2xl flex-1 p-4 hover:shadow-xl flex flex-col gap-1 '>
+        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 max-md:w-[240px] flex-1'>
           {/* Icon with percent */}
           <div className='flex items-center justify-between'>
             <div className='bg-red-200 p-2 rounded-lg'>
@@ -314,7 +186,7 @@ export default function AdminDashboard() {
             <p className='text-sm text-gray-500'>ready to deploy</p>
           </div>
         </div>
-        <div className='bg-white rounded-2xl flex-1 p-4 hover:shadow-xl flex flex-col gap-1 '>
+        <div className='bg-white rounded-2xl  p-4 hover:shadow-xl flex flex-col gap-1 max-md:w-[240px] flex-1'>
           {/* Icon with percent */}
           <div className='flex items-center justify-between'>
             <div className='bg-red-200 p-2 rounded-lg'>
@@ -330,10 +202,38 @@ export default function AdminDashboard() {
             <p className='text-sm text-[#64748b]'>actively hiring</p>
           </div>
         </div>
+        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 max-md:w-[240px] flex-1'>
+          {/* Icon with percent */}
+          <div className='flex items-center justify-between'>
+            <div className='bg-red-200 p-2 rounded-lg'>
+              <Building2 className=' stroke-red-500 stroke-2' />
+            </div>
+            <p className='text-[#16a34a]'>+12%</p>
+          </div>
+          <div>
+            <h1 className='text-3xl font-bold mt-3'>0</h1>
+            <p className='text-lg font-semibold text-[#64748b]'>Collages</p>
+            <p className='text-sm text-[#64748b]'>Colleges under us</p>
+          </div>
+        </div>
+        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 max-md:w-[240px] flex-1'>
+          {/* Icon with percent */}
+          <div className='flex items-center justify-between'>
+            <div className='bg-red-200 p-2 rounded-lg'>
+              <Building2 className=' stroke-red-500 stroke-2' />
+            </div>
+            <p className='text-[#16a34a]'>+12%</p>
+          </div>
+          <div>
+            <h1 className='text-3xl font-bold mt-3'>0</h1>
+            <p className='text-lg font-semibold text-[#64748b]'>Placements</p>
+            <p className='text-sm text-[#64748b]'>Placements</p>
+          </div>
+        </div>
       </div>
       {/* Charts */}
       <div className='flex gap-4 md:tems-center max-md:flex-col '>
-        <div className='bg-white rounded-xl w-[50%] max-md:w-full p-4 '>
+        <div className='bg-white rounded-xl w-[50%] max-md:w-97 p-4 '>
           <div className='flex gap-2 text-xl font-bold'>
             <TrendingUp className='stroke-2 stroke-red-500' />
             Application Trends
@@ -388,7 +288,7 @@ export default function AdminDashboard() {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-        <div className='bg-white rounded-xl w-[50%] max-md:w-full p-4 '>
+        <div className='bg-white rounded-xl w-[50%] max-md:w-97 p-4 '>
           <div className='flex gap-2 text-xl font-bold'>
             <Briefcase className='stroke-2 stroke-red-500' />
             Job Status Distribution
@@ -397,7 +297,7 @@ export default function AdminDashboard() {
         </div>
       </div>
       {/* Recent Applications */}
-      <div className='bg-white w-full p-4 rounded-xl'>
+      <div className='bg-white w-full p-4 rounded-xl overflow-scroll'>
         {/* heading */}
         <div className='flex justify-center gap-1'>
           <UsersRound className='stroke-2 stroke-red-500' />

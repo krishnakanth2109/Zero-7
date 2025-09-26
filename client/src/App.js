@@ -48,31 +48,27 @@ import Nonittraining from './Pages/Nonittraining.jsx'
 const LoginPage = () => {
   const navigate = useNavigate()
   useEffect(() => {
-    const isAdmin = localStorage.getItem('isAdmin')
     const hasToken = Cookie.get('token')
 
-    if (isAdmin && hasToken) {
+    if (hasToken) {
       console.log('User already authenticated, redirecting to dashboard...')
       navigate('/admin/dashboard', { replace: true })
     }
   }, [navigate])
   const handleLoginSuccess = () => {
-    localStorage.setItem('isAdmin', 'true')
     navigate('/admin/dashboard')
   }
   return <Login onLogin={handleLoginSuccess} />
 }
 
 const PrivateRoute = ({ children }) => {
-  const isAdmin = localStorage.getItem('isAdmin')
   const token = Cookie.get('token')
 
   // Check if user is authenticated
-  const isAuthenticated = isAdmin && token
+  const isAuthenticated = token
 
   if (!isAuthenticated) {
     // Clear any stale data
-    localStorage.removeItem('isAdmin')
     return <Navigate to='/admin' replace />
   }
 
@@ -101,12 +97,21 @@ function App() {
           <Route path='/college-connect' element={<CollegeConnect />} />
           <Route path='/current-hirings' element={<CurrentHirings />} />
 
-          <Route path='/digital-courses' element={<DigitalCourses/>} />
-          <Route path='/services/payroll-services' element={<PayrollServices/>} />
-          <Route path='/services/resume-marketing' element={<Resumemarketing/>} />
-          <Route path='/services/college-connect' element={<CollegeConnect/>} />
-          <Route path='/services/it-training' element={<Ittraining/>} />
-           <Route path='/services/non-it-training' element={<Nonittraining/>} />
+          <Route path='/digital-courses' element={<DigitalCourses />} />
+          <Route
+            path='/services/payroll-services'
+            element={<PayrollServices />}
+          />
+          <Route
+            path='/services/resume-marketing'
+            element={<Resumemarketing />}
+          />
+          <Route
+            path='/services/college-connect'
+            element={<CollegeConnect />}
+          />
+          <Route path='/services/it-training' element={<Ittraining />} />
+          <Route path='/services/non-it-training' element={<Nonittraining />} />
           {/* Admin Login Route */}
           <Route path='/admin' element={<LoginPage />} />
           {/* Admin Protected Routes */}
@@ -125,8 +130,6 @@ function App() {
             <Route path='applications' element={<AdminViewApplications />} />
             <Route path='new-batch-dashboard' element={<NewBatchDashboard />} />
             <Route path='manage-blogs' element={<ManageBlogs />} />
-
-
 
             <Route
               path='manage-candidates'

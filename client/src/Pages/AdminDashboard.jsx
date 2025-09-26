@@ -16,10 +16,11 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function AdminDashboard() {
   const [showModal, setShowModal] = useState(false)
+
   const [form, setForm] = useState({
     candidate: '',
     position: '',
@@ -29,6 +30,8 @@ export default function AdminDashboard() {
     Phone: '',
     Status: '',
   })
+
+  useEffect(() => {}, [])
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })

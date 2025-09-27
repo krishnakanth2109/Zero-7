@@ -139,8 +139,8 @@ export default function AdminDashboard() {
         </div>
       </div>
       {/* Card Container */}
-      <div className='flex flex-wrap gap-2 max-md:flex-col '>
-        <div className='bg-white rounded-2xl p-4 hover:shadow-xl max-md:w-[240px] flex-1 flex flex-col gap-1 '>
+      <div className='grid grid-cols-3 max-md:grid-cols-2 gap-2'>
+        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 '>
           {/* Icon with percent */}
           <div className='flex items-center justify-between'>
             <div className='bg-red-200 p-2 rounded-lg'>
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
             <p className='text-sm text-[#64748b]'>vs Last week</p>
           </div>
         </div>
-        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 max-md:w-[240px] flex-1 '>
+        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 '>
           {/* Icon with percent */}
           <div className='flex items-center justify-between'>
             <div className='bg-red-200 p-2 rounded-lg'>
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
             <p className='text-sm text-[#64748b]'>new this week</p>
           </div>
         </div>
-        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 max-md:w-[240px] flex-1'>
+        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1  '>
           {/* Icon with percent */}
           <div className='flex items-center justify-between'>
             <div className='bg-red-200 p-2 rounded-lg'>
@@ -186,7 +186,7 @@ export default function AdminDashboard() {
             <p className='text-sm text-gray-500'>ready to deploy</p>
           </div>
         </div>
-        <div className='bg-white rounded-2xl  p-4 hover:shadow-xl flex flex-col gap-1 max-md:w-[240px] flex-1'>
+        <div className='bg-white rounded-2xl  p-4 hover:shadow-xl flex flex-col gap-1 '>
           {/* Icon with percent */}
           <div className='flex items-center justify-between'>
             <div className='bg-red-200 p-2 rounded-lg'>
@@ -202,7 +202,7 @@ export default function AdminDashboard() {
             <p className='text-sm text-[#64748b]'>actively hiring</p>
           </div>
         </div>
-        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 max-md:w-[240px] flex-1'>
+        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 '>
           {/* Icon with percent */}
           <div className='flex items-center justify-between'>
             <div className='bg-red-200 p-2 rounded-lg'>
@@ -216,7 +216,7 @@ export default function AdminDashboard() {
             <p className='text-sm text-[#64748b]'>Colleges under us</p>
           </div>
         </div>
-        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 max-md:w-[240px] flex-1'>
+        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 '>
           {/* Icon with percent */}
           <div className='flex items-center justify-between'>
             <div className='bg-red-200 p-2 rounded-lg'>
@@ -334,7 +334,7 @@ export default function AdminDashboard() {
             <tbody className='divide-y divide-gray-100'>
               {recentApplicates.map((applicante) => {
                 return (
-                  <tr className='hover:bg-gray-50'>
+                  <tr key={applicante.candidate} className='hover:bg-gray-50'>
                     <td className='p-3'>{applicante.candidate}</td>
                     <td className='p-3'>{applicante.position}</td>
                     <td className='p-3'>{applicante.Experience}</td>

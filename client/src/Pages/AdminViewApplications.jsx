@@ -1,98 +1,88 @@
 import React, { useEffect, useState } from "react";
 import "./AdminViewApplications.css"; // Import the CSS file
 
-const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxf3HDT5zGZQqPkkDTC_72jSd-OASNrCd71FiRxtnv3Q3EK3o8YzfiHYRwBP1b_StjJ/exec"; // replace with your script URL
+const Job_Applications_GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwNpys2m9qGngoB2fkcSyhUxkkuegOpzzL_adw47LZoTuhTwCc4q1u5KGh7e7r-8DKI/exec";
 
-const ViewEnrollments = () => {
-  const [enrollments, setEnrollments] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(null); // Add error state
+const AdminApplications = () => {
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch data on component mount
-  useEffect(() => {
-    const fetchEnrollments = async () => {
-      try {
-        setLoading(true); // Set loading to true before fetching
-        const response = await fetch(GOOGLE_SHEETS_URL);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setEnrollments(data);
-      } catch (e) {
-        console.error("Error fetching enrollments:", e);
-        setError("Failed to load enrollments. Please try again later.");
-      } finally {
-        setLoading(false); // Set loading to false after fetching (success or error)
-      }
-    };
+useEffect(() => {
+  window.handleApplications = (response) => {
+    if (response.result === "success") {
+      setApplications(response.data);
+    } else {
+      setError("Failed to load applications");
+    }
+    setLoading(false); // ✅ Important: stop loading
+  };
 
-    fetchEnrollments();
-  }, []);
+  const script = document.createElement("script");
+  script.src = `${Job_Applications_GOOGLE_SHEETS_URL}?callback=handleApplications`;
+  script.async = true; // ✅ Ensure async load
+  document.body.appendChild(script);
 
+  return () => {
+    document.body.removeChild(script);
+    delete window.handleApplications;
+  };
+}, []);
 
 
+  if (loading) return (
+    <div className="loading-spinner-container">
+      <div className="spinner"></div>
+      <p style={{marginLeft: '15px'}}>Loading applications...</p>
+    </div>
+  );
+  if (error) return <p>{error}</p>; // ✅ Show error if exists
 
   return (
-    <div className="view-enrollments-container">
-      <h2 className="enrollments-title">Enrolled Students</h2>
-
-      {loading && (
-        <div className="loading-spinner">
-        </div>
-        
-      )}
-
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
-
-      {!loading && !error && (
-        <div className="table-wrapper">
-          <table className="enrollments-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Contact</th>
-                <th>Email</th>
-                <th>Location</th>
-                <th>Resume</th>
+    <div className="admin-applications">
+      <h2>Job Applications</h2>
+      <table className="applications-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>Experience</th>
+            <th>Current Salary</th>
+            <th>Expected Salary</th>
+            <th>Location</th>
+            <th>Job Role</th>
+            <th>Resume</th>
+          </tr>
+        </thead>
+        <tbody>
+          {applications.length > 0 ? (
+            applications.map((app, index) => (
+              <tr key={index}>
+                <td>{app.name}</td>
+                <td>{app.contact}</td>
+                <td>{app.email}</td>
+                <td>{app.experience}</td>
+                <td>{app.currentSalary}</td>
+                <td>{app.expectedSalary}</td>
+                <td>{app.location}</td>
+                <td>{app.jobRole}</td>
+                <td>
+                  {app.resumeUrl ? (
+                    <a href={app.resumeUrl} target="_blank" rel="noopener noreferrer">View Resume</a>
+                  ) : "N/A"}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {enrollments.length > 0 ? (
-                enrollments.map((student, index) => (
-                  <tr key={index} className={index % 2 === 0 ? "even-row" : "odd-row"}>
-                    <td>{student.Name}</td>
-                    <td>{student.Contact}</td>
-                    <td>{student.Email}</td>
-                    <td>{student.Location}</td>
-                    <td>
-                      <a 
-                        href={student.Resume} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="resume-link"
-                      >
-                        View Resume
-                      </a>
-                    </td>
-
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="no-enrollments">No enrollments yet</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+            ))
+          ) : (
+            <tr>
+              <td colSpan="9">No applications yet</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-export default ViewEnrollments;
+export default AdminApplications;

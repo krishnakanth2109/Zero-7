@@ -44,6 +44,7 @@ import PayrollServices from './Pages/PayrollServices.jsx'
 import Resumemarketing from './Pages/Resumemarketing.jsx'
 import Ittraining from './Pages/Ittraining.jsx'
 import Nonittraining from './Pages/Nonittraining.jsx'
+import ViewEnrollments from './Pages/AdminStudentEnrollment.jsx'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -96,6 +97,7 @@ function App() {
           <Route path='/contact' element={<Contact />} />
           <Route path='/college-connect' element={<CollegeConnect />} />
           <Route path='/current-hirings' element={<CurrentHirings />} />
+                
 
           <Route path='/digital-courses' element={<DigitalCourses />} />
           <Route
@@ -112,6 +114,7 @@ function App() {
           />
           <Route path='/services/it-training' element={<Ittraining />} />
           <Route path='/services/non-it-training' element={<Nonittraining />} />
+
           {/* Admin Login Route */}
           <Route path='/admin' element={<LoginPage />} />
           {/* Admin Protected Routes */}
@@ -130,6 +133,7 @@ function App() {
             <Route path='applications' element={<AdminViewApplications />} />
             <Route path='new-batch-dashboard' element={<NewBatchDashboard />} />
             <Route path='manage-blogs' element={<ManageBlogs />} />
+                <Route path='studentenrollment' element={<ViewEnrollments />} />
 
             <Route
               path='manage-candidates'

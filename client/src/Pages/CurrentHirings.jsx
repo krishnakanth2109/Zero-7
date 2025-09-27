@@ -45,47 +45,51 @@ const CurrentHirings = () => {
     fetchJobs();
   }, []);
 
-
-
-
-
-
-
-
-
-  const handleApplyChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "resume") {
-      setApplyData({ ...applyData, resume: files[0] });
-    } else {
-      setApplyData({ ...applyData, [name]: value });
-    }
-  };
-
-  const handleApplySubmit = async (e) => {
-    e.preventDefault();
-    if (selectedJobIndex === null) return;
-
-    const job = jobPositions[selectedJobIndex];
-    const applicationData = new FormData();
-    applicationData.append("jobId", job._id);
-    applicationData.append("name", applyData.name);
-    applicationData.append("contact", applyData.contact);
-    applicationData.append("email", applyData.email);
-    applicationData.append("experience", applyData.experience);
-    applicationData.append("currentSalary", applyData.currentSalary);
-    applicationData.append("expectedSalary", applyData.expectedSalary);
-    applicationData.append("location", applyData.location);
-    applicationData.append("resume", applyData.resume);
-
-    try {
-      await axios.post(`${API_URL}/api/applications`, applicationData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
+const handleApplyChange = (e) => {
+  const { name, value, files } = e.target;
+  if (name === "resume") {
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setApplyData({
+        ...applyData,
+        resume: {
+          name: file.name,
+          type: file.type,
+          data: reader.result.split(",")[1], // Base64 only
         },
       });
-      alert(`Application submitted for ${job.role} ✅`);
-      console.log("Application Data:", applyData);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    setApplyData({ ...applyData, [name]: value });
+  }
+};
+
+
+const handleApplySubmit = async (e) => {
+  e.preventDefault();
+
+  const selectedJob = jobPositions[selectedJobIndex];
+
+  const formDataToSend = {
+    ...applyData,
+    jobRole: selectedJob.role,
+  };
+
+  try {
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbzkJT0y4eIeKIcKEgmLl2A_QOmDuqan0uPBM_Z9GKn9rAC_tNQoT7E-KzwHOuA4RGNK/exec",
+      {
+        method: "POST",
+        body: JSON.stringify(formDataToSend), // ✅ no headers
+      }
+    );
+
+    const result = await response.json(); // Apps Script returns JSON
+    if (result.result === "success") {
+      alert("Application submitted!");
+      setSelectedJobIndex(null);
       setApplyData({
         name: "",
         contact: "",
@@ -96,12 +100,16 @@ const CurrentHirings = () => {
         location: "",
         resume: null,
       });
-      setSelectedJobIndex(null);
-    } catch (error) {
-      console.error("Error submitting application:", error);
-      alert("Failed to submit application. Please check the console for details.");
+    } else {
+      alert("Error: " + result.message);
     }
-  };
+  } catch (error) {
+    console.error("Error submitting application:", error);
+    alert("Submission failed. Check console for details.");
+  }
+};
+
+
 
 
   
@@ -164,7 +172,8 @@ const CurrentHirings = () => {
                   <tr className="apply-form-row">
                     <td colSpan="6">
                       <div className="apply-form-container slide-down">
-                        <h3><Briefcase size={20} className="icon" /> Apply for {job.role}</h3>
+               <h3><Briefcase size={20} className="icon" /> Apply for {job.role}</h3>
+
                         <form onSubmit={handleApplySubmit} className="apply-form">
                           <div className="input-group">
                             <User size={16} /> <input type="text" name="name" placeholder="Your Name" value={applyData.name} onChange={handleApplyChange} required />

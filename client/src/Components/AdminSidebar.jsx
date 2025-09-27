@@ -106,9 +106,8 @@ export default function AdminSidebar({ isOpen }) {
         <nav>
           <Link
             to='/admin/dashboard'
-            className={`sidebar-link ${
-              isActive('/admin/dashboard') ? 'active' : ''
-            }`}>
+            className={`sidebar-link ${isActive('/admin/dashboard') ? 'active' : ''
+              }`}>
             <div className='dashboard-icon'>
               <LayoutDashboard style={{ width: '18px' }} /> Dashboard{' '}
             </div>
@@ -116,9 +115,8 @@ export default function AdminSidebar({ isOpen }) {
           <div className='dropdown-container'>
             <div
               onClick={() => setOpenServices(!openServices)}
-              className={`sidebar-link flex justify-between items-center services-header ${
-                isSubmenuActive ? 'active' : ''
-              }`}>
+              className={`sidebar-link flex justify-between items-center services-header ${isSubmenuActive ? 'active' : ''
+                }`}>
               <div className='dashboard-icon'>
                 <HardDrive style={{ width: '18px' }} /> Services{' '}
               </div>
@@ -131,16 +129,14 @@ export default function AdminSidebar({ isOpen }) {
               <div className='submenu'>
                 <Link
                   to='/admin/it-programs'
-                  className={`sidebar-link ${
-                    isActive('/admin/it-programs') ? 'active' : ''
-                  }`}>
+                  className={`sidebar-link ${isActive('/admin/it-programs') ? 'active' : ''
+                    }`}>
                   IT Services
                 </Link>
                 <Link
                   to='/admin/non-it-programs'
-                  className={`sidebar-link ${
-                    isActive('/admin/non-it-programs') ? 'active' : ''
-                  }`}>
+                  className={`sidebar-link ${isActive('/admin/non-it-programs') ? 'active' : ''
+                    }`}>
                   Non IT Services
                 </Link>
               </div>
@@ -148,9 +144,8 @@ export default function AdminSidebar({ isOpen }) {
           </div>
           <Link
             to='/admin/forms'
-            className={`sidebar-link ${
-              isActive('/admin/forms') ? 'active' : ''
-            }`}>
+            className={`sidebar-link ${isActive('/admin/forms') ? 'active' : ''
+              }`}>
             <div className='dashboard-cont'>
               <div className='dashboard-icon'>
                 <CardSim style={{ width: '18px' }} /> Form Submissions
@@ -168,28 +163,34 @@ export default function AdminSidebar({ isOpen }) {
           </Link>
           <Link
             to='/admin/manage-jobs'
-            className={`sidebar-link ${
-              isActive('/admin/manage-jobs') ? 'active' : ''
-            }`}>
+            className={`sidebar-link ${isActive('/admin/manage-jobs') ? 'active' : ''
+              }`}>
             <div className='dashboard-icon'>
               <CircleUser style={{ width: '18px' }} /> Manage Jobs{' '}
             </div>
           </Link>
           <Link
             to='/admin/applications'
-            className={`sidebar-link ${
-              isActive('/admin/applications') ? 'active' : ''
-            }`}>
+            className={`sidebar-link ${isActive('/admin/applications') ? 'active' : ''
+              }`}>
             <div className='dashboard-icon'>
               <Store style={{ width: '18px' }} />
               View Applications{' '}
             </div>
           </Link>
+                    <Link
+            to='/admin/studentenrollment'
+            className={`sidebar-link ${isActive('/admin/studentenrollment') ? 'active' : ''
+              }`}>
+            <div className='dashboard-icon'>
+              <Store style={{ width: '18px' }} />
+              Student Enrollments{' '}
+            </div>
+          </Link>
           <Link
             to='/admin/new-batch-dashboard'
-            className={`sidebar-link ${
-              isActive('/admin/new-batch-dashboard') ? 'active' : ''
-            }`}>
+            className={`sidebar-link ${isActive('/admin/new-batch-dashboard') ? 'active' : ''
+              }`}>
             <div className='dashboard-icon'>
               <GraduationCap style={{ width: '18px' }} />
               New Batches{' '}
@@ -197,9 +198,8 @@ export default function AdminSidebar({ isOpen }) {
           </Link>
           <Link
             to='/admin/manage-blogs'
-            className={`sidebar-link ${
-              isActive('/admin/manage-blogs') ? 'active' : ''
-            }`}>
+            className={`sidebar-link ${isActive('/admin/manage-blogs') ? 'active' : ''
+              }`}>
             <div className='dashboard-icon'>
               <Shield style={{ width: '18px' }} />
               Manage Blogs{' '}
@@ -207,9 +207,8 @@ export default function AdminSidebar({ isOpen }) {
           </Link>
           <Link
             to='/admin/manage-candidates'
-            className={`sidebar-link ${
-              isActive('/admin/manage-candidates') ? 'active' : ''
-            }`}>
+            className={`sidebar-link ${isActive('/admin/manage-candidates') ? 'active' : ''
+              }`}>
             <div className='dashboard-icon'>
               <UserRound style={{ width: '18px' }} />
               Manage Candidates{' '}
@@ -217,9 +216,8 @@ export default function AdminSidebar({ isOpen }) {
           </Link>
           <Link
             to='/admin/view-requests'
-            className={`sidebar-link ${
-              isActive('/admin/view-requests') ? 'active' : ''
-            }`}>
+            className={`sidebar-link ${isActive('/admin/view-requests') ? 'active' : ''
+              }`}>
             <div className='dashboard-cont'>
               <div className='dashboard-icon'>
                 <AudioLines style={{ width: '18px' }} /> View Requests

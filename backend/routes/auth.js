@@ -72,7 +72,7 @@ router.post('/', async (request, response) => {
       // await transporter.sendMail(mailOptions)
       console.log('Successful login alert email sent')
       response.status(200)
-      response.send({ message: 'Welcome Admin', user: payLoad, Token: token })
+      response.send({ message: 'Welcome Admin', user: payLoad, token: token })
     }
   }
 })

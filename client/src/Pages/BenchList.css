@@ -2,13 +2,16 @@
    GLOBAL
 =========================== */
 .bench-page {
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   color: #000000;
   line-height: 1.6;
   background: #f8fbff;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-weight: 600;
   margin-bottom: 15px;
 }
@@ -44,7 +47,7 @@ section {
 
 /* Dark/gradient overlay to improve text visibility */
 .hero-section::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -66,15 +69,13 @@ section {
 .hero-section h1 {
   font-size: 4rem;
   margin-bottom: 20px;
-  color: #131415;
+  color: #fff;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-
 }
 
 .hero-section p {
   font-size: 1.5rem;
   margin-bottom: 30px;
-  
 }
 
 .btn-gradient {
@@ -86,7 +87,7 @@ section {
   cursor: pointer;
   transition: 0.3s ease;
   font-size: 1.2rem;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
 .btn-gradient:hover {
@@ -103,7 +104,7 @@ section {
   cursor: pointer;
   transition: 0.3s ease;
   font-size: 1.2rem;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
   display: inline-block;
   text-align: center;
 }
@@ -147,7 +148,6 @@ section {
   }
 }
 
-
 /* Responsive styles */
 @media (max-width: 1024px) {
   .hero-section h1 {
@@ -190,7 +190,6 @@ section {
     font-size: 0.9rem;
   }
 }
-
 
 /* ===========================
    BUTTONS
@@ -292,10 +291,10 @@ section {
   padding: 15px;
   text-align: center;
   border-bottom: 1px solid #eee;
-  max-width: 200px;          /* 👈 limit column width */
-  white-space: nowrap;       /* 👈 single line */
-  overflow: hidden;          /* 👈 hide overflow */
-  text-overflow: ellipsis;   /* 👈 show ... */
+  max-width: 200px; /* 👈 limit column width */
+  white-space: nowrap; /* 👈 single line */
+  overflow: hidden; /* 👈 hide overflow */
+  text-overflow: ellipsis; /* 👈 show ... */
 }
 .candidate-table th {
   background: linear-gradient(45deg, #389bf3, #00bfff);
@@ -345,10 +344,10 @@ section {
   font-size: 1rem;
 }
 
-.input-group input[type="text"],
-.input-group input[type="tel"],
-.input-group input[type="email"],
-.input-group input[type="file"] {
+.input-group input[type='text'],
+.input-group input[type='tel'],
+.input-group input[type='email'],
+.input-group input[type='file'] {
   width: 100%;
   padding: 12px 14px 12px 40px; /* left padding for icon */
   border: 1px solid #ccc;
@@ -400,7 +399,6 @@ section {
   }
 }
 
-
 /* Google Font (add to your <head> in index.html) 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 */
@@ -409,7 +407,7 @@ section {
 .popup-form-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -427,7 +425,7 @@ section {
   width: 100%;
   border-radius: 16px;
   text-align: left;
-  box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
   margin-top: 20px;
   max-height: 90vh;
   overflow-y: auto;
@@ -460,7 +458,7 @@ section {
 .popup-form form select:focus {
   outline: none;
   border: 1px solid #0f62fe;
-  box-shadow: 0 0 0 3px rgba(15,98,254,0.15);
+  box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.15);
 }
 
 /* Icon inside input */
@@ -495,7 +493,7 @@ section {
   line-height: 1.4;
   cursor: pointer;
 }
-.checkbox input[type="checkbox"] {
+.checkbox input[type='checkbox'] {
   appearance: none;
   width: 18px;
   height: 18px;
@@ -506,10 +504,10 @@ section {
   cursor: pointer;
   flex-shrink: 0;
 }
-.checkbox input[type="checkbox"]:checked {
+.checkbox input[type='checkbox']:checked {
   background: #0f62fe;
 }
-.checkbox input[type="checkbox"]:checked::after {
+.checkbox input[type='checkbox']:checked::after {
   content: '✔';
   color: #fff;
   font-size: 12px;
@@ -535,7 +533,7 @@ section {
   transition: transform 0.25s ease, opacity 0.25s ease;
   font-size: 1rem;
   font-weight: 500;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 .btn-gradient:hover {
   transform: scale(1.04);
@@ -573,7 +571,6 @@ section {
     flex-direction: column;
   }
 }
-
 
 /* ===========================
    INFO FLIP CARDS
@@ -739,7 +736,7 @@ section {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -751,7 +748,7 @@ section {
   border-radius: 12px;
   max-width: 500px;
   width: 90%;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 .popup-form input,
 .popup-form textarea {
@@ -776,7 +773,9 @@ section {
   .stats-section {
     flex-direction: column;
   }
-  .info-cards, .process-steps, .testimonial-cards {
+  .info-cards,
+  .process-steps,
+  .testimonial-cards {
     flex-direction: column;
     align-items: center;
   }

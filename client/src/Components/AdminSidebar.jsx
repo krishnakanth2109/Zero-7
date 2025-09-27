@@ -96,7 +96,7 @@ export default function AdminSidebar({ isOpen }) {
       <div>
         <div className='admin-sidebar-header'>
           <div className='logo-img'>
-            <span>Z7</span>
+            <img src='/L1.png' alt='logo' />
           </div>
           <div className='logo-side-name'>
             <div className='head-name'>Zero7 Tech</div>

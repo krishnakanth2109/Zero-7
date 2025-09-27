@@ -1,246 +1,154 @@
-// File: src/Components/AdminSidebar.jsx (The Final, Correct Version)
+// File: src/Components/AdminSidebar.jsx (Complete and Corrected)
 
-import React, { useState, useEffect } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  AudioLines,
-  CardSim,
-  ChevronDown,
-  CircleUser,
-  GraduationCap,
-  HardDrive,
-  LayoutDashboard,
-  LogOut,
-  Shield,
-  Store,
-  UserRound,
-} from 'lucide-react'
-import api from '../api/axios' // <-- CORRECT: Imports the central, working API connection.
-import { io } from 'socket.io-client'
-import './AdminSidebar.css'
-
-// REMOVED: The old, inconsistent 'const API_URL' is gone because 'api' now handles it correctly.
+  AudioLines, CardSim, ChevronDown, CircleUser, GraduationCap, HardDrive,
+  LayoutDashboard, LogOut, Shield, Store, UserCog, UserRound, UserSearch,
+} from 'lucide-react';
+import api from '../api/axios';
+import { io } from 'socket.io-client';
+import './AdminSidebar.css';
 
 export default function AdminSidebar({ isOpen }) {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const [openServices, setOpenServices] = useState(false)
-  const [newCount, setNewCount] = useState(0)
-  const [newRequestCount, setNewRequestCount] = useState(0)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [openServices, setOpenServices] = useState(false);
+  const [newCount, setNewCount] = useState(0);
+  const [newRequestCount, setNewRequestCount] = useState(0);
 
-  // This logic is preserved
   useEffect(() => {
-    if (
-      location.pathname === '/admin/it-programs' ||
-      location.pathname === '/admin/non-it-programs'
-    ) {
-      setOpenServices(true)
+    if (location.pathname.startsWith('/admin/it-programs') || location.pathname.startsWith('/admin/non-it-programs')) {
+      setOpenServices(true);
     }
-  }, [location.pathname])
+  }, [location.pathname]);
 
-  const isActive = (path) => location.pathname === path
-  const isSubmenuActive =
-    location.pathname === '/admin/it-programs' ||
-    location.pathname === '/admin/non-it-programs'
+  const isActive = (path) => location.pathname === path;
+  const isSubmenuActive = location.pathname.includes('programs');
 
-  // This logic is preserved but now uses the correct API connection
   useEffect(() => {
-    const fetchNewForms = async () => {
+    const fetchCounts = async () => {
       try {
-        // CORRECT: Uses the central 'api' object. This will now succeed.
-        const res = await api.get('/forms/count-new')
-        setNewCount(res.data.count ?? 0)
+        const res = await api.get('/forms/count-new');
+        setNewCount(res.data.count ?? 0);
       } catch (err) {
-        console.error('Failed to fetch form count:', err)
+        console.error('Failed to fetch counts:', err);
       }
-    }
-    fetchNewForms()
-  }, [])
+    };
+    fetchCounts();
+  }, []);
 
-  // This logic is preserved
   useEffect(() => {
-    if (location.pathname === '/admin/forms') {
-      setNewCount(0)
-    }
-    if (location.pathname === '/admin/view-requests') {
-      setNewRequestCount(0)
-    }
-  }, [location.pathname])
+    if (location.pathname === '/admin/forms') setNewCount(0);
+    if (location.pathname === '/admin/view-requests') setNewRequestCount(0);
+  }, [location.pathname]);
 
-  // This logic is preserved and made more robust
   useEffect(() => {
-    // Correctly determines the base URL for Socket.IO from the environment
-    const socket_url = (
-      process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
-    ).replace('/api', '')
-    const socket = io(socket_url)
+    const socket_url = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace('/api', '');
+    const socket = io(socket_url);
 
-    socket.on('newFormSubmission', () => setNewCount((prev) => prev + 1))
-    socket.on('newInfoRequest', () => setNewRequestCount((prev) => prev + 1))
+    socket.on('newFormSubmission', () => setNewCount((prev) => prev + 1));
+    socket.on('newInfoRequest', () => setNewRequestCount((prev) => prev + 1));
 
-    return () => socket.disconnect()
-  }, [])
+    return () => socket.disconnect();
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('isAdmin')
-    navigate('/admin')
-  }
+    localStorage.removeItem('isAdmin');
+    navigate('/admin');
+  };
 
-  // Your JSX and all links are preserved exactly as they were
   return (
-    <aside
-      className={`
-          admin-sidebar overflow-scroll fixed top-0 left-0 h-full w-64 transform transition-all duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : '-translate-x-full opacity-0'}
-        `}>
+    <aside className={`admin-sidebar ${!isOpen ? 'collapsed' : ''}`}>
       <div>
         <div className='admin-sidebar-header'>
+<<<<<<< HEAD
           <div className='logo-img'>
             <img src='/L1.png' alt='logo' />
           </div>
+=======
+          <div className='logo-img'><span>Z7</span></div>
+>>>>>>> 986d6a7852cb58322ed5bf543bd9fa6f99bbd3ad
           <div className='logo-side-name'>
             <div className='head-name'>Zero7 Tech</div>
             <div className='head-panel'>Admin Panel</div>
           </div>
         </div>
+        
         <nav>
-          <Link
-            to='/admin/dashboard'
-            className={`sidebar-link ${
-              isActive('/admin/dashboard') ? 'active' : ''
-            }`}>
-            <div className='dashboard-icon'>
-              <LayoutDashboard style={{ width: '18px' }} /> Dashboard{' '}
-            </div>
+          <Link to='/admin/dashboard' className={`sidebar-link ${isActive('/admin/dashboard') ? 'active' : ''}`} data-tooltip="Dashboard">
+            <div className='dashboard-icon'><LayoutDashboard style={{ width: '18px', flexShrink: 0 }} /> <span className="link-text">Dashboard</span></div>
           </Link>
+          
           <div className='dropdown-container'>
-            <div
-              onClick={() => setOpenServices(!openServices)}
-              className={`sidebar-link flex justify-between items-center services-header ${
-                isSubmenuActive ? 'active' : ''
-              }`}>
-              <div className='dashboard-icon'>
-                <HardDrive style={{ width: '18px' }} /> Services{' '}
-              </div>
-              <ChevronDown
-                size={18}
-                className={`dropdown-arrow ${openServices ? 'rotate' : ''}`}
-              />
+            <div onClick={() => setOpenServices(!openServices)} className={`sidebar-link services-header ${isSubmenuActive ? 'active' : ''}`} data-tooltip="Services">
+              <div className='dashboard-icon'><HardDrive style={{ width: '18px', flexShrink: 0 }} /> <span className="link-text">Services</span></div>
+              <ChevronDown size={18} className={`dropdown-arrow ${openServices ? 'rotate' : ''}`} />
             </div>
             {openServices && (
               <div className='submenu'>
-                <Link
-                  to='/admin/it-programs'
-                  className={`sidebar-link ${
-                    isActive('/admin/it-programs') ? 'active' : ''
-                  }`}>
-                  IT Services
-                </Link>
-                <Link
-                  to='/admin/non-it-programs'
-                  className={`sidebar-link ${
-                    isActive('/admin/non-it-programs') ? 'active' : ''
-                  }`}>
-                  Non IT Services
-                </Link>
+                <Link to='/admin/it-programs' className={`sidebar-link ${isActive('/admin/it-programs') ? 'active' : ''}`} data-tooltip="IT Services">IT Services</Link>
+                <Link to='/admin/non-it-programs' className={`sidebar-link ${isActive('/admin/non-it-programs') ? 'active' : ''}`} data-tooltip="Non-IT Services">Non IT Services</Link>
               </div>
             )}
           </div>
-          <Link
-            to='/admin/forms'
-            className={`sidebar-link ${
-              isActive('/admin/forms') ? 'active' : ''
-            }`}>
+
+          <Link to='/admin/forms' className={`sidebar-link ${isActive('/admin/forms') ? 'active' : ''}`} data-tooltip="Form Submissions">
             <div className='dashboard-cont'>
-              <div className='dashboard-icon'>
-                <CardSim style={{ width: '18px' }} /> Form Submissions
-              </div>
-              <div>
-                <span>
-                  {newCount > 0 ? (
-                    <span className='notification-badge'>{newCount}</span>
-                  ) : (
-                    <span className='notification-badge'>{newCount}</span>
-                  )}
-                </span>
-              </div>
+              <div className='dashboard-icon'><CardSim style={{ width: '18px', flexShrink: 0 }} /> <span className="link-text">Form Submissions</span></div>
+              {newCount > 0 && <span className='notification-badge'>{newCount}</span>}
             </div>
           </Link>
-          <Link
-            to='/admin/manage-jobs'
-            className={`sidebar-link ${
-              isActive('/admin/manage-jobs') ? 'active' : ''
-            }`}>
-            <div className='dashboard-icon'>
-              <CircleUser style={{ width: '18px' }} /> Manage Jobs{' '}
-            </div>
+
+          <Link to='/admin/manage-jobs' className={`sidebar-link ${isActive('/admin/manage-jobs') ? 'active' : ''}`} data-tooltip="Manage Jobs">
+            <div className='dashboard-icon'><CircleUser style={{ width: '18px', flexShrink: 0 }} /> <span className="link-text">Manage Jobs</span></div>
           </Link>
-          <Link
-            to='/admin/applications'
-            className={`sidebar-link ${
-              isActive('/admin/applications') ? 'active' : ''
-            }`}>
-            <div className='dashboard-icon'>
-              <Store style={{ width: '18px' }} />
-              View Applications{' '}
-            </div>
+
+          <Link to='/admin/applications' className={`sidebar-link ${isActive('/admin/applications') ? 'active' : ''}`} data-tooltip="View Applications">
+            <div className='dashboard-icon'><Store style={{ width: '18px', flexShrink: 0 }} /> <span className="link-text">View Applications</span></div>
           </Link>
-          <Link
-            to='/admin/new-batch-dashboard'
-            className={`sidebar-link ${
-              isActive('/admin/new-batch-dashboard') ? 'active' : ''
-            }`}>
-            <div className='dashboard-icon'>
-              <GraduationCap style={{ width: '18px' }} />
-              New Batches{' '}
-            </div>
+
+          <Link to='/admin/new-batch-dashboard' className={`sidebar-link ${isActive('/admin/new-batch-dashboard') ? 'active' : ''}`} data-tooltip="New Batches">
+            <div className='dashboard-icon'><GraduationCap style={{ width: '18px', flexShrink: 0 }} /> <span className="link-text">New Batches</span></div>
           </Link>
-          <Link
-            to='/admin/manage-blogs'
-            className={`sidebar-link ${
-              isActive('/admin/manage-blogs') ? 'active' : ''
-            }`}>
-            <div className='dashboard-icon'>
-              <Shield style={{ width: '18px' }} />
-              Manage Blogs{' '}
-            </div>
+
+          <Link to='/admin/manage-blogs' className={`sidebar-link ${isActive('/admin/manage-blogs') ? 'active' : ''}`} data-tooltip="Manage Blogs">
+            <div className='dashboard-icon'><Shield style={{ width: '18px', flexShrink: 0 }} /> <span className="link-text">Manage Blogs</span></div>
           </Link>
-          <Link
-            to='/admin/manage-candidates'
-            className={`sidebar-link ${
-              isActive('/admin/manage-candidates') ? 'active' : ''
-            }`}>
-            <div className='dashboard-icon'>
-              <UserRound style={{ width: '18px' }} />
-              Manage Candidates{' '}
-            </div>
+
+          <Link to='/admin/manage-candidates' className={`sidebar-link ${isActive('/admin/manage-candidates') ? 'active' : ''}`} data-tooltip="Manage Candidates">
+            <div className='dashboard-icon'><UserRound style={{ width: '18px', flexShrink: 0 }} /> <span className="link-text">Manage Candidates</span></div>
           </Link>
-          <Link
-            to='/admin/view-requests'
-            className={`sidebar-link ${
-              isActive('/admin/view-requests') ? 'active' : ''
-            }`}>
+          
+          <Link to='/admin/view-requests' className={`sidebar-link ${isActive('/admin/view-requests') ? 'active' : ''}`} data-tooltip="View Requests">
             <div className='dashboard-cont'>
-              <div className='dashboard-icon'>
-                <AudioLines style={{ width: '18px' }} /> View Requests
-              </div>
-              <div>
-                <span>
-                  {newCount > 0 ? (
-                    <span className='notification-badge'>{newCount}</span>
-                  ) : (
-                    <span className='notification-badge'>{newCount}</span>
-                  )}
-                </span>
-              </div>
+              <div className='dashboard-icon'><AudioLines style={{ width: '18px', flexShrink: 0 }} /> <span className="link-text">View Requests</span></div>
+              {newRequestCount > 0 && <span className='notification-badge'>{newRequestCount}</span>}
             </div>
           </Link>
-        </nav>
-      </div>
-      <button className='logout-btn' onClick={handleLogout}>
-        <LogOut size={18} style={{ marginRight: '8px' }} />
-        Logout
+
+          <Link to="/admin/manage-managers" className={`sidebar-link ${isActive("/admin/manage-managers") ? "active" : ""}`} data-tooltip="Add Managers">
+            <div className="dashboard-icon"><UserCog style={{ width: '18px', flexShrink: 0 }} /> <span className="link-text">Add Managers</span></div>
+          </Link>
+          
+          <Link to="/admin/manage-recruiters" className={`sidebar-link ${isActive("/admin/manage-recruiters") ? "active" : ""}`} data-tooltip="Add Recruiters">
+            <div className="dashboard-icon"><UserSearch style={{ width: '18px', flexShrink: 0 }} /> <span className="link-text">Add Recruiters</span></div>
+          </Link>
+           <button className='logout-btn' onClick={handleLogout} data-tooltip="Logout">
+        <LogOut size={18} />
+        <span className="link-text">Logout</span>
       </button>
+      
+        </nav>
+
+      </div>
+      
+      {/* This is the single, correctly placed logout button */}
+      <button className='logout-btn' onClick={handleLogout} data-tooltip="Logout">
+        <LogOut size={18} />
+        <span className="link-text">Logout</span>
+      </button>
+      
     </aside>
-  )
+  );
 }

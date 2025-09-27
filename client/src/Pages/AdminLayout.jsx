@@ -1,30 +1,37 @@
-// AdminLayout.jsx
-import React, { useState } from 'react'
-import { Outlet } from 'react-router-dom'
-import AdminSidebar from '../Components/AdminSidebar'
-import AdminHeader from '../Components/AdminHeader'
-import AdminNotifications from '../Components/AdminNotifications'
-import './AdminLayout.css'
+// File: src/Pages/AdminLayout.jsx (Corrected)
+
+import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import AdminSidebar from '../Components/AdminSidebar';
+import AdminHeader from '../Components/AdminHeader';
+import AdminNotifications from '../Components/AdminNotifications';
 
 export default function AdminLayout() {
-  const [open, setOpen] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const onToggleSidebar = () => {
-    setOpen(!open)
-  }
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
-    <div
-      className={`flex h-screen overflow-none flex-grow transition-all duration-300 ease-in-out ${
-        open ? 'ml-64' : 'ml-0'
-      }`}>
-      <AdminSidebar isOpen={open} />
-      <AdminNotifications /> {/* Always mounted */}
-      <div className='flex-1 flex flex-col'>
-        <AdminHeader toggleSidebar={onToggleSidebar} isOpen={open} />
-        <main className='overflow-scroll p-4'>
+    <div className="bg-slate-50 min-h-screen">
+      
+      {/* AdminSidebar is positioned fixed via its own CSS */}
+      <AdminSidebar isOpen={isSidebarOpen} />
+      <AdminNotifications />
+
+      {/* --- This wrapper gets a dynamic margin to stay clear of the fixed sidebar --- */}
+      <div 
+        className={`
+          transition-all duration-300 ease-in-out
+          ${isSidebarOpen ? 'ml-64' : 'ml-20'} 
+        `}
+      >
+        <AdminHeader toggleSidebar={toggleSidebar} isOpen={isSidebarOpen} />
+        <main className='p-4 sm:p-6'>
           <Outlet />
         </main>
       </div>
     </div>
-  )
+  );
 }

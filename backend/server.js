@@ -55,7 +55,16 @@ app.set('io', io)
 // --- THIS IS THE FIX ---
 // The detailed configuration block has been replaced by the simpler app.use(cors())
 // This allows your frontend on localhost:3000 to talk to your backend on localhost:5000
-app.use(cors())
+const allowedOrigins =
+  process.env.NODE_ENV === 'production'
+    ? ['https://zeroseven7.netlify.app']
+    : ['http://localhost:3000']
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  }),
+)
 // -----------------------
 
 // Use path.join to create an absolute path for serving static files

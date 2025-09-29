@@ -39,8 +39,8 @@ const __dirname = path.dirname(__filename)
 const io = new Server(server, {
   cors: {
     origin: [
-      'https://zero7-lw66.onrender.com', // backend host
-      'https://zero7tech.netlify.app', // frontend host
+      'https://zero-7-ayjp.onrender.com', // backend host
+      'https://zeroseven7.netlify.app', // frontend host
       'http://localhost:3000', // local dev
     ],
     methods: ['GET', 'POST'],

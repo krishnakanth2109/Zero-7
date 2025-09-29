@@ -81,7 +81,6 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('isAdmin')
     Cookie.remove('token')
     window.location.href = '/admin'
   }
@@ -262,7 +261,9 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
                   <div className='text-sm font-medium text-gray-900'>
                     {user.role === 'superAdmin' ? 'superAdmin' : user.name}
                   </div>
-                  <p className='text-[12px] text-gray-500'>{user.email}</p>
+                  <span className='text-[12px] text-gray-500'>
+                    {user.email}
+                  </span>
                 </div>
               </div>
 

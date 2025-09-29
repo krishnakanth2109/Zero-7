@@ -11,23 +11,3 @@
   align-items: center;
   gap: 10px;
 }
-.schedule-button {
-  background-color: #ffffff;
-  padding: 10px;
-  border-radius: 9px;
-  border-width: 0px;
-  font-weight: 500;
-}
-.icons {
-  height: 16px;
-  width: 16px;
-}
-
-.add-candidate {
-  background-color: #dc2626;
-  padding: 10px;
-  border-radius: 9px;
-  border-width: 0px;
-  font-weight: 500;
-  color: #ffffff;
-}

@@ -28,7 +28,7 @@ h2 {
 }
 
 .applications-table thead {
-  background-color: #4CAF50; /* A pleasant green */
+  background-color: #4caf50; /* A pleasant green */
   color: white;
 }
 
@@ -80,7 +80,7 @@ h2 {
 
 .spinner {
   border: 8px solid rgba(0, 0, 0, 0.1);
-  border-left-color: #4CAF50; /* Green spinner */
+  border-left-color: #4caf50; /* Green spinner */
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -88,12 +88,16 @@ h2 {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* No applications message styling */
-.applications-table tbody tr td[colSpan="9"] {
+.applications-table tbody tr td[colSpan='9'] {
   text-align: center;
   padding: 30px;
   font-style: italic;
@@ -101,9 +105,3 @@ h2 {
 }
 
 /* Error message styling */
-p {
-  text-align: center;
-  font-size: 1.2em;
-  color: #e74c3c; /* Red for errors */
-  margin-top: 20px;
-}

@@ -44,6 +44,7 @@
   position: relative;
   overflow: hidden;
   transition: transform 0.3s ease, background 0.3s ease;
+  color: #03a9f4;
 }
 
 /* icon inside */
@@ -159,6 +160,7 @@
   border: none;
   border-radius: 4px 0 0 4px;
   background: rgba(255, 255, 255, 0.95);
+  color: #0e0e0e;
 }
 
 .send-btn {

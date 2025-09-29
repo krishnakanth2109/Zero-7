@@ -27,6 +27,7 @@ import managerRoutes from './routes/manager.js'
 import recruiterRoutes from './routes/recruiter.js'
 import collegeConnectRoutes from './routes/collegeConnect.js'
 import registerDemoRoutes from './routes/registerDemo.js'
+import loginRoutes from './routes/login.js'
 
 const app = express()
 const server = http.createServer(app)
@@ -95,6 +96,7 @@ app.use('/api/managers', managerRoutes)
 app.use('/api/recruiters', recruiterRoutes)
 app.use('/api/college-connect', collegeConnectRoutes)
 app.use('/api/register-demo', registerDemoRoutes)
+app.use('/api/user', loginRoutes)
 // ✅ MongoDB connection
 const PORT = process.env.PORT || 5000
 

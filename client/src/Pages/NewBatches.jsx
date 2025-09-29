@@ -8,10 +8,9 @@ const NewBatches = () => {
   const [showRegistration, setShowRegistration] = useState(false)
   const [selectedCourse, setSelectedCourse] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
-  const [coursesData, setCoursesData] = useState([]) // Will hold data from API
+  const [coursesData, setCoursesData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // Fetch batch data from the backend
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -24,28 +23,27 @@ const NewBatches = () => {
       }
     }
     fetchCourses()
-    console.log(coursesData)
   }, [])
 
-  const courses = coursesData.map((course) => course.name)
+  // ✅ FIX: Mapped `course.course` instead of `course.name`
+  const courses = coursesData.map((course) => course.course)
 
-  // --- THIS IS THE CORRECTED FILTER LOGIC ---
+  // ✅ FIX: Filtering logic now uses the correct field names (`course`, `timing`)
   const filteredCourses = coursesData.filter((course) => {
     const searchLower = searchTerm.toLowerCase()
-    // Add safety checks (e.g., course.name && ...) to prevent crash if a field is missing
     return (
-      (course.name && course.name.toLowerCase().includes(searchLower)) ||
+      (course.course && course.course.toLowerCase().includes(searchLower)) ||
       (course.date && course.date.toLowerCase().includes(searchLower)) ||
-      (course.timings && course.timings.toLowerCase().includes(searchLower)) ||
+      (course.timing && course.timing.toLowerCase().includes(searchLower)) ||
       (course.duration &&
         course.duration.toLowerCase().includes(searchLower)) ||
       (course.trainer && course.trainer.toLowerCase().includes(searchLower))
     )
   })
-  // ------------------------------------------
 
-  const handleRegister = (course) => {
-    setSelectedCourse(course)
+  // ✅ FIX: Pass the correct course name string to the handler
+  const handleRegister = (courseName) => {
+    setSelectedCourse(courseName)
     setShowRegistration(true)
   }
 
@@ -53,7 +51,6 @@ const NewBatches = () => {
   const handleSearchChange = (e) => setSearchTerm(e.target.value)
   const clearSearch = () => setSearchTerm('')
 
-  // The RegistrationModal component does not need any changes.
   const RegistrationModal = ({ isOpen, onClose, initialCourse }) => {
     const [formData, setFormData] = useState({
       name: '',
@@ -78,14 +75,16 @@ const NewBatches = () => {
         return
       }
       try {
+        // ✅ FIX: Find the course object by `c.course`
         const selectedCourseObj = coursesData.find(
-          (c) => c.name === formData.selectedCourse,
+          (c) => c.course === formData.selectedCourse,
         )
         const payload = {
           ...formData,
           trainer: selectedCourseObj?.trainer || '',
           date: selectedCourseObj?.date || '',
-          timings: selectedCourseObj?.timings || '',
+          // ✅ FIX: Use `timing` instead of `timings`
+          timings: selectedCourseObj?.timing || '',
           duration: selectedCourseObj?.duration || '',
         }
         const response = await fetch(
@@ -164,9 +163,10 @@ const NewBatches = () => {
                     onChange={handleInputChange}
                     required>
                     <option value=''>-- Select a Course --</option>
-                    {courses.map((course, index) => (
-                      <option key={index} value={course}>
-                        {course}
+                    {/* ✅ FIX: Use a more descriptive variable name */}
+                    {courses.map((courseName, index) => (
+                      <option key={index} value={courseName}>
+                        {courseName}
                       </option>
                     ))}
                   </select>
@@ -249,15 +249,17 @@ const NewBatches = () => {
                 {filteredCourses.length > 0 ? (
                   filteredCourses.map((course) => (
                     <tr key={course._id}>
+                      {/* ✅ FIX: Render all fields from the course object */}
                       <td>{course.course}</td>
                       <td>{course.date}</td>
                       <td>{course.timing}</td>
-                      <td>{course.duration}</td>
+                      <td>{course.duration || 'N/A'}</td>
                       <td>{course.trainer}</td>
                       <td>
                         <button
                           className='register-btn'
-                          onClick={() => handleRegister(course.name)}>
+                          // ✅ FIX: Pass `course.course` to the handler
+                          onClick={() => handleRegister(course.course)}>
                           Register Now
                         </button>
                       </td>

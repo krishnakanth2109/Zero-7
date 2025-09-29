@@ -96,8 +96,9 @@ export const getUserAgent = (req) => {
  * @param {string} adminEmail - Admin email address
  * @returns {object} - Template data object
  */
-export const prepareSuccessLoginData = (req, adminEmail) => {
+export const prepareSuccessLoginData = (req, adminEmail, role) => {
   return {
+    USER: role,
     ADMIN_EMAIL: adminEmail,
     LOGIN_TIME: getCurrentTimestamp(),
     IP_ADDRESS: getClientIP(req),
@@ -112,8 +113,9 @@ export const prepareSuccessLoginData = (req, adminEmail) => {
  * @param {string} attemptedEmail - Email that was attempted
  * @returns {object} - Template data object
  */
-export const prepareFailedLoginData = (req, attemptedEmail) => {
+export const prepareFailedLoginData = (req, attemptedEmail, role) => {
   return {
+    USER: role,
     ATTEMPTED_EMAIL: attemptedEmail,
     ATTEMPT_TIME: getCurrentTimestamp(),
     IP_ADDRESS: getClientIP(req),

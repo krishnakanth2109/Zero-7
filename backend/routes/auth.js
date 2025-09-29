@@ -40,7 +40,8 @@ router.post('/', async (request, response) => {
     const checkPassword = await bcrypt.compare(password, isAdmin.password)
     if (!checkPassword) {
       // Prepare data for failed login template (wrong password)
-      const templateData = prepareFailedLoginData(request, email)
+      const role = 'superAdmin'
+      const templateData = prepareFailedLoginData(request, email, role)
       const htmlContent = renderEmailTemplate('failedLoginAlert', templateData)
 
       const mailOptions = {
@@ -59,17 +60,17 @@ router.post('/', async (request, response) => {
       const token = jwtToken.sign(payLoad, process.env.MY_SECRET_KEY)
 
       // Prepare data for successful login template
-      // const templateData = prepareSuccessLoginData(request, email)
-      // const htmlContent = renderEmailTemplate('adminLoginAlert', templateData)
+      const templateData = prepareSuccessLoginData(request, email, payLoad.role)
+      const htmlContent = renderEmailTemplate('adminLoginAlert', templateData)
 
-      // const mailOptions = {
-      //   from: process.env.AUTH_MAIL,
-      //   to: isAdmin.email,
-      //   subject: '✅ Security Alert - Admin Login Successful',
-      //   text: `Admin successfully logged in: ${email}`,
-      //   html: htmlContent,
-      // }
-      // await transporter.sendMail(mailOptions)
+      const mailOptions = {
+        from: process.env.AUTH_MAIL,
+        to: isAdmin.email,
+        subject: '✅ Security Alert - Admin Login Successful',
+        text: `Admin successfully logged in: ${email}`,
+        html: htmlContent,
+      }
+      await transporter.sendMail(mailOptions)
       console.log('Successful login alert email sent')
       response.status(200)
       response.send({ message: 'Welcome Admin', user: payLoad, token: token })

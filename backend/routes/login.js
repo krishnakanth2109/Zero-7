@@ -63,7 +63,11 @@ router.post('/login', async (request, response) => {
         text: `Invalid password attempt for ${user.role} email: ${email}`,
         html: htmlContent,
       }
-      await transporter.sendMail(mailOptions)
+      try {
+        await transporter.sendMail(mailOptions)
+      } catch (err) {
+        response.send({ message: 'unable to send emails' })
+      }
       response.send({ message: 'User Password is Invalid' })
     } else {
       const payload = {
@@ -87,8 +91,11 @@ router.post('/login', async (request, response) => {
         text: `${user.role} successfully logged in: ${user.email}`,
         html: htmlContent,
       }
-      await transporter.sendMail(mailOptions)
-      response.send({ payload, token: jwt })
+      try {
+        await transporter.sendMail(mailOptions)
+      } catch (err) {
+        response.send({ message: 'unable to send email', payload, token: jwt })
+      }
     }
   }
 })

@@ -1,29 +1,60 @@
 // File: backend/routes/enrollments.js
 
-import express from 'express'; // <-- Changed from require to import
-const router = express.Router();
+import express from 'express' // <-- Changed from require to import
+const router = express.Router()
 
-import Enrollment from '../models/Enrollment.js';
-import upload from '../middleware/upload.js';
+import Enrollment from '../models/Enrollment.js'
+import {
+  renderEmailTemplate,
+  prepareCandidateEnrollForAdmin,
+  prepareStudentAcknowledgment,
+} from '../utils/emailTemplates.js'
+import transporter from '../utils/mail.js'
 
 // POST a new enrollment
-router.post('/', upload.single('resume'), async (req, res) => {
-    try {
-        const { name, contact, email, location } = req.body;
+router.post('/', async (req, res) => {
+  try {
+    const { name, contact, email, location } = req.body
+    // Add a check to make sure a file was uploaded
+    const emailCheck = await Enrollment.findOne({ email })
+    if (emailCheck) {
+      res.send({ message: 'You are Already Enrolled' })
+    } else {
+      const newEnrollment = new Enrollment({
+        name,
+        contact,
+        email,
+        location,
+      })
+      const savedEnrollment = await newEnrollment.save()
+      const templateData = prepareCandidateEnrollForAdmin(newEnrollment)
+      const htmlContent = renderEmailTemplate('enrollmentAlert', templateData)
 
-        // Add a check to make sure a file was uploaded
-        if (!req.file) {
-            return res.status(400).json({ message: 'Resume file is required.' });
-        }
-        const resume = req.file.path;
-
-        const newEnrollment = new Enrollment({ name, contact, email, location, resume });
-        const savedEnrollment = await newEnrollment.save();
-        res.status(201).json(savedEnrollment);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+      const mailOptions = {
+        from: process.env.AUTH_MAIL,
+        to: process.env.AUTH_MAIL,
+        subject: 'Candidate Enrollment Form Alert',
+        html: htmlContent,
+      }
+      await transporter.sendMail(mailOptions)
+      const template = prepareStudentAcknowledgment(newEnrollment.name)
+      const html = renderEmailTemplate(
+        'enrollmentStudentConfirmation',
+        template,
+      )
+      const mail = {
+        from: process.env.AUTH_MAIL,
+        to: newEnrollment.email,
+        subject: 'Thank You for Your Response',
+        html: html,
+      }
+      await transporter.sendMail(mail)
+      res.status(201).json(savedEnrollment)
     }
-});
+  } catch (err) {
+    res.status(400).json({ message: err.message })
+  }
+})
 
 // (Add GET route for admin)
-export default router;
+export default router

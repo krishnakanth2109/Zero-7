@@ -143,3 +143,20 @@ export const prepareForSuccessfulPasswordChange = (req, username, login) => {
     CURRENT_DATE: getCurrentDate(),
   }
 }
+
+export const prepareCandidateEnrollForAdmin = (userDetails) => {
+  return {
+    NAME: userDetails.name,
+    EMAIL: userDetails.email,
+    PHONE: userDetails.contact,
+    LOCATION: userDetails.location,
+    CURRENT_DATE: getCurrentDate(),
+  }
+}
+
+export const prepareStudentAcknowledgment = (name) => {
+  return {
+    NAME: name,
+    CURRENT_DATE: getCurrentDate(),
+  }
+}

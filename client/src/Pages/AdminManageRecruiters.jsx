@@ -4,7 +4,16 @@ import api from '../api/axios';
 
 export default function AdminManageRecruiters() {
     const [recruiters, setRecruiters] = useState([]);
-    const [formData, setFormData] = useState({ email: '', password: '' });
+    // Expanded formData state to include all necessary fields
+    const [formData, setFormData] = useState({
+        name: '',
+        assigned_Company: '',
+        age: '',
+        phone: '',
+        employeeID: '',
+        email: '',
+        password: ''
+    });
     const [editingId, setEditingId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -39,11 +48,9 @@ export default function AdminManageRecruiters() {
         setSubmitting(true);
         try {
             if (editingId) {
-                const updateData = { email: formData.email };
-                if (formData.password) {
-                    updateData.password = formData.password;
-                }
-                await api.put(`/recruiters/${editingId}`, updateData);
+                // Logic from managers: don't send password if it's not being changed
+                const { password, ...updateData } = formData;
+                await api.put(`/recruiters/${editingId}`, password ? formData : updateData);
             } else {
                 await api.post('/recruiters/register', formData);
             }
@@ -58,7 +65,8 @@ export default function AdminManageRecruiters() {
     };
 
     const handleEdit = (recruiter) => {
-        setFormData({ email: recruiter.email, password: '' });
+        // Populate all fields for editing, clear password for security
+        setFormData({ ...recruiter, password: '' });
         setEditingId(recruiter._id);
         window.scrollTo({
             top: 0,
@@ -83,8 +91,20 @@ export default function AdminManageRecruiters() {
 
     const resetForm = () => {
         setEditingId(null);
-        setFormData({ email: '', password: '' });
+        // Reset all fields in the form
+        setFormData({
+            name: '',
+            assigned_Company: '',
+            age: '',
+            phone: '',
+            employeeID: '',
+            email: '',
+            password: ''
+        });
     };
+
+    // Helper class for input fields for consistency
+    const inputFieldClass = "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 ease-in-out shadow-sm text-gray-800";
 
     return (
         <div className="p-4 sm:p-6 lg:p-8 font-sans">
@@ -110,36 +130,15 @@ export default function AdminManageRecruiters() {
                     <h2 className="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3 border-gray-200">
                         {editingId ? 'Edit Recruiter' : 'Add New Recruiter'}
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder="recruiter@example.com"
-                                required
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 ease-in-out shadow-sm text-gray-800"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                id="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                placeholder={editingId ? "New Password (Optional)" : "Password"}
-                                required={!editingId}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 ease-in-out shadow-sm text-gray-800"
-                            />
-                            {editingId && (
-                                <p className="mt-2 text-sm text-gray-500">Leave blank to keep current password.</p>
-                            )}
-                        </div>
+                    {/* Updated form grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                        <input name="name" value={formData.name} onChange={handleChange} placeholder="Name" required className={inputFieldClass} />
+                        <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Email" required className={inputFieldClass} />
+                        <input name="employeeID" value={formData.employeeID} onChange={handleChange} placeholder="Employee ID" required className={inputFieldClass} />
+                        <input name="assigned_Company" value={formData.assigned_Company} onChange={handleChange} placeholder="Assigned Company" required className={inputFieldClass} />
+                        <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone Number" required className={inputFieldClass} />
+                        <input name="age" type="number" value={formData.age} onChange={handleChange} placeholder="Age" required className={inputFieldClass} />
+                        <input name="password" type="password" value={formData.password} onChange={handleChange} placeholder={editingId ? "New Password (Optional)" : "Password"} required={!editingId} className={`${inputFieldClass} lg:col-span-1`} />
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4 justify-end">
                         {editingId && (
@@ -171,7 +170,7 @@ export default function AdminManageRecruiters() {
                     </div>
                 </form>
 
-                {/* All Recruiters Table styled to match screenshot */}
+                {/* All Recruiters Table */}
                 <div className="bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-3xl font-bold text-gray-800 mb-4">
                         All Recruiters
@@ -180,14 +179,18 @@ export default function AdminManageRecruiters() {
                         <table className="w-full text-sm text-left">
                             <thead className="text-xs text-gray-400 uppercase bg-gray-700">
                                 <tr>
-                                    <th scope="col" className="py-3 px-6">Recruiter Email</th>
-                                    <th scope="col" className="py-3 px-6 text-right">Actions</th>
+                                    <th scope="col" className="py-3 px-6">Name</th>
+                                    <th scope="col" className="py-3 px-6">Email</th>
+                                    <th scope="col" className="py-3 px-6">Employee ID</th>
+                                    <th scope="col" className="py-3 px-6">Company</th>
+                                    <th scope="col" className="py-3 px-6">Phone</th>
+                                    <th scope="col" className="py-3 px-6 text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="2" className="py-4 px-6 text-center text-gray-500 bg-gray-800">
+                                        <td colSpan="6" className="py-4 px-6 text-center text-gray-500 bg-gray-800">
                                             <div className="flex justify-center items-center text-white">
                                                 <Loader2 className="w-6 h-6 animate-spin mr-2" />
                                                 Loading recruiters...
@@ -196,13 +199,17 @@ export default function AdminManageRecruiters() {
                                     </tr>
                                 ) : recruiters.length === 0 ? (
                                     <tr>
-                                        <td colSpan="2" className="py-4 px-6 text-center text-gray-400 bg-gray-800">No recruiters found.</td>
+                                        <td colSpan="6" className="py-4 px-6 text-center text-gray-400 bg-gray-800">No recruiters found.</td>
                                     </tr>
                                 ) : (
                                     recruiters.map(r => (
                                         <tr key={r._id} className="bg-gray-800 border-b border-gray-700 hover:bg-gray-700 transition-colors duration-200">
-                                            <td className="py-4 px-6 font-medium text-white whitespace-nowrap">{r.email}</td>
-                                            <td className="py-4 px-6 text-right flex justify-end space-x-3">
+                                            <td className="py-4 px-6 font-medium text-white whitespace-nowrap">{r.name}</td>
+                                            <td className="py-4 px-6 text-gray-300">{r.email}</td>
+                                            <td className="py-4 px-6 text-gray-300">{r.employeeID}</td>
+                                            <td className="py-4 px-6 text-gray-300">{r.assigned_Company}</td>
+                                            <td className="py-4 px-6 text-gray-300">{r.phone}</td>
+                                            <td className="py-4 px-6 flex justify-center items-center gap-3">
                                                 <button
                                                     onClick={() => handleEdit(r)}
                                                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-purple-700 bg-purple-200 hover:bg-purple-300 transition-colors duration-200"

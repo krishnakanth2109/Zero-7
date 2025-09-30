@@ -12,6 +12,7 @@ const JWT_SECRET = process.env.MY_SECRET_KEY
 // GET all recruiters
 router.get('/', async (req, res) => {
   try {
+    // Selects all fields except for the password for security
     const recruiters = await Recruiter.find().select('-password')
     res.json(recruiters)
   } catch (err) {
@@ -31,9 +32,11 @@ router.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, recruiter.password)
     if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' })
 
+    // Token payload now includes name, just like the manager
     const tokenPayload = {
       id: recruiter._id,
       email: recruiter.email,
+      name: recruiter.name,
       role: 'recruiter', // Add the role
     }
     const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '3h' })
@@ -52,7 +55,10 @@ router.post('/login', async (req, res) => {
 // REGISTRATION
 router.post('/register', async (req, res) => {
   try {
-    const { email, password } = req.body
+    // Destructure all fields from the request body
+    const { email, password, name, assigned_Company, age, phone, employeeID } =
+      req.body
+      
     if (!password) {
       return res.status(400).json({ error: 'Password is required.' })
     }
@@ -64,9 +70,17 @@ router.post('/register', async (req, res) => {
     const newRecruiter = new Recruiter({
       email,
       password: hashedPassword,
+      name,
+      assigned_Company,
+      age,
+      phone,
+      employeeID,
     })
     const savedRecruiter = await newRecruiter.save()
-    res.status(201).json(savedRecruiter)
+    // Send back the new recruiter data (without password)
+    const recruiterData = savedRecruiter.toObject();
+    delete recruiterData.password;
+    res.status(201).json(recruiterData)
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Server error' })
@@ -76,12 +90,19 @@ router.post('/register', async (req, res) => {
 // UPDATE a recruiter
 router.put('/:id', async (req, res) => {
   try {
-    const { email } = req.body
+    const { password } = req.body
+
+    // If a new password is provided, hash it before updating
+    if (password) {
+      req.body.password = await bcrypt.hash(password, 10)
+    }
+
     const updatedRecruiter = await Recruiter.findByIdAndUpdate(
       req.params.id,
-      { email },
+      { $set: req.body }, // Use $set to update only provided fields
       { new: true },
-    )
+    ).select('-password')
+
     if (!updatedRecruiter)
       return res.status(404).json({ message: 'Recruiter not found' })
     res.json(updatedRecruiter)
@@ -96,7 +117,7 @@ router.delete('/:id', async (req, res) => {
   try {
     const deletedRecruiter = await Recruiter.findByIdAndDelete(req.params.id)
     if (!deletedRecruiter)
-      return res.status(404).json({ message: 'Recruiter not found' })
+      return res.status(44).json({ message: 'Recruiter not found' })
     res.json({ message: 'Recruiter deleted successfully' })
   } catch (err) {
     console.error(err)

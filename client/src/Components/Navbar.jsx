@@ -250,7 +250,11 @@ const Navbar = () => {
                 isActive ? 'nav-links active-link' : 'nav-links'
               }
               onClick={closeMobileMenu}>
-              <Rss title='Blog / Gallery' />
+              <img
+                src='https://cdn-icons-png.flaticon.com/512/10026/10026257.png'
+                alt='blog-posts'
+                style={{ height: '40px', width: '40px' }}
+              />
             </NavLink>
           </li>
         </ul>

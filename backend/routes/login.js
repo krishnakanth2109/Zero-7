@@ -49,25 +49,6 @@ router.post('/login', async (request, response) => {
   } else {
     const checkPassword = await bcrypt.compare(password, user.password)
     if (!checkPassword) {
-      const templateData = prepareFailedLoginData(
-        request,
-        user.email,
-        user.role,
-      )
-      const htmlContent = renderEmailTemplate('failedLoginAlert', templateData)
-
-      const mailOptions = {
-        from: process.env.AUTH_MAIL,
-        to: user.email,
-        subject: '🚫 Security Alert - Invalid Password Attempt',
-        text: `Invalid password attempt for ${user.role} email: ${email}`,
-        html: htmlContent,
-      }
-      try {
-        await transporter.sendMail(mailOptions)
-      } catch (err) {
-        response.send({ message: 'unable to send emails' })
-      }
       response.send({ message: 'User Password is Invalid' })
     } else {
       const payload = {
@@ -77,25 +58,7 @@ router.post('/login', async (request, response) => {
         employeeId: user.employeeId,
       }
       const jwt = jwtToken.sign(payload, process.env.MY_SECRET_KEY)
-      const templateData = prepareSuccessLoginData(
-        request,
-        user.email,
-        user.role,
-      )
-      const htmlContent = renderEmailTemplate('loginAlert', templateData)
-
-      const mailOptions = {
-        from: process.env.AUTH_MAIL,
-        to: user.email,
-        subject: `✅ Security Alert - ${user.role} Login Successful`,
-        text: `${user.role} successfully logged in: ${user.email}`,
-        html: htmlContent,
-      }
-      try {
-        await transporter.sendMail(mailOptions)
-      } catch (err) {
-        response.send({ message: 'unable to send email', payload, token: jwt })
-      }
+      response.send({ payload, token: jwt })
     }
   }
 })

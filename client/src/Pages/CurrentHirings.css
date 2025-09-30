@@ -1,310 +1,431 @@
+/* ---------------------------
+   Basic page containers
+   --------------------------- */
 .current-hirings-page {
-  font-family: "Poppins", sans-serif;
-  color: #333;
-  overflow-x: hidden;
+  font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', sans-serif;
+  color: #222;
+  line-height: 1.5;
 }
 
-/* Hero Section */
+/* Hero */
 .hero-section {
   position: relative;
   width: 100%;
-  height: 60vh;
+  height: 500px; /* adjust height as needed */
   overflow: hidden;
-  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.hero-image {
+/* Make the image fill the section */
+.hero-section .hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.hero-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: #ffffff;
-  background: rgba(120, 196, 228, 0.5);
-  padding: 20px 30px;
-  border-radius: 5px;
+  z-index: 0;
 }
 
 .hero-overlay h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-}
-
-/* Intro Section */
-.intro-section {
-  text-align: center;
-  padding: 2rem 1rem;
-}
-
-.intro-section h2 {
-  color: #ff5722;
-  margin-bottom: 1rem;
-  font-size: 32px;
-}
-
-/* Enrollment Form */
-.form-section {
-  padding: 2rem 1rem;
-  background: #f9f9f9;
-  text-align: center;
-}
-
-.enrollment-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  max-width: 500px;
-  margin: auto;
-}
-
-.enrollment-form input,
-.enrollment-form button {
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-.enrollment-form button {
-  background: #ff5722;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.enrollment-form button:hover {
-  background: #e64a19;
-}
-
-/* Flipping Section */
-.flipping-section {
-  padding: 2rem 1rem;
-  text-align: center;
-}
-
-.flip-container {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.flip-card {
-  width: 300px;
-  height: 200px;
-  perspective: 1000px;
-}
-
-.flip-inner {
-  width: 100%;
-  height: 100%;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-  position: relative;
-}
-
-.flip-card:hover .flip-inner {
-  transform: rotateY(180deg);
-}
-
-.flip-front,
-.flip-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  backface-visibility: hidden;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.flip-front img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.flip-back {
-  background: #ff5722;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
-  transform: rotateY(180deg);
-}
-
-
-
-/* Jobs Section */
-.jobs-section {
-  padding: 2rem 1rem;
-}
-
-.jobs-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-
-.jobs-table th,
-.jobs-table td {
-  padding: 12px;
-  border: 1px solid #ddd;
-  text-align: center;
-}
-
-.jobs-table th {
-  background: #ff5722;
-  color: #fff;
-}
-
-.apply-btn {
-  background: #ff9800;
-  color: #fff;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.apply-btn:hover {
-  background: #e68900;
-}
-/* Inline Apply Form */
-.apply-form-row td {
-  padding: 0 !important;
-  background: #fafafa;
-}
-
-.apply-form-container {
-  margin: 15px auto;
-  padding: 20px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  max-width: 850px;
-  animation: fadeIn 0.4s ease-in-out;
-}
-
-.apply-form-container h3 {
-  margin-bottom: 20px;
-  color: #ff5722;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.apply-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-}
-
-.input-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f9f9f9;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-}
-
-.input-group input {
-  border: none;
-  outline: none;
-  flex: 1;
-  background: transparent;
-}
-
-.file-input {
-  grid-column: span 2;
-}
-
-.apply-form .form-buttons {
-  grid-column: span 2;
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 10px;
-}
-
-.apply-form button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.apply-form button[type="submit"] {
-  background: #ff5722;
-  color: #fff;
-}
-
-.apply-form button[type="submit"]:hover {
-  background: #e64a19;
-}
-
-.cancel-btn {
-  background: #999;
-  color: #fff;
-}
-
-.cancel-btn:hover {
-  background: #777;
-}
-
-/* Animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  font-size: 2rem;
+  margin-bottom: 8px;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
+  .hero-section {
+    height: 200px;
+  }
+  .hero-overlay h1 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Intro */
+.intro-section {
+  padding: 28px 20px;
+  max-width: 900px;
+  margin: 0 auto 20px;
+  text-align: center;
+}
+.intro-section h2 {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+}
+.intro-section p {
+  color: #71c5f6;
+}
+
+/* Enrollment form */
+.form-section {
+  padding: 24px 16px;
+  max-width: 920px;
+  margin: 0 auto 30px;
+}
+.enrollment-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: center;
+}
+.enrollment-form input[type='file'] {
+  grid-column: 1 / -1;
+}
+.enrollment-form .primary-submit {
+  grid-column: 1 / -1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(90deg, #1689c7, #60b8f0);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.enrollment-form input,
+.enrollment-form textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+}
+
+/* ------------------------------------------------------------------
+   Hiring Process (new responsive + mobile-tap flip)
+   ------------------------------------------------------------------ */
+.process-section {
+  padding: clamp(28px, 6vw, 48px) 16px;
+  text-align: center;
+  background: #f9f9f9;
+}
+
+.process-section h2 {
+  font-size: clamp(1.4rem, 3.5vw, 2rem);
+  margin-bottom: 22px;
+  color: #222;
+}
+
+/* Use grid for robust responsive layout */
+.process-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: stretch;
+  justify-items: center;
+}
+
+/* each card */
+.process-card {
+  width: 100%;
+  max-width: 360px;
+  min-height: 180px; /* ensures readable space on mobile */
+  perspective: 1000px;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.process-card:focus {
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
+  border-radius: 14px;
+}
+
+/* inner */
+.process-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.72s cubic-bezier(0.2, 0.9, 0.2, 1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* flip states: hover for pointer devices, .is-flipped for clicks */
+.process-card.is-flipped .process-inner {
+  transform: rotateY(180deg);
+}
+
+/* hover only if device supports hover */
+@media (hover: hover) {
+  .process-card:hover .process-inner {
+    transform: rotateY(180deg);
+  }
+}
+
+/* front & back faces */
+.process-front,
+.process-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(18, 24, 31, 0.06);
+  text-align: center;
+}
+
+.process-front {
+  background: linear-gradient(135deg, #1689c7, #60b8f0);
+  color: #fff;
+  z-index: 2;
+  transform: rotateY(0deg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.process-front .process-icon {
+  font-size: 28px;
+}
+
+.process-front h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* back */
+.process-back {
+  background: #fff;
+  color: #333;
+  transform: rotateY(180deg);
+  border: 1px solid #eee;
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+/* ---------- Small screens: stack and make tap flip stable ---------- */
+@media (max-width: 900px) {
+  .process-cards {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    gap: 18px;
+  }
+  .process-card {
+    min-height: 170px;
+  }
+}
+
+@media (max-width: 620px) {
+  .process-cards {
+    grid-template-columns: 1fr; /* single column â€” no overlap */
+    gap: 22px;
+    padding: 0 12px;
+  }
+  .process-card {
+    max-width: 100%;
+    min-height: 160px;
+  }
+  .process-front h3 {
+    font-size: 1rem;
+  }
+  .process-back {
+    font-size: 0.95rem;
+    padding: 14px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Jobs table + Apply form responsive
+   ------------------------------------------------------------------ */
+.jobs-section {
+  padding: 32px 16px;
+  background: #fff;
+  max-width: 1200px;
+  margin: 0 auto 60px;
+}
+
+.jobs-section h2 {
+  text-align: center;
+  margin-bottom: 18px;
+  font-size: 1.6rem;
+}
+
+/* wrapper to enable horizontal scroll on small screens */
+.jobs-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  background: white;
+  padding: 10px;
+}
+
+/* table */
+.jobs-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px; /* ensures readable columns and triggers scrolling on small screens */
+}
+.jobs-table th,
+.jobs-table td {
+  padding: 12px 10px;
+  border: 1px solid #eee;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 0.95rem;
+}
+.jobs-table thead th {
+  background: linear-gradient(90deg, #1689c7, #60b8f0);
+  color: white;
+  font-weight: 600;
+}
+
+.job-offer-ticker {
+  background: #ffe599;
+  overflow: hidden;
+  white-space: nowrap;
+  height: 50px;
+}
+
+.ticker-bar {
+  background: #007bff;
+  color: #fff;
+  font-weight: 500;
+  padding: 8px 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  box-sizing: border-box;
+  animation: scroll 10s linear infinite;
+}
+
+@keyframes scroll {
+  0% {
+    text-indent: 100%;
+  }
+  100% {
+    text-indent: -100%;
+  }
+}
+
+.ticker-content {
+  display: inline-block;
+  padding-top: 15px;
+  padding-left: 100%;
+  animation: ticker 20s linear infinite;
+}
+
+.ticker-item {
+  display: inline-block;
+  margin-right: 2rem;
+  font-weight: 600;
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* apply button */
+.apply-btn {
+  background: linear-gradient(90deg, #1689c7, #60b8f0);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.apply-btn:hover {
+  opacity: 0.94;
+}
+
+/* apply form row */
+.apply-form-row td {
+  padding: 10px;
+  background: #fbfbfb;
+}
+
+.apply-form-container {
+  background: white;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #f0f0f0;
+}
+
+/* apply form layout */
+.apply-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: center;
+}
+.apply-form .input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+}
+.apply-form .input-group input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+}
+.apply-form .file-input {
+  grid-column: 1 / -1;
+}
+
+.form-buttons {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+.submit-apply {
+  background: linear-gradient(90deg, #1d72ff, #3bb0ff);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+}
+.cancel-btn {
+  background: #ddd;
+  color: #222;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+/* responsive changes for apply form and enrollment */
+@media (max-width: 860px) {
+  .enrollment-form,
   .apply-form {
     grid-template-columns: 1fr;
   }
-}
-
-
-/* 📱 Responsive */
-@media (max-width: 768px) {
-  .hero-overlay h1 {
-    font-size: 1.8rem;
-  }
-
-  .flip-card {
-    width: 100%;
-    max-width: 350px;
-    height: 220px;
-  }
-
-  .jobs-table {
-    font-size: 14px;
-  }
-
-  .jobs-table th,
-  .jobs-table td {
-    padding: 8px;
+  .apply-form .file-input {
+    grid-column: 1 / -1;
   }
 }
 
-@media (max-width: 480px) {
-  .hero-section {
-    height: 40vh;
-  }
+/* a11y focus */
+.process-card:focus {
+  outline: 3px solid rgba(37, 99, 235, 0.14);
+}
 
-  .hero-overlay h1 {
-    font-size: 1.5rem;
+/* small niceties */
+.primary-submit,
+.submit-apply,
+.apply-btn {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+/* reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .process-inner,
+  .apply-form,
+  .enrollment-form {
+    transition: none !important;
   }
 }

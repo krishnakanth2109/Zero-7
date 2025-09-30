@@ -215,7 +215,9 @@ const BenchList = () => {
             onChange={handleChange}
             required
           />
-          <button type='submit'>Submit</button>
+          <button className='bg-blue-500 py-3 px-2 text-white' type='submit'>
+            Submit
+          </button>
         </form>
       </section>
 

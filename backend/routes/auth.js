@@ -61,7 +61,7 @@ router.post('/', async (request, response) => {
 
       // Prepare data for successful login template
       const templateData = prepareSuccessLoginData(request, email, payLoad.role)
-      const htmlContent = renderEmailTemplate('adminLoginAlert', templateData)
+      const htmlContent = renderEmailTemplate('loginAlert', templateData)
 
       const mailOptions = {
         from: process.env.AUTH_MAIL,

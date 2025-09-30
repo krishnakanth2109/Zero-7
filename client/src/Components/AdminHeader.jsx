@@ -217,9 +217,9 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
             </div>
             <div className='hidden md:block text-left'>
               <div className='text-sm font-medium text-gray-900'>
-                {user.role === 'superAdmin' ? 'superAdmin' : user.name}
+                {user.name}
               </div>
-              {user.role === 'superAdmin' && (
+              {user.role === 'Admin' && (
                 <span class='bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-red-900 dark:text-red-300'>
                   {user.role}
                 </span>

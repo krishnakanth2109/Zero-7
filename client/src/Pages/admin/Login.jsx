@@ -11,12 +11,11 @@ const Login = () => {
   const [error, setError] = useState('')
   const [showForgotPassword, setShowForgotPassword] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [selectedRole, setSelectedRole] = useState(null) // 'superAdmin', 'admin', 'recruiter'
+
   const [isLoading, setIsLoading] = useState(false) // For loading animation
   const navigate = useNavigate()
 
   // Function to determine if inputs should be blurred
-  const areInputsBlurred = selectedRole === null
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -25,20 +24,7 @@ const Login = () => {
     // Start loading animation
 
     const payload = { email, password } // Include selected role
-    let endPoint = ''
-    switch (selectedRole) {
-      case 'superAdmin':
-        endPoint = '/auth'
-        break
-      case 'admin':
-        endPoint = '/managers/login'
-        break
-      case 'recruiter':
-        endPoint = '/recruiters/login'
-        break
-      default:
-        break
-    }
+    let endPoint = '/user/login'
     const url = process.env.REACT_APP_API_URL
       ? `${process.env.REACT_APP_API_URL}${endPoint}`
       : `http://localhost:5000/api${endPoint}`
@@ -58,7 +44,7 @@ const Login = () => {
 
       if (response.ok && data.token) {
         Cookie.set('token', data.token, { expires: 1 })
-        Cookie.set('user', JSON.stringify(data.user), { expires: 1 })
+        Cookie.set('user', JSON.stringify(data.payload), { expires: 1 })
         console.log(data.user) // This might need to be dynamic based on role
         console.log('Login successful, navigating to dashboard...')
         navigate('/admin/dashboard')
@@ -81,18 +67,6 @@ const Login = () => {
   }
 
   // Dynamic styling for login button
-  const getLoginButtonStyle = (role) => {
-    switch (role) {
-      case 'superAdmin':
-        return { backgroundColor: '#FF6347', color: 'white' } // Tomato
-      case 'admin':
-        return { backgroundColor: '#4CAF50', color: 'white' } // Green
-      case 'recruiter':
-        return { backgroundColor: '#FFD700', color: 'black' } // Gold
-      default:
-        return {} // Default style
-    }
-  }
 
   return (
     <div className='login-page-container'>
@@ -113,44 +87,8 @@ const Login = () => {
       <div className='login-form-section'>
         {!showForgotPassword ? (
           <form className='login-form-content' onSubmit={handleLogin}>
-            <h2 className='login-form-title'>
-              Zero 7 Technologies <br />
-              Admin Dashboard Login
-            </h2>
-
-            <div className='role-selection-group'>
-              <button
-                type='button'
-                className={`role-select-button ${
-                  selectedRole === 'superAdmin'
-                    ? 'selected-role-super-admin'
-                    : ''
-                }`}
-                onClick={() => setSelectedRole('superAdmin')}>
-                Super Admin
-              </button>
-              <button
-                type='button'
-                className={`role-select-button ${
-                  selectedRole === 'admin' ? 'selected-role-admin' : ''
-                }`}
-                onClick={() => setSelectedRole('admin')}>
-                Admin
-              </button>
-              <button
-                type='button'
-                className={`role-select-button ${
-                  selectedRole === 'recruiter' ? 'selected-role-recruiter' : ''
-                }`}
-                onClick={() => setSelectedRole('recruiter')}>
-                Recruiter
-              </button>
-            </div>
-
-            <div
-              className={`input-field-group ${
-                areInputsBlurred ? 'blurred-input-state' : ''
-              }`}>
+            <h2 className='text-sm'>Zero7 Dashboard Login</h2>
+            <div className={`input-field-group`}>
               <label htmlFor='email-input'>Email Address</label>
               <input
                 id='email-input'
@@ -159,14 +97,11 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={areInputsBlurred}
               />
             </div>
 
             <div
-              className={`input-field-group password-field-group ${
-                areInputsBlurred ? 'blurred-input-state' : ''
-              }`}
+              className={`input-field-group password-field-group`}
               style={{ position: 'relative' }}>
               <label htmlFor='password-input'>Password</label>
               <input
@@ -177,7 +112,6 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 style={{ paddingRight: '35px' }}
-                disabled={areInputsBlurred}
               />
               <span
                 onClick={() => setShowPassword(!showPassword)}
@@ -188,12 +122,8 @@ const Login = () => {
 
             {error && <p className='error-message-text'>{error}</p>}
 
-            <button
-              type='submit'
-              className='submit-login-button'
-              style={getLoginButtonStyle(selectedRole)}
-              disabled={areInputsBlurred}>
-              Sign In to Dashboard
+            <button type='submit' className='submit-login-button'>
+              Log In to Dashboard
             </button>
 
             <p

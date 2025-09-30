@@ -67,6 +67,7 @@ router.post('/login', async (request, response) => {
       response.send({ message: 'User Password is Invalid' })
     } else {
       const payload = {
+        name: user.name,
         email: user.email,
         role: user.role,
         employeeId: user.employeeId,

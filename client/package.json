@@ -20,6 +20,7 @@
     "emailjs-com": "^3.2.0",
     "framer-motion": "^12.23.12",
     "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.539.0",
     "mammoth": "^1.10.0",
     "material-react-table": "^3.2.1",

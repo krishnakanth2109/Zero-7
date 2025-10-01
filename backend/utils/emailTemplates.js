@@ -1,3 +1,5 @@
+// File: backend/utils/emailTemplates.js
+
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -33,6 +35,28 @@ export const renderEmailTemplate = (templateName, data = {}) => {
     return '<h1>Error loading email template</h1>'
   }
 }
+
+/**
+ * --- ADD THIS NEW FUNCTION ---
+ * Prepares the data object for the candidate details email template.
+ * @param {object} request - The full request info object from the database.
+ * @param {object} candidate - The full candidate object from the database.
+ * @returns {object} The data object ready for the HTML template.
+ */
+export const prepareCandidateDetailsForRequester = (request, candidate) => {
+  return {
+      REQUESTER_NAME: request.contactPerson,
+      CANDIDATE_NAME: candidate.name,
+      CANDIDATE_ROLE: candidate.role,
+      CANDIDATE_EXP: candidate.exp,
+      CANDIDATE_SKILLS: candidate.skills,
+      CANDIDATE_LOCATION: candidate.location,
+      CANDIDATE_EMAIL: candidate.email,
+      CANDIDATE_PHONE: candidate.phone,
+      CURRENT_YEAR: new Date().getFullYear(),
+  };
+};
+// --- END OF NEW FUNCTION ---
 
 /**
  * Gets current timestamp in a readable format

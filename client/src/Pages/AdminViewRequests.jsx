@@ -1,4 +1,4 @@
-// File: src/Pages/AdminViewRequests.jsx (Updated with centered alignment)
+// File: src/Pages/AdminViewRequests.jsx
 
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Eye } from 'lucide-react';
@@ -34,7 +34,8 @@ export default function AdminViewRequests() {
             setRequests(requests.map(req => 
                 req._id === requestId ? { ...req, status: 'approved' } : req
             ));
-            alert('Request approved successfully!');
+            // We use a more subtle confirmation now
+            // alert('Request approved successfully!'); 
         } catch (err) {
             console.error("Approve request error:", err);
             alert('Failed to approve request. Please try again.');
@@ -50,7 +51,7 @@ export default function AdminViewRequests() {
             setRequests(requests.map(req => 
                 req._id === requestId ? { ...req, status: 'rejected' } : req
             ));
-            alert('Request rejected successfully!');
+            // alert('Request rejected successfully!');
         } catch (err) {
             console.error("Reject request error:", err);
             alert('Failed to reject request. Please try again.');
@@ -70,8 +71,8 @@ export default function AdminViewRequests() {
         }
     };
 
-    if (isLoading) return <p>Loading requests...</p>;
-    if (error) return <p style={{ color: 'red' }}>{error}</p>;
+    if (isLoading) return <div className="loading-spinner">Loading...</div>;
+    if (error) return <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>;
 
     return (
         <div className="requests-container">
@@ -81,93 +82,84 @@ export default function AdminViewRequests() {
                 <table className="requests-table">
                     <thead>
                         <tr>
-                            <th className="text-center">Date Received</th>
-                            <th className="text-center">Status</th>
-                            <th className="text-center">Candidate Name</th>
-                            <th className="text-center">Company</th>
-                            <th className="text-center">Contact Person</th>
-                            <th className="text-center">Requirement</th>
-                            <th className="text-center">Details</th>
-                            <th className="text-center">Actions</th>
+                            <th>Date Received</th>
+                            <th>Status</th>
+                            <th>Candidate Name</th>
+                            <th>Company</th>
+                            <th>Contact Person</th>
+                            <th>Requirement</th>
+                            {/* --- REMOVED DETAILS HEADER --- */}
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {requests.length === 0 ? (
                             <tr>
-                                <td colSpan="8" style={{ textAlign: 'center' }}>No requests found.</td>
+                                <td colSpan="7" style={{ textAlign: 'center' }}>No requests found.</td>
                             </tr>
                         ) : (
                             requests.map(req => {
                                 const statusBadge = getStatusBadge(req.status);
-                                const isApproved = req.status === 'approved';
-                                const isRejected = req.status === 'rejected';
                                 const isPending = !req.status || req.status === 'pending';
                                 
                                 return (
-                                    <tr key={req._id} className={isApproved ? 'row-approved' : isRejected ? 'row-rejected' : ''}>
-                                        <td className="text-center">{new Date(req.createdAt).toLocaleDateString()}</td>
-                                        <td className="text-center">
+                                    <tr key={req._id} className={statusBadge.class.replace('status-', 'row-')}>
+                                        <td>{new Date(req.createdAt).toLocaleDateString()}</td>
+                                        <td>
                                             <span className={`status-badge ${statusBadge.class}`}>
                                                 {statusBadge.text}
                                             </span>
                                         </td>
-                                        <td className="text-center">{req.candidateName}</td>
-                                        <td className="text-center">{req.companyName}</td>
-                                        <td className="text-center">{req.contactPerson}</td>
-                                        <td className="text-center requirement-cell" title={req.requirementDetails}>
+                                        <td>{req.candidateName}</td>
+                                        <td>{req.companyName}</td>
+                                        <td>{req.contactPerson}</td>
+                                        <td className="requirement-cell" title={req.requirementDetails}>
                                             {req.requirementDetails}
                                         </td>
-                                        <td className="text-center">
-                                            {/* DETAILS COLUMN: Full width View Details button */}
-                                            <button 
-                                                className="view-details-btn full-width"
-                                                style={{width:'150px'}}
-                                                onClick={() => setSelectedRequest(req)}
-                                            >
-                                                <Eye size={16} />
-                                                View Details
-                                            </button>
+                                        
+                                        {/* --- START: MERGED ACTIONS COLUMN LOGIC --- */}
+                                        <td>
+                                            <div className="actions-cell-container">
+                                                {isPending ? (
+                                                    // State: PENDING
+                                                    <div className="approve-reject-buttons">
+                                                        <button 
+                                                            className={`approve-btn ${actionLoading === req._id ? 'loading' : ''}`}
+                                                            onClick={() => handleApprove(req._id)}
+                                                            disabled={actionLoading === req._id}>
+                                                            <CheckCircle size={16} />
+                                                            {actionLoading === req._id ? '...' : 'Approve'}
+                                                        </button>
+                                                        <button 
+                                                            className={`reject-btn ${actionLoading === req._id ? 'loading' : ''}`}
+                                                            onClick={() => handleReject(req._id)}
+                                                            disabled={actionLoading === req._id}>
+                                                            <XCircle size={16} />
+                                                            {actionLoading === req._id ? '...' : 'Reject'}
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    // State: APPROVED or REJECTED
+                                                    <div className="action-completed-buttons">
+                                                         <button 
+                                                            className="view-details-btn"
+                                                            onClick={() => setSelectedRequest(req)}>
+                                                            <Eye size={16} />
+                                                            View Details
+                                                        </button>
+                                                        <button className="approve-btn disabled" disabled>
+                                                            <CheckCircle size={16} />
+                                                            Approve
+                                                        </button>
+                                                        <button className="reject-btn disabled" disabled>
+                                                            <XCircle size={16} />
+                                                            Reject
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
-                                        <td className="text-center">
-                                            {/* ACTIONS COLUMN: Approve/Reject buttons */}
-                                            {isPending ? (
-                                                <div className="approve-reject-buttons">
-                                                    <button 
-                                                        className={`approve-btn ${actionLoading === req._id ? 'loading' : ''}`}
-                                                        onClick={() => handleApprove(req._id)}
-                                                        disabled={actionLoading === req._id}
-                                                    >
-                                                        <CheckCircle size={16} />
-                                                        {actionLoading === req._id ? '...' : 'Approve'}
-                                                    </button>
-                                                    <button 
-                                                        className={`reject-btn ${actionLoading === req._id ? 'loading' : ''}`}
-                                                        onClick={() => handleReject(req._id)}
-                                                        disabled={actionLoading === req._id}
-                                                    >
-                                                        <XCircle size={16} />
-                                                        {actionLoading === req._id ? '...' : 'Reject'}
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <div className="action-completed-buttons">
-                                                    <button 
-                                                        className={`approve-btn ${isApproved ? 'active' : 'disabled'}`}
-                                                        disabled
-                                                    >
-                                                        <CheckCircle size={16} />
-                                                        Approve
-                                                    </button>
-                                                    <button 
-                                                        className={`reject-btn ${isRejected ? 'active' : 'disabled'}`}
-                                                        disabled
-                                                    >
-                                                        <XCircle size={16} />
-                                                        Reject
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </td>
+                                        {/* --- END: MERGED ACTIONS COLUMN LOGIC --- */}
                                     </tr>
                                 );
                             })
@@ -176,7 +168,7 @@ export default function AdminViewRequests() {
                 </table>
             </div>
 
-            {/* Modal for displaying full details */}
+            {/* Modal for displaying full details (No changes needed here) */}
             {selectedRequest && (
                 <div className="modal-overlay" onClick={() => setSelectedRequest(null)}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -203,23 +195,13 @@ export default function AdminViewRequests() {
                             <div className="modal-actions">
                                 <button 
                                     className="approve-btn"
-                                    onClick={() => {
-                                        handleApprove(selectedRequest._id);
-                                        setSelectedRequest(null);
-                                    }}
-                                >
-                                    <CheckCircle size={16} />
-                                    Approve Request
+                                    onClick={() => { handleApprove(selectedRequest._id); setSelectedRequest(null); }}>
+                                    <CheckCircle size={16} /> Approve Request
                                 </button>
                                 <button
                                     className="reject-btn"
-                                    onClick={() => {
-                                        handleReject(selectedRequest._id);
-                                        setSelectedRequest(null);
-                                    }}
-                                >
-                                    <XCircle size={16} />
-                                    Reject Request
+                                    onClick={() => { handleReject(selectedRequest._id); setSelectedRequest(null); }}>
+                                    <XCircle size={16} /> Reject Request
                                 </button>
                             </div>
                         )}

@@ -209,6 +209,20 @@ export default function AdminDashboard() {
             <p className='text-sm text-[#64748b]'>Placements</p>
           </div>
         </div>
+        <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 '>
+          {/* Icon with percent */}
+          <div className='flex items-center justify-between'>
+            <div className='bg-red-200 p-2 rounded-lg'>
+              <Building2 className=' stroke-red-500 stroke-2' />
+            </div>
+            <p className='text-[#16a34a]'>+12%</p>
+          </div>
+          <div>
+            <h1 className='text-3xl font-bold mt-3'>0</h1>
+            <p className='text-lg font-semibold text-[#64748b]'>Interviews</p>
+            <p className='text-sm text-[#64748b]'>Interviews scheduled</p>
+          </div>
+        </div>
       </div>
       {/* Charts */}
       <div className='flex gap-4 md:tems-center max-md:flex-col '>

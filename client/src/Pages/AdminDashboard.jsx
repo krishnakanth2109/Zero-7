@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react' // <-- IMPORT REACT HOOKS
+import { jwtDecode } from 'jwt-decode' // <-- IMPORT THE DECODER
 import {
   Briefcase,
   Calendar,
@@ -17,7 +19,31 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
+// Helper function to capitalize the first letter of a string
+const capitalize = (s) => {
+  if (typeof s !== 'string' || !s) return ''
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
 export default function AdminDashboard() {
+  // --- ADDED CODE: Logic to get user role from token ---
+  const [userRole, setUserRole] = useState(null)
+
+  useEffect(() => {
+    // This code runs once when the component first loads
+    const token = localStorage.getItem('token') // Make sure this key 'token' is correct
+    if (token) {
+      try {
+        const decodedUser = jwtDecode(token)
+        setUserRole(decodedUser.role) // Read the 'role' from the token
+      } catch (error) {
+        console.error('Invalid token:', error)
+      }
+    }
+  }, []) // The empty array ensures this logic runs only once
+  // --- END OF ADDED CODE ---
+
+
   const applicationsTrend = [
     { month: 'Jan', applications: 45, interviews: 12, hired: 3 },
     { month: 'Feb', applications: 52, interviews: 18, hired: 5 },
@@ -78,63 +104,16 @@ export default function AdminDashboard() {
       AppliedDate: '15/09/2025',
       Status: 'Active',
     },
-    {
-      candidate: 'Lisa Patel',
-      position: 'Data Engineer',
-      Experience: '4-7 years',
-      Location: 'Delhi',
-      Skills: ['Python', 'SQL', 'Hadoop'],
-      Phone: 7788994455,
-      AppliedDate: '14/09/2025',
-      Status: 'InActive',
-    },
-    {
-      candidate: 'Tom Wilson',
-      position: 'Cloud Architect',
-      Experience: '6-10 years',
-      Location: 'Hyderabad',
-      Skills: ['Azure', 'AWS', 'GCP'],
-      Phone: 8877665544,
-      AppliedDate: '13/09/2025',
-      Status: 'Active',
-    },
-    {
-      candidate: 'Priya Sharma',
-      position: 'QA Engineer',
-      Experience: '2-4 years',
-      Location: 'Bangalore',
-      Skills: ['Selenium', 'Jest', 'Cypress'],
-      Phone: 9966554433,
-      AppliedDate: '12/09/2025',
-      Status: 'InActive',
-    },
-    {
-      candidate: 'David Lee',
-      position: 'Mobile Developer',
-      Experience: '3-5 years',
-      Location: 'Mumbai',
-      Skills: ['React Native', 'Flutter', 'iOS'],
-      Phone: 8855443322,
-      AppliedDate: '11/09/2025',
-      Status: 'Active',
-    },
-    {
-      candidate: 'Anna Brown',
-      position: 'System Architect',
-      Experience: '7-12 years',
-      Location: 'Pune',
-      Skills: ['Java', 'Spring', 'Microservices'],
-      Phone: 7744332211,
-      AppliedDate: '10/09/2025',
-      Status: 'InActive',
-    },
   ]
 
   return (
     <div className='flex flex-col gap-4 overflow-auto'>
       <div className='admin-main flex-1 rounded-2xl p-6 border-border flex flex-col md:flex-row items-start md:items-center justify-between'>
         <div>
-          <h1 className='text-3xl font-bold'>Welcome back!</h1>
+          {/* --- MODIFIED CODE: The h1 tag is now dynamic --- */}
+          <h1 className='text-3xl font-bold'>
+            Welcome back, {capitalize(userRole) || 'Admin'}!
+          </h1>
           <span>Here&apos;s your recruitment dashboard today.</span>
         </div>
       </div>

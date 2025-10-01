@@ -2,6 +2,7 @@ import express from 'express'
 const router = express.Router()
 // Correctly imports your model file
 import Job from '../models/jobs.js'
+import Company from '../models/Companies.js'
 
 // GET all jobs
 router.get('/', async (req, res) => {
@@ -39,12 +40,17 @@ router.get('/', async (req, res) => {
 // POST a new job
 router.post('/', async (req, res) => {
   const { companyId, role, exp, skills, salary, location } = req.body
-  const newJob = new Job({ companyId, role, exp, skills, salary, location })
-  try {
-    const savedJob = await newJob.save()
-    res.status(201).json(savedJob)
-  } catch (err) {
-    res.status(400).json({ message: err.message })
+  const companyExists = await Company.findOne({ _id: companyId })
+  if (companyExists) {
+    try {
+      const newJob = new Job({ companyId, role, exp, skills, salary, location })
+      const savedJob = await newJob.save()
+      res.status(201).json(savedJob)
+    } catch (err) {
+      res.status(400).json({ message: err.message })
+    }
+  } else {
+    res.status(404).send('Wrong CompanyID')
   }
 })
 

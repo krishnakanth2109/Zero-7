@@ -32,7 +32,7 @@ const AdminManageJobs = () => {
 
   useEffect(() => {
     fetchJobs()
-  }, [])
+  }, [showPopup])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -45,10 +45,10 @@ const AdminManageJobs = () => {
       const response = await api.post('/jobs', formState)
       setJobs([response.data, ...jobs])
       setFormState({ role: '', exp: '', skills: '', salary: '', location: '' })
-      alert('Job added successfully!')
-      setShowPopup(false) // Close pop-up after adding job
+      setShowPopup(false)
+      // Close pop-up after adding job
     } catch (err) {
-      alert('Failed to add job. Check console for details.')
+      alert(err.response.data)
       console.error('Error adding job:', err)
     }
   }

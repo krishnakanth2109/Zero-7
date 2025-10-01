@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 
 const InterviewSchema = new mongoose.Schema({
+  candidateId: { type: String, required: true },
   jobId: { type: String, required: true },
   status: { type: String, required: true },
   companyId: { type: String, required: true },

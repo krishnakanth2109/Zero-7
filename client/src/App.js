@@ -45,6 +45,7 @@ import Ittraining from './Pages/Ittraining.jsx'
 import Nonittraining from './Pages/Nonittraining.jsx'
 import ViewEnrollments from './Pages/AdminStudentEnrollment.jsx'
 import InterviewTracker from './Pages/AdminInterviews.jsx'
+import AdminManageCompanies from './Pages/AdminManageCompanies.jsx'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -126,6 +127,7 @@ function App() {
             <Route path='manage-blogs' element={<ManageBlogs />} />
             <Route path='studentenrollment' element={<ViewEnrollments />} />
             <Route path='interviews' element={<InterviewTracker />} />
+            <Route path='companies' element={<AdminManageCompanies />} />
             <Route
               path='manage-candidates'
               element={<AdminManageCandidates />}

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   AudioLines,
+  Building,
   CardSim,
   ChevronDown,
   CircleUser,
@@ -168,6 +169,22 @@ export default function AdminSidebar({ isOpen }) {
               <div className='dashboard-icon'>
                 <FileUser style={{ width: '18px', flexShrink: 0 }} />
                 <span className='link-text'>Interviews</span>
+              </div>
+              {newCount > 0 && (
+                <span className='notification-badge'>{newCount}</span>
+              )}
+            </div>
+          </Link>
+          <Link
+            to='/admin/companies'
+            className={`sidebar-link ${
+              isActive('/admin/companies') ? 'active' : ''
+            }`}
+            data-tooltip='Form Submissions'>
+            <div className='dashboard-cont'>
+              <div className='dashboard-icon'>
+                <Building style={{ width: '18px', flexShrink: 0 }} />
+                <span className='link-text'>Manage Companies</span>
               </div>
               {newCount > 0 && (
                 <span className='notification-badge'>{newCount}</span>

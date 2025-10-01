@@ -1,162 +1,152 @@
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState } from 'react'
+import { NavLink } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faChevronDown,
   faChevronUp,
   faBars,
   faTimes,
-  faImages // 👈 add gallery icon
-} from '@fortawesome/free-solid-svg-icons';
-import './Navbar.css';
+  faImages, // 👈 add gallery icon
+} from '@fortawesome/free-solid-svg-icons'
+import './Navbar.css'
+import { Rss } from 'lucide-react'
 
 const Navbar = () => {
-  const [isServicesOpen, setIsServicesOpen] = useState(false);
-  const [isTrainingOpen, setIsTrainingOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isServicesOpen, setIsServicesOpen] = useState(false)
+  const [isTrainingOpen, setIsTrainingOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    setIsMobileMenuOpen(!isMobileMenuOpen)
     if (isMobileMenuOpen) {
-      setIsServicesOpen(false);
-      setIsTrainingOpen(false);
+      setIsServicesOpen(false)
+      setIsTrainingOpen(false)
     }
-  };
+  }
 
   const toggleServices = () => {
     if (window.innerWidth <= 960) {
-      setIsServicesOpen(!isServicesOpen);
-      setIsTrainingOpen(false);
+      setIsServicesOpen(!isServicesOpen)
+      setIsTrainingOpen(false)
     }
-  };
+  }
 
   const toggleTraining = (e) => {
-    e.stopPropagation();
+    e.stopPropagation()
     if (window.innerWidth <= 960) {
-      setIsTrainingOpen(!isTrainingOpen);
+      setIsTrainingOpen(!isTrainingOpen)
     }
-  };
+  }
 
   const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-    setIsServicesOpen(false);
-    setIsTrainingOpen(false);
-  };
+    setIsMobileMenuOpen(false)
+    setIsServicesOpen(false)
+    setIsTrainingOpen(false)
+  }
 
   return (
-    <nav className="navbar">
-      <div className="navbar-container">
+    <nav className='navbar'>
+      <div className='navbar-container'>
         {/* Logo */}
-        <NavLink to="/" className="navbar-logo" onClick={closeMobileMenu}>
+        <NavLink to='/' className='navbar-logo' onClick={closeMobileMenu}>
           <img
-            src="/Logo6.jpg"
-            alt="Zero7 Technologies Logo"
-            className="logo-img"
+            src='/Logo6.jpg'
+            alt='Zero7 Technologies Logo'
+            className='logo-img'
           />
         </NavLink>
 
         {/* Mobile menu icon */}
-        <div className="mobile-menu-icon" onClick={toggleMobileMenu}>
+        <div className='mobile-menu-icon' onClick={toggleMobileMenu}>
           <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} />
         </div>
 
         {/* Nav menu */}
         <ul className={`nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
-          <li className="nav-item">
+          <li className='nav-item'>
             <NavLink
-              to="/"
+              to='/'
               className={({ isActive }) =>
                 isActive ? 'nav-links active-link' : 'nav-links'
               }
-              onClick={closeMobileMenu}
-            >
+              onClick={closeMobileMenu}>
               Home
             </NavLink>
           </li>
 
-          <li className="nav-item">
+          <li className='nav-item'>
             <NavLink
-              to="/about"
+              to='/about'
               className={({ isActive }) =>
                 isActive ? 'nav-links active-link' : 'nav-links'
               }
-              onClick={closeMobileMenu}
-            >
+              onClick={closeMobileMenu}>
               About Us
             </NavLink>
           </li>
 
           {/* Services */}
           <li
-            className={`nav-item services-item ${
-              isServicesOpen ? 'open' : ''
-            }`}
+            className={`nav-item services-item ${isServicesOpen ? 'open' : ''}`}
             onMouseEnter={() =>
               window.innerWidth > 960 && setIsServicesOpen(true)
             }
             onMouseLeave={() =>
               window.innerWidth > 960 && setIsServicesOpen(false)
             }
-            onClick={toggleServices}
-          >
-            <div className="nav-links">
+            onClick={toggleServices}>
+            <div className='nav-links'>
               Services
               <FontAwesomeIcon
                 icon={isServicesOpen ? faChevronUp : faChevronDown}
-                className="dropdown-icon"
+                className='dropdown-icon'
               />
             </div>
 
             <ul className={`services-dropdown ${isServicesOpen ? 'show' : ''}`}>
               {/* Training submenu */}
               <li
-                className={`training-submenu ${
-                  isTrainingOpen ? 'open' : ''
-                }`}
+                className={`training-submenu ${isTrainingOpen ? 'open' : ''}`}
                 onMouseEnter={() =>
                   window.innerWidth > 960 && setIsTrainingOpen(true)
                 }
                 onMouseLeave={() =>
                   window.innerWidth > 960 && setIsTrainingOpen(false)
                 }
-                onClick={toggleTraining}
-              >
-                <div className="dropdown-link">
+                onClick={toggleTraining}>
+                <div className='dropdown-link'>
                   Training
                   <FontAwesomeIcon
                     icon={isTrainingOpen ? faChevronUp : faChevronDown}
-                    className="submenu-icon"
+                    className='submenu-icon'
                   />
                 </div>
 
                 <ul
                   className={`training-dropdown ${
                     isTrainingOpen ? 'show' : ''
-                  }`}
-                >
+                  }`}>
                   <li>
                     <NavLink
-                      to="/services/it-training"
+                      to='/services/it-training'
                       className={({ isActive }) =>
                         isActive
                           ? 'dropdown-link active-dropdown'
                           : 'dropdown-link'
                       }
-                      onClick={closeMobileMenu}
-                    >
+                      onClick={closeMobileMenu}>
                       IT Training
                     </NavLink>
                   </li>
                   <li>
                     <NavLink
-                      to="/services/non-it-training"
+                      to='/services/non-it-training'
                       className={({ isActive }) =>
                         isActive
                           ? 'dropdown-link active-dropdown'
                           : 'dropdown-link'
                       }
-                      onClick={closeMobileMenu}
-                    >
+                      onClick={closeMobileMenu}>
                       Non-IT Training
                     </NavLink>
                   </li>
@@ -166,124 +156,111 @@ const Navbar = () => {
               {/* Digital Courses */}
               <li>
                 <NavLink
-                  to="/digital-courses"
+                  to='/digital-courses'
                   className={({ isActive }) =>
-                    isActive
-                      ? 'dropdown-link active-dropdown'
-                      : 'dropdown-link'
+                    isActive ? 'dropdown-link active-dropdown' : 'dropdown-link'
                   }
-                  onClick={closeMobileMenu}
-                >
+                  onClick={closeMobileMenu}>
                   Digital Courses
                 </NavLink>
               </li>
 
               <li>
                 <NavLink
-                  to="/services/payroll-services"
+                  to='/services/payroll-services'
                   className={({ isActive }) =>
-                    isActive
-                      ? 'dropdown-link active-dropdown'
-                      : 'dropdown-link'
+                    isActive ? 'dropdown-link active-dropdown' : 'dropdown-link'
                   }
-                  onClick={closeMobileMenu}
-                >
+                  onClick={closeMobileMenu}>
                   Payroll Services
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="/services/resume-marketing"
+                  to='/services/resume-marketing'
                   className={({ isActive }) =>
-                    isActive
-                      ? 'dropdown-link active-dropdown'
-                      : 'dropdown-link'
+                    isActive ? 'dropdown-link active-dropdown' : 'dropdown-link'
                   }
-                  onClick={closeMobileMenu}
-                >
+                  onClick={closeMobileMenu}>
                   Resume Marketing
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="/services/college-connect"
+                  to='/services/college-connect'
                   className={({ isActive }) =>
-                    isActive
-                      ? 'dropdown-link active-dropdown'
-                      : 'dropdown-link'
+                    isActive ? 'dropdown-link active-dropdown' : 'dropdown-link'
                   }
-                  onClick={closeMobileMenu}
-                >
+                  onClick={closeMobileMenu}>
                   College Connect
                 </NavLink>
               </li>
             </ul>
           </li>
 
-          <li className="nav-item">
+          <li className='nav-item'>
             <NavLink
-              to="/new-batches"
+              to='/new-batches'
               className={({ isActive }) =>
                 isActive ? 'nav-links active-link' : 'nav-links'
               }
-              onClick={closeMobileMenu}
-            >
+              onClick={closeMobileMenu}>
               New Batches
             </NavLink>
           </li>
 
-          <li className="nav-item">
+          <li className='nav-item'>
             <NavLink
-              to="/bench-list"
+              to='/bench-list'
               className={({ isActive }) =>
                 isActive ? 'nav-links active-link' : 'nav-links'
               }
-              onClick={closeMobileMenu}
-            >
+              onClick={closeMobileMenu}>
               Bench List
             </NavLink>
           </li>
 
-          <li className="nav-item">
+          <li className='nav-item'>
             <NavLink
-              to="/current-hirings"
+              to='/current-hirings'
               className={({ isActive }) =>
                 isActive ? 'nav-links active-link' : 'nav-links'
               }
-              onClick={closeMobileMenu}
-            >
+              onClick={closeMobileMenu}>
               Current Hirings
             </NavLink>
           </li>
 
-          <li className="nav-item">
+          <li className='nav-item'>
             <NavLink
-              to="/contact"
+              to='/contact'
               className={({ isActive }) =>
                 isActive ? 'nav-links active-link' : 'nav-links'
               }
-              onClick={closeMobileMenu}
-            >
+              onClick={closeMobileMenu}>
               Contact Us
             </NavLink>
           </li>
 
           {/* Blog – shows icon but keeps route */}
-          <li className="nav-item">
+          <li className='nav-item'>
             <NavLink
-              to="/blog"
+              to='/blog'
               className={({ isActive }) =>
                 isActive ? 'nav-links active-link' : 'nav-links'
               }
-              onClick={closeMobileMenu}
-            >
-              <FontAwesomeIcon icon={faImages} title="Blog / Gallery" />
+              onClick={closeMobileMenu}>
+              <img
+                src='https://cdn-icons-png.flaticon.com/512/10026/10026257.png'
+                alt='blog-posts'
+                style={{ height: '40px', width: '40px' }}
+              />
             </NavLink>
           </li>
         </ul>
       </div>
     </nav>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar

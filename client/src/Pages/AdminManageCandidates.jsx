@@ -1,52 +1,54 @@
-import React, { useState, useEffect } from 'react'
-import { Edit, Trash2, Download, Upload, PlusCircle, X } from 'lucide-react'
-import api from '../api/axios'
-import './AdminManageCandidates.css'
+import React from 'react';
+import { useState, useEffect } from 'react';
+import { Edit, Trash2, Download, Upload, PlusCircle, X } from 'lucide-react';
+import api from '../api/axios';
+import './AdminManageCandidates.css';
+import * as XLSX from 'xlsx'; // Import for Excel functionality
 
 export default function AdminManageCandidates() {
-  const [candidates, setCandidates] = useState([])
+  const [candidates, setCandidates] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     role: '',
-    skills: '', // <-- Field is present
+    skills: '',
     exp: '',
     location: '',
     email: '',
     phone: '',
-  })
-  const [editingId, setEditingId] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [showModal, setShowModal] = useState(false)
-  const [alertMessage, setAlertMessage] = useState({ type: '', message: '' })
+  });
+  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({ type: '', message: '' });
+
+  const showAlert = (type, message) => {
+    setAlertMessage({ type, message });
+    setTimeout(() => setAlertMessage({ type: '', message: '' }), 3000);
+  };
 
   const fetchCandidates = async () => {
     try {
-      setLoading(true)
-      const { data } = await api.get('/candidates')
-      setCandidates(data)
+      setLoading(true);
+      const { data } = await api.get('/candidates');
+      setCandidates(data);
     } catch (error) {
-      console.error('Failed to fetch candidates:', error)
-      showAlert('error', 'Failed to load candidates.')
+      console.error('Failed to fetch candidates:', error);
+      showAlert('error', 'Failed to load candidates.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchCandidates()
-  }, [])
-
-  const showAlert = (type, message) => {
-    setAlertMessage({ type, message })
-    setTimeout(() => setAlertMessage({ type: '', message: '' }), 3000)
-  }
+    fetchCandidates();
+  }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleOpenAddModal = () => {
-    setEditingId(null)
+    setEditingId(null);
     setFormData({
       name: '',
       role: '',
@@ -55,62 +57,112 @@ export default function AdminManageCandidates() {
       location: '',
       email: '',
       phone: '',
-    })
-    setShowModal(true)
-  }
+    });
+    setShowModal(true);
+  };
 
   const handleOpenEditModal = (candidate) => {
-    setFormData(candidate)
-    setEditingId(candidate._id)
-    setShowModal(true)
-  }
+    setFormData(candidate);
+    setEditingId(candidate._id);
+    setShowModal(true);
+  };
 
   const handleCloseModal = () => {
-    setShowModal(false)
-  }
+    setShowModal(false);
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
       if (editingId) {
-        await api.put(`/candidates/${editingId}`, formData)
-        showAlert('success', 'Candidate updated successfully!')
+        await api.put(`/candidates/${editingId}`, formData);
+        showAlert('success', 'Candidate updated successfully!');
       } else {
-        await api.post('/candidates', formData)
-        showAlert('success', 'Candidate added successfully!')
+        await api.post('/candidates', formData);
+        showAlert('success', 'Candidate added successfully!');
       }
-      handleCloseModal()
-      fetchCandidates()
+      handleCloseModal();
+      fetchCandidates();
     } catch (error) {
-      console.error('Failed to submit candidate:', error)
-      showAlert('error', 'Failed to save candidate. Please try again.')
+      console.error('Failed to submit candidate:', error);
+      showAlert('error', 'Failed to save candidate. Please try again.');
     }
-  }
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this candidate?')) {
       try {
-        await api.delete(`/candidates/${id}`)
-        fetchCandidates()
-        showAlert('success', 'Candidate deleted successfully!')
+        await api.delete(`/candidates/${id}`);
+        fetchCandidates();
+        showAlert('success', 'Candidate deleted successfully!');
       } catch (error) {
-        console.error('Failed to delete candidate:', error)
-        showAlert('error', 'Failed to delete candidate.')
+        console.error('Failed to delete candidate:', error);
+        showAlert('error', 'Failed to delete candidate.');
       }
     }
-  }
+  };
 
-  // Export and Import functions remain...
-  const exportToCSV = () => {
-    // Implementation here...
-  }
+  // Export to Excel function
+  const exportToExcel = () => {
+    try {
+      const dataToExport = candidates.map(({ name, role, skills, exp, location, email, phone }) => ({
+        name,
+        role,
+        skills,
+        exp,
+        location,
+        email,
+        phone
+      }));
 
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Candidates");
+      XLSX.writeFile(workbook, "candidates.xlsx");
+      showAlert('success', 'Data exported successfully!');
+    } catch (error) {
+      console.error('Export failed:', error);
+      showAlert('error', 'Failed to export data.');
+    }
+  };
+
+  // Import from Excel function
   const handleImport = (e) => {
-    // Implementation here...
-  }
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const workbook = XLSX.read(event.target.result, { type: 'binary' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const data = XLSX.utils.sheet_to_json(worksheet);
+
+        const formattedData = data.map(item => ({
+          name: item.name || '',
+          role: item.role || '',
+          skills: item.skills || '',
+          exp: item.exp || '',
+          location: item.location || '',
+          email: item.email || '',
+          phone: item.phone || ''
+        }));
+
+        await api.post('/candidates/bulk', formattedData);
+        showAlert('success', 'Data imported successfully!');
+        fetchCandidates();
+      } catch (error) {
+        console.error('Import failed:', error);
+        showAlert('error', 'Failed to import data. Please check the file format.');
+      }
+    };
+    reader.readAsBinaryString(file);
+    e.target.value = '';
+  };
 
   if (loading) {
-    return <div className='loading-spinner'></div>
+    return <div className='loading-spinner'></div>;
   }
 
   return (
@@ -130,10 +182,22 @@ export default function AdminManageCandidates() {
           <div className='section-header'>
             <h2>All Candidates</h2>
             <div className='actions-group'>
+              <label htmlFor='import-file' className='btn btn-secondary'>
+                <Upload size={18} /> Import Data
+              </label>
+              <input
+                id='import-file'
+                type='file'
+                style={{ display: 'none' }}
+                accept=".xlsx, .xls"
+                onChange={handleImport}
+              />
+              <button className='btn btn-secondary' onClick={exportToExcel}>
+                <Download size={18} /> Export Data
+              </button>
               <button className='btn btn-primary' onClick={handleOpenAddModal}>
                 <PlusCircle size={18} /> Add New Candidate
               </button>
-              {/* Other buttons like import/export */}
             </div>
           </div>
           <div className='table-responsive'>
@@ -151,7 +215,7 @@ export default function AdminManageCandidates() {
               <tbody>
                 {candidates.length === 0 ? (
                   <tr>
-                    <td colSpan='7' className='no-data-message'>
+                    <td colSpan='6' className='no-data-message'>
                       No candidates found.
                     </td>
                   </tr>
@@ -281,5 +345,5 @@ export default function AdminManageCandidates() {
         </div>
       )}
     </div>
-  )
+  );
 }

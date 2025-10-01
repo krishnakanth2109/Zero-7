@@ -7,6 +7,7 @@ import {
   CardSim,
   ChevronDown,
   CircleUser,
+  FileUser,
   GraduationCap,
   HardDrive,
   LayoutDashboard,
@@ -82,7 +83,7 @@ export default function AdminSidebar({ isOpen }) {
       <div>
         <div className='admin-sidebar-header'>
           <div className='logo-img'>
-            <img src='/L1.png' alt='logo' />
+            <img src='/Logo6.jpg' alt='logo' className='h-[30px] w-[40px]' />
           </div>
           <div className='logo-side-name'>
             <div className='head-name'>Zero7 Tech</div>
@@ -151,6 +152,22 @@ export default function AdminSidebar({ isOpen }) {
               <div className='dashboard-icon'>
                 <CardSim style={{ width: '18px', flexShrink: 0 }} />
                 <span className='link-text'>Form Submissions</span>
+              </div>
+              {newCount > 0 && (
+                <span className='notification-badge'>{newCount}</span>
+              )}
+            </div>
+          </Link>
+          <Link
+            to='/admin/interviews'
+            className={`sidebar-link ${
+              isActive('/admin/interviews') ? 'active' : ''
+            }`}
+            data-tooltip='Form Submissions'>
+            <div className='dashboard-cont'>
+              <div className='dashboard-icon'>
+                <FileUser style={{ width: '18px', flexShrink: 0 }} />
+                <span className='link-text'>Interviews</span>
               </div>
               {newCount > 0 && (
                 <span className='notification-badge'>{newCount}</span>

@@ -10,6 +10,8 @@ const CandidateSchema = new Schema(
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true },
     skills: { type: String, required: true },
+    interviewIds: { type: Array },
+    assignedRecruiter: { type: Array },
   },
   { timestamps: true },
 )

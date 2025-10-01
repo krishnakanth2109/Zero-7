@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios'; // <-- CORRECT: Imports the central API connection
 import './AdminManageJobs.css'; // Import the new CSS file
+import * as XLSX from 'xlsx';
 
 const AdminManageJobs = () => {
     const [jobs, setJobs] = useState([]);
@@ -58,6 +59,46 @@ const AdminManageJobs = () => {
         }
     };
 
+    const handleExportToExcel = () => {
+        // Create a new array without the _id field for a cleaner export
+        const jobsToExport = jobs.map(({ _id, __v, ...rest }) => rest);
+        const worksheet = XLSX.utils.json_to_sheet(jobsToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Jobs");
+        XLSX.writeFile(workbook, "JobListings.xlsx");
+    };
+
+    const handleImportFromExcel = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            try {
+                const binaryString = event.target.result;
+                const workbook = XLSX.read(binaryString, { type: 'binary' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const data = XLSX.utils.sheet_to_json(worksheet);
+
+                // Post each job sequentially and wait for all to complete
+                for (const job of data) {
+                    await api.post('/jobs', job);
+                }
+
+                alert('Jobs imported successfully!');
+                fetchJobs(); // Refresh the job list from the server
+            } catch (err) {
+                 alert('Failed to import jobs. Please check the file format and console for details.');
+                console.error("Error importing jobs:", err);
+            }
+        };
+        reader.readAsBinaryString(file);
+        // Reset file input to allow uploading the same file again
+        e.target.value = '';
+    };
+
+
     return (
         <div className="admin-manage-jobs">
             <h1 className="main-title">Admin Job Management</h1>
@@ -65,6 +106,24 @@ const AdminManageJobs = () => {
             <button onClick={() => setShowPopup(true)} className="add-new-job-button">
                 Add New Job Posting
             </button>
+
+            {/* Container for Import/Export links to match the screenshot layout */}
+            <div className="excel-actions-container">
+                 <label htmlFor="import-excel" className="excel-action-link">
+                    Import from Excel
+                </label>
+                <input
+                    id="import-excel"
+                    type="file"
+                    accept=".xlsx, .xls"
+                    onChange={handleImportFromExcel}
+                    style={{ display: 'none' }}
+                />
+                <button onClick={handleExportToExcel} className="excel-action-link">
+                    Export to Excel
+                </button>
+            </div>
+
 
             {showPopup && (
                 <div className="popup-overlay">

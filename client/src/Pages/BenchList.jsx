@@ -33,6 +33,19 @@ const BenchList = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    let endPoint = '/enrollments/'
+    const url = process.env.REACT_APP_API_URL
+      ? `${process.env.REACT_APP_API_URL}${endPoint}`
+      : `http://localhost:5000/api${endPoint}`
+
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    }
+    const res = await fetch(url, options)
     try {
       await fetch(GOOGLE_SHEETS_URL, {
         method: 'POST',

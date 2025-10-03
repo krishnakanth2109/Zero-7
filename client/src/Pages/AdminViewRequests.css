@@ -198,7 +198,8 @@
 /* Center align specific columns */
 .requests-table td:nth-child(1), /* Date */
 .requests-table td:nth-child(2), /* Status */
-.requests-table td:nth-child(7) { /* Actions */
+.requests-table td:nth-child(7) {
+  /* Actions */
   text-align: center;
 }
 
@@ -331,7 +332,7 @@
 .approve-btn.loading::after,
 .reject-btn.loading::after,
 .delete-btn.loading::after {
-  content: "";
+  content: '';
   position: absolute;
   width: 16px;
   height: 16px;
@@ -342,8 +343,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Compact Approve/Reject buttons alignment */
@@ -515,7 +520,8 @@
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   position: relative;
   animation: modalAppear 0.3s ease;
 }
@@ -606,29 +612,29 @@
   .requests-table {
     min-width: 900px;
   }
-  
+
   .requests-table th,
   .requests-table td {
     padding: 14px 8px;
     font-size: 0.8rem;
   }
-  
+
   .requests-table th:nth-child(6), /* Requirement */
   .requests-table td:nth-child(6) {
     width: 180px;
   }
-  
+
   .requests-table th:nth-child(7), /* Actions */
   .requests-table td:nth-child(7) {
     width: 160px;
   }
-  
+
   .requests-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 20px;
   }
-  
+
   .header-stats {
     width: 100%;
     justify-content: space-between;
@@ -639,32 +645,32 @@
   .requests-container {
     padding: 16px;
   }
-  
+
   .requests-header h2 {
     font-size: 1.5rem;
   }
-  
+
   .header-stats {
     gap: 12px;
   }
-  
+
   .stat-card {
     padding: 10px 12px;
     min-width: 70px;
   }
-  
+
   .stat-number {
     font-size: 1.25rem;
   }
-  
+
   .modal-content {
     padding: 20px;
   }
-  
+
   .modal-actions {
     flex-direction: column;
   }
-  
+
   .modal-actions button {
     width: 100%;
   }

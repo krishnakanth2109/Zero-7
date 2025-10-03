@@ -1,759 +1,684 @@
 /* File: src/Pages/AdminViewRequests.css */
 
 /* =========================================
-   Main Container and Header
+   Enhanced Table Design & Alignment
 ========================================= */
+
 .requests-container {
+  padding: 24px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+/* Header Section */
+.requests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
   padding: 20px;
-  font-family: 'Poppins', sans-serif;
-  background-color: #f9fafb; /* A light grey background */
-}
-
-.requests-container h2 {
-  font-size: 1.8rem;
-  color: #1f2937; /* Dark blue-grey text */
-  margin-bottom: 25px;
-  border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 10px;
-}
-
-/* =========================================
-   Table Wrapper for Responsiveness
-========================================= */
-.requests-table-wrapper {
-  width: 100%;
-  overflow-x: auto; /* Crucial for making the table scroll on small screens */
-  background-color: #ffffff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
 }
 
-/* =========================================
-   Table Styling
-========================================= */
+.requests-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.header-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  min-width: 80px;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.stat-card.pending {
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.stat-card.approved {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.stat-card.rejected {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+
+/* Table Container */
+.requests-table-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  position: relative;
+  overflow-x: auto;
+}
+
+/* Table Styling with Perfect Alignment */
 .requests-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px; /* Ensures columns don't get too squished before scrolling */
+  min-width: 1000px;
+  font-size: 0.875rem;
+  table-layout: fixed;
 }
 
 .requests-table th,
 .requests-table td {
-  padding: 16px 20px;
+  padding: 16px 12px;
   text-align: left;
-  border-bottom: 1px solid #e5e7eb; /* Light grey border */
+  border-bottom: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  vertical-align: middle;
 }
 
-/* Table Header */
+/* Table Header Styling - FIXED VISIBILITY */
 .requests-table thead {
-  background-color: #f3f4f6; /* Very light grey for the header */
+  background: linear-gradient(to right, #4f46e5, #7c3aed);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .requests-table th {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #4b5563; /* Medium grey text */
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffffff !important; /* Force white text */
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Table Body */
-.requests-table tbody tr {
-  transition: background-color 0.2s ease-in-out;
-}
-
-.requests-table tbody tr:hover {
-  background-color: #f9fafb;
-}
-
-.requests-table td {
-  color: #374151; /* Darker grey for content */
-  font-size: 0.95rem;
-}
-
-/* Special styling for the long 'Requirement' column */
-.requirement-cell {
-  max-width: 300px;
+  letter-spacing: 0.1em;
+  padding: 18px 12px;
+  position: relative;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* =========================================
-   Action Button in Table
-========================================= */
-.view-details-btn {
-  background-color: #3b82f6; /* A nice blue */
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
+/* Ensure header text is visible */
+.requests-table thead tr th {
+  color: #ffffff !important;
+  background: transparent !important;
+}
+
+/* Fixed Column Widths for Perfect Alignment */
+.requests-table th:nth-child(1), /* Date Received */
+.requests-table td:nth-child(1) {
+  width: 120px;
+  text-align: center;
+}
+
+.requests-table th:nth-child(2), /* Status */
+.requests-table td:nth-child(2) {
+  width: 100px;
+  text-align: center;
+}
+
+.requests-table th:nth-child(3), /* Candidate Name */
+.requests-table td:nth-child(3) {
+  width: 150px;
+}
+
+.requests-table th:nth-child(4), /* Company */
+.requests-table td:nth-child(4) {
+  width: 140px;
+}
+
+.requests-table th:nth-child(5), /* Contact Person */
+.requests-table td:nth-child(5) {
+  width: 140px;
+}
+
+.requests-table th:nth-child(6), /* Requirement */
+.requests-table td:nth-child(6) {
+  width: 200px;
+  text-align: left;
+}
+
+.requests-table th:nth-child(7), /* Actions */
+.requests-table td:nth-child(7) {
+  width: 180px;
+  text-align: center;
+}
+
+/* Table Body Styling */
+.requests-table tbody tr {
   transition: background-color 0.2s ease;
 }
 
-.view-details-btn:hover {
-  background-color: #2563eb; /* A darker blue on hover */
+.requests-table tbody tr:hover {
+  background-color: #f7fafc;
 }
 
-/* =========================================
-   Modal (Popup) for Details
-========================================= */
+.requests-table tbody tr.row-pending:hover {
+  background-color: #fffbeb;
+}
+
+.requests-table tbody tr.row-approved:hover {
+  background-color: #f0fdf4;
+}
+
+.requests-table tbody tr.row-rejected:hover {
+  background-color: #fef2f2;
+}
+
+/* Center align specific columns */
+.requests-table td:nth-child(1), /* Date */
+.requests-table td:nth-child(2), /* Status */
+.requests-table td:nth-child(7) { /* Actions */
+  text-align: center;
+}
+
+/* Status Badge Styling */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: 80px;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.status-approved {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Action Buttons Container Alignment */
+.actions-cell-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 160px;
+  align-items: center;
+}
+
+/* Compact Button Group Alignment */
+.compact-button-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Button Base Styles */
+.view-details-btn,
+.approve-btn,
+.reject-btn,
+.delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 6px;
+}
+
+.view-details-btn {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.view-details-btn:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.approve-btn {
+  background-color: #10b981;
+  color: white;
+}
+
+.approve-btn:hover:not(.disabled) {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.reject-btn {
+  background-color: #ef4444;
+  color: white;
+}
+
+.reject-btn:hover:not(.disabled) {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+}
+
+.delete-btn {
+  background-color: #6b7280;
+  color: white;
+}
+
+.delete-btn:hover:not(.disabled) {
+  background-color: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* Disabled Buttons */
+.approve-btn.disabled,
+.reject-btn.disabled,
+.delete-btn.disabled {
+  background-color: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Loading State */
+.view-details-btn.loading,
+.approve-btn.loading,
+.reject-btn.loading,
+.delete-btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.view-details-btn.loading::after,
+.approve-btn.loading::after,
+.reject-btn.loading::after,
+.delete-btn.loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Compact Approve/Reject buttons alignment */
+.compact-approve-reject {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Individual action button alignment */
+.approve-btn,
+.reject-btn {
+  flex: 1;
+  min-width: 70px;
+}
+
+/* View Details button alignment */
+.view-details-btn {
+  min-width: 80px;
+}
+
+/* Delete button alignment */
+.delete-btn {
+  width: 100%;
+  max-width: 160px;
+}
+
+/* Requirement Cell Alignment */
+.requirement-cell {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  text-align: left;
+  padding: 16px 8px;
+}
+
+/* Date and Icon Alignment */
+.requests-table td:nth-child(1) > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Candidate Name and Icon Alignment */
+.requests-table td:nth-child(3) > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Company and Icon Alignment */
+.requests-table td:nth-child(4) > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Contact Person Alignment */
+.requests-table td:nth-child(5) {
+  text-align: left;
+  padding: 16px 8px;
+}
+
+/* Message Toast */
+.message-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s ease;
+}
+
+.message-success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border-left: 4px solid #10b981;
+}
+
+.message-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-left: 4px solid #ef4444;
+}
+
+.message-info {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border-left: 4px solid #3b82f6;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Loading State Alignment */
+.table-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Empty State Alignment */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #6b7280;
+}
+
+.empty-state svg {
+  margin-bottom: 16px;
+  color: #9ca3af;
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+.empty-state p {
+  color: #6b7280;
+}
+
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(17, 24, 39, 0.7); /* Dark semi-transparent background */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  padding: 20px;
 }
 
 .modal-content {
-  background: #ffffff;
-  padding: 30px;
+  background: white;
   border-radius: 12px;
+  padding: 24px;
   max-width: 600px;
-  width: 90%;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  position: relative;
-  max-height: 85vh;
+  width: 100%;
+  max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  position: relative;
+  animation: modalAppear 0.3s ease;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .modal-close-btn {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 16px;
+  right: 16px;
   background: none;
   border: none;
-  font-size: 2rem;
-  color: #9ca3af;
+  font-size: 1.5rem;
   cursor: pointer;
-  line-height: 1;
-  transition: color 0.2s ease;
+  color: #6b7280;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
 }
 
 .modal-close-btn:hover {
-  color: #1f2937;
+  background-color: #f3f4f6;
 }
 
 .modal-content h3 {
-  font-size: 1.5rem;
-  color: #111827;
   margin-top: 0;
   margin-bottom: 20px;
+  font-size: 1.5rem;
+  color: #1f2937;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 12px;
 }
 
 .modal-content p {
-  margin: 10px 0;
-  color: #4b5563;
-  line-height: 1.7;
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.modal-content p:last-of-type {
+  border-bottom: none;
 }
 
 .modal-content p strong {
-  color: #1f2937;
-  margin-right: 8px;
-}
-
-.modal-content hr {
-  border: 0;
-  border-top: 1px solid #e5e7eb;
-  margin: 20px 0;
+  min-width: 160px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #374151;
 }
 
 .modal-content a {
   color: #3b82f6;
   text-decoration: none;
 }
+
 .modal-content a:hover {
   text-decoration: underline;
 }
 
-.modal-content small {
-  display: block;
-  margin-top: 20px;
-  text-align: right;
-  color: #6b7280;
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
 }
 
-/* NEW: Status Badges */
-.status-badge {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.status-pending {
-    background-color: #fef3c7;
-    color: #d97706;
-}
-
-.status-approved {
-    background-color: #d1fae5;
-    color: #065f46;
-}
-
-.status-rejected {
-    background-color: #fee2e2;
-    color: #dc2626;
-}
-
-/* NEW: Action Buttons Container */
-.action-buttons {
-    display: flex;
+/* Responsive Table Alignment */
+@media (max-width: 1200px) {
+  .requests-table {
+    min-width: 900px;
+  }
+  
+  .requests-table th,
+  .requests-table td {
+    padding: 14px 8px;
+    font-size: 0.8rem;
+  }
+  
+  .requests-table th:nth-child(6), /* Requirement */
+  .requests-table td:nth-child(6) {
+    width: 180px;
+  }
+  
+  .requests-table th:nth-child(7), /* Actions */
+  .requests-table td:nth-child(7) {
+    width: 160px;
+  }
+  
+  .requests-header {
     flex-direction: column;
-    gap: 8px;
-    min-width: 150px;
-}
-
-.approve-reject-buttons {
-    display: flex;
-    gap: 6px;
-}
-
-/* NEW: Approve Button */
-.approve-btn {
-    background-color: #10b981;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-    justify-content: center;
-}
-
-.approve-btn:hover:not(:disabled) {
-    background-color: #059669;
-}
-
-.approve-btn:disabled {
-    background-color: #9ca3af;
-    cursor: not-allowed;
-}
-
-/* NEW: Reject Button */
-.reject-btn {
-    background-color: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-    justify-content: center;
-}
-
-.reject-btn:hover:not(:disabled) {
-    background-color: #dc2626;
-}
-
-.reject-btn:disabled {
-    background-color: #9ca3af;
-    cursor: not-allowed;
-}
-
-/* NEW: Action Completed Text */
-.action-completed {
-    font-size: 0.8rem;
-    color: #6b7280;
-    font-style: italic;
-    text-align: center;
-    display: block;
-}
-
-/* NEW: Modal Actions */
-.modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #e5e7eb;
-}
-
-.modal-actions .approve-btn,
-.modal-actions .reject-btn {
-    padding: 10px 16px;
-    font-size: 0.9rem;
-    flex: 1;
-}
-
-/* Update table header for new column */
-.requests-table th:nth-child(2) {
-    width: 100px;
-}
-
-.requests-table td:nth-child(2) {
-    text-align: center;
-}
-
-/* Update action column width */
-.requests-table th:last-child,
-.requests-table td:last-child {
-    width: 200px;
-}
-/* NEW: Row highlighting */
-.row-approved {
-    background-color: #f0fdf4 !important;
-}
-
-.row-rejected {
-    background-color: #fef2f2 !important;
-}
-
-.requests-table tbody tr.row-approved:hover,
-.requests-table tbody tr.row-rejected:hover {
-    background-color: #ecfdf5 !important;
-}
-
-.requests-table tbody tr.row-rejected:hover {
-    background-color: #fef2f2 !important;
-}
-
-/* NEW: Status Badges */
-.status-badge {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.status-pending {
-    background-color: #fef3c7;
-    color: #d97706;
-}
-
-.status-approved {
-    background-color: #d1fae5;
-    color: #065f46;
-}
-
-.status-rejected {
-    background-color: #fee2e2;
-    color: #dc2626;
-}
-
-/* NEW: View Details Button */
-.view-details-btn {
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .header-stats {
     width: 100%;
-    justify-content: center;
+    justify-content: space-between;
+  }
 }
 
-.view-details-btn:hover {
-    background-color: #2563eb;
-}
-
-/* NEW: Approve/Reject Buttons Container */
-.approve-reject-buttons {
-    display: flex;
-    gap: 6px;
-}
-
-.action-completed-buttons {
-    display: flex;
-    gap: 6px;
-}
-
-/* NEW: Approve Button */
-.approve-btn {
-    background-color: #10b981;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 10px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-    justify-content: center;
-}
-
-.approve-btn:hover:not(:disabled) {
-    background-color: #059669;
-    transform: translateY(-1px);
-}
-
-.approve-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.approve-btn.active {
-    background-color: #059669;
-    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
-}
-
-.approve-btn.disabled {
-    background-color: #9ca3af;
-}
-
-/* NEW: Reject Button */
-.reject-btn {
-    background-color: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 10px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-    justify-content: center;
-}
-
-.reject-btn:hover:not(:disabled) {
-    background-color: #dc2626;
-    transform: translateY(-1px);
-}
-
-.reject-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.reject-btn.active {
-    background-color: #dc2626;
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-}
-
-.reject-btn.disabled {
-    background-color: #9ca3af;
-}
-
-/* NEW: Loading state */
-.approve-btn.loading,
-.reject-btn.loading {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-/* Update table column widths */
-.requests-table th:nth-child(1),
-.requests-table td:nth-child(1) {
-    width: 120px; /* Date */
-}
-
-.requests-table th:nth-child(2),
-.requests-table td:nth-child(2) {
-    width: 100px; /* Status */
-    text-align: center;
-}
-
-.requests-table th:nth-child(7),
-.requests-table td:nth-child(7) {
-    width: 120px; /* Details column */
-}
-
-.requests-table th:nth-child(8),
-.requests-table td:nth-child(8) {
-    width: 200px; /* Actions column */
-}
-
-/* Modal Actions */
-.modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #e5e7eb;
-}
-
-.modal-actions .approve-btn,
-.modal-actions .reject-btn {
-    padding: 10px 16px;
-    font-size: 0.9rem;
-    flex: 1;
-}
-
-
-/* NEW: Center alignment classes */
-.text-center {
-    text-align: center !important;
-}
-
-.requests-table th,
-.requests-table td {
-    text-align: center;
-    vertical-align: middle;
-}
-
-/* NEW: Full width View Details button */
-.view-details-btn.full-width {
+@media (max-width: 768px) {
+  .requests-container {
+    padding: 16px;
+  }
+  
+  .requests-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .header-stats {
+    gap: 12px;
+  }
+  
+  .stat-card {
+    padding: 10px 12px;
+    min-width: 70px;
+  }
+  
+  .stat-number {
+    font-size: 1.25rem;
+  }
+  
+  .modal-content {
+    padding: 20px;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .modal-actions button {
     width: 100%;
-    min-width: 120px;
-    padding: 10px 12px;
-    font-size: 0.9rem;
-    justify-content: center;
+  }
 }
 
-/* Row highlighting */
-.row-approved {
-    background-color: #f0fdf4 !important;
-}
-
-.row-rejected {
-    background-color: #fef2f2 !important;
-}
-
-.requests-table tbody tr.row-approved:hover,
-.requests-table tbody tr.row-rejected:hover {
-    background-color: #ecfdf5 !important;
-}
-
-.requests-table tbody tr.row-rejected:hover {
-    background-color: #fef2f2 !important;
-}
-
-/* Status Badges */
-.status-badge {
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    display: inline-block;
-}
-
-.status-pending {
-    background-color: #fef3c7;
-    color: #d97706;
-}
-
-.status-approved {
-    background-color: #d1fae5;
-    color: #065f46;
-}
-
-.status-rejected {
-    background-color: #fee2e2;
-    color: #dc2626;
-}
-
-/* View Details Button */
-.view-details-btn {
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 12px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    justify-content: center;
-}
-
-.view-details-btn:hover {
-    background-color: #2563eb;
-    transform: translateY(-1px);
-}
-
-/* Approve/Reject Buttons Container */
-.approve-reject-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-}
-
-.action-completed-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-}
-
-/* Approve Button */
-.approve-btn {
-    background-color: #10b981;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    min-width: 80px;
-    justify-content: center;
-}
-
-.approve-btn:hover:not(:disabled) {
-    background-color: #059669;
-    transform: translateY(-1px);
-}
-
-.approve-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.approve-btn.active {
-    background-color: #059669;
-    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
-}
-
-.approve-btn.disabled {
-    background-color: #9ca3af;
-}
-
-/* Reject Button */
-.reject-btn {
-    background-color: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    min-width: 80px;
-    justify-content: center;
-}
-
-.reject-btn:hover:not(:disabled) {
-    background-color: #dc2626;
-    transform: translateY(-1px);
-}
-
-.reject-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.reject-btn.active {
-    background-color: #dc2626;
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-}
-
-.reject-btn.disabled {
-    background-color: #9ca3af;
-}
-
-/* Loading state */
-.approve-btn.loading,
-.reject-btn.loading {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-/* Update table column widths */
-.requests-table th:nth-child(1),
-.requests-table td:nth-child(1) {
-    width: 120px; /* Date */
-}
-
-.requests-table th:nth-child(2),
-.requests-table td:nth-child(2) {
-    width: 100px; /* Status */
-}
-
-.requests-table th:nth-child(7),
-.requests-table td:nth-child(7) {
-    width: 140px; /* Details column - Increased width */
-}
-
-.requests-table th:nth-child(8),
-.requests-table td:nth-child(8) {
-    width: 200px; /* Actions column */
-}
-
-/* Table header center alignment */
-.requests-table th {
-    text-align: center;
-    vertical-align: middle;
-}
-
-/* Table cell center alignment */
-.requests-table td {
-    text-align: center;
-    vertical-align: middle;
-}
-
-/* Requirement cell with centered text */
-.requirement-cell {
-    max-width: 200px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: center;
-}
-
-/* Modal Actions */
-.modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #e5e7eb;
-}
-
-.modal-actions .approve-btn,
-.modal-actions .reject-btn {
-    padding: 10px 16px;
-    font-size: 0.9rem;
-    flex: 1;
-}
-
-/* Ensure all content in table cells is centered */
+/* Ensure all content in table cells is properly aligned */
 .requests-table td > * {
-    margin: 0 auto;
+  margin: 0;
+}
+
+/* Fix for the requirement tooltip alignment */
+.requirement-cell:hover::after {
+  text-align: center;
+  white-space: normal;
+  max-width: 300px;
+  word-wrap: break-word;
 }

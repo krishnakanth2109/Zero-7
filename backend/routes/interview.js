@@ -100,8 +100,17 @@ router.post('/', async (request, response) => {
     candidateId: candidateId,
     jobId: jobId,
   })
+  const checkRightJobId = await jobs.findOne({
+    _id: jobId,
+    companyId: companyId,
+  })
+  console.log(checkRightJobId)
   if (interviewPosted) {
     response.status(400).send('Interview Already Scheduled for Cadidate')
+  } else if (!checkRightJobId) {
+    response
+      .status(400)
+      .send('Wrong Job Id, this jobId does not belong to this company')
   } else {
     const candidateName = await Candidate.find(
       { _id: candidateId },

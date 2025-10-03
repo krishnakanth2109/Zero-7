@@ -9,95 +9,85 @@ const router = express.Router()
 router.get('/', async (request, response) => {
   try {
     const pipeline = [
-      // Stage 1: Match the specific application/interview document
+      // Stage 1: Convert String IDs to ObjectId for lookups where target _id is ObjectId
       {
-        $match: {
-          _id: new mongoose.Types.ObjectId(applicationId),
-          // For your example: _id: new mongoose.Types.ObjectId("68dd0389362ac8ea001bec1f")
+        $addFields: {
+          candidateObjectId: { $toObjectId: '$candidateId' },
+          jobObjectId: { $toObjectId: '$jobId' }, // <--- NEW: Convert jobId to ObjectId
+          // userObjectId: { $toObjectId: '$userId' }, // Also convert userId if you need recruiter details
         },
       },
-      // Stage 2: Lookup Candidate details
+      // Stage 2: Lookup Candidate details (using converted ObjectId)
       {
         $lookup: {
-          from: 'candidates', // The collection name for Candidate model (usually lowercase, plural)
-          localField: 'candidateId',
+          from: 'candidates', // Collection name for the Candidate model
+          localField: 'candidateObjectId',
           foreignField: '_id',
-          as: 'candidateDetails',
+          as: 'candidateInfo',
         },
       },
-      // Stage 3: Unwind the candidateDetails array (since $lookup returns an array)
+      // Stage 3: Unwind candidateInfo (to get the candidate object directly)
       {
-        $unwind: '$candidateDetails',
+        $unwind: '$candidateInfo',
       },
-      // Stage 4: Lookup Job details
+      // Stage 4: Lookup Job details (using converted jobObjectId) <--- NEW STAGE
       {
         $lookup: {
-          from: 'jobs', // The collection name for Job model
-          localField: 'jobId',
+          from: 'jobs', // Collection name for the Job model
+          localField: 'jobObjectId',
           foreignField: '_id',
-          as: 'jobDetails',
+          as: 'jobInfo',
         },
       },
-      // Stage 5: Unwind jobDetails
+      // Stage 5: Unwind jobInfo (to get the job object directly) <--- NEW STAGE
       {
-        $unwind: '$jobDetails',
+        $unwind: '$jobInfo',
       },
-      // Stage 6: Lookup Company details (using the company ID from the Job document)
+      // Stage 6: Lookup Company details (using the string companyId from Interview, matching on Company.name)
+      // This is based on your specific document, where companyId might be a string like "Vg07"
       {
         $lookup: {
-          from: 'companies', // The collection name for Company model
-          localField: 'jobDetails.company', // Reference company ID within jobDetails
-          foreignField: '_id',
-          as: 'companyDetails',
+          from: 'companies', // Collection name for the Company model
+          localField: 'companyId', // Interview's companyId (e.g., "Vg07")
+          foreignField: '_id', // Company's name field (assuming your Company model has a 'name' field)
+          as: 'companyInfo',
         },
       },
-      // Stage 7: Unwind companyDetails
+      // Stage 7: Unwind companyInfo (to get the company object directly)
+      // Use preserveNullAndEmptyArrays: true if a company name might not always match,
+      // and you still want the interview in the result.
       {
-        $unwind: '$companyDetails',
-      },
-      // Stage 8: Lookup Recruiter (User) details
-      {
-        $lookup: {
-          from: 'users', // The collection name for User model
-          localField: 'userId',
-          foreignField: '_id',
-          as: 'recruiterDetails',
+        $unwind: {
+          path: '$companyInfo',
+          preserveNullAndEmptyArrays: true, // Keep the interview even if company isn't found
         },
       },
-      // Stage 9: Unwind recruiterDetails
-      {
-        $unwind: '$recruiterDetails',
-      },
-      // Stage 10: Project the desired fields into the final output shape
+      // Stage 8: Project the desired fields, including new ones and original ones
       {
         $project: {
-          _id: 1, // Include the original application/interview ID
+          // Include all original fields from the Interview document
+          _id: 1,
+          candidateId: 1,
+          jobId: 1,
           status: 1,
-          date: 1, // Include the original date
-          // companyId: "$companyDetails._id", // If you want the companyId from the company document
-          // userId: "$recruiterDetails._id", // If you want the userId from the user document
+          companyId: 1,
+          userId: 1,
+          date: 1,
+          // If you have timestamps in Interview schema, include them
+          createdAt: 1,
+          updatedAt: 1,
 
-          candidate: {
-            _id: '$candidateDetails._id',
-            name: '$candidateDetails.name', // Combine first and last name
-          },
-          job: {
-            _id: '$jobDetails._id',
-            role: '$jobDetails.title', // "role" from job title
-            description: '$jobDetails.description', // Example: include job description
-            company: {
-              _id: '$companyDetails._id',
-              name: '$companyDetails.name',
-            },
-          },
-          recruiter: {
-            _id: '$recruiterDetails._id',
-            name: '$recruiterDetails.username', // Recruiter's name (username)
-          },
+          // Add the derived names and role
+          candidateName: '$candidateInfo.name', // Candidate's 'name' field
+          // Use ternary operator with $ifNull to handle cases where companyInfo might be null
+          companyName: '$companyInfo.name',
+          jobRole: '$jobInfo.role', // <--- NEW: Job's 'role' field
         },
       },
+      // Stage 9: Sort the results (optional)
+      { $sort: { date: -1 } }, // Assuming you want to sort by interview date
     ]
-    const result = await Application.aggregate(pipeline) //
+    const result = await Interview.aggregate(pipeline)
     response.send(result)
   } catch (err) {
     response.send({ err })
@@ -105,7 +95,7 @@ router.get('/', async (request, response) => {
 })
 
 router.post('/', async (request, response) => {
-  const { candidateId, jobId, status, companyId, userId, date } = request.body
+  const { candidateId, jobId, status, companyId, date } = request.body
   const interviewPosted = await Interview.findOne({
     candidateId: candidateId,
     jobId: jobId,
@@ -133,7 +123,6 @@ router.post('/', async (request, response) => {
       jobId: jobId,
       status: status,
       companyId: companyId,
-      userId: userId,
       date: date,
     })
     await newInterview.save()
@@ -144,6 +133,17 @@ router.post('/', async (request, response) => {
       date: newInterview.date,
     }
     response.status(201).send({ payload })
+  }
+})
+
+router.get('/search', async (request, response) => {
+  try {
+    const candidates = await Candidate.find({}, { _id: 1, name: 1 })
+    const companies = await Companies.find({}, { _id: 1, name: 1 })
+    response.send({ candidates, companies })
+  } catch (error) {
+    console.error('Error fetching enriched interviews:', error)
+    response.status(500).json({ message: 'Internal server error.' })
   }
 })
 

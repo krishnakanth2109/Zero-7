@@ -5,7 +5,7 @@ const InterviewSchema = new mongoose.Schema({
   jobId: { type: String, required: true },
   status: { type: String, required: true },
   companyId: { type: String, required: true },
-  userId: { type: String, required: true, ref: 'recruiter' },
+  userId: { type: String, ref: 'recruiter' },
   date: { type: Date, required: true },
 })
 

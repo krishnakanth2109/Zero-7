@@ -1,52 +1,35 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import api from '../api/axios'
 
 const InterviewTracker = () => {
-  const [interviewData, setInterviewData] = useState([
-    {
-      id: 1,
-      candidateName: 'Alice Johnson',
-      companyName: 'Tech Innovators Inc.',
-      status: 'Scheduled',
-      date: '2024-10-26',
-    },
-    {
-      id: 2,
-      candidateName: 'Bob Williams',
-      companyName: 'Global Solutions',
-      status: 'Completed',
-      date: '2024-10-20',
-    },
-    {
-      id: 3,
-      candidateName: 'Charlie Brown',
-      companyName: 'Data Analytics Corp.',
-      status: 'Pending Feedback',
-      date: '2024-10-18',
-    },
-    {
-      id: 4,
-      candidateName: 'Diana Prince',
-      companyName: 'Future Ventures',
-      status: 'Rejected',
-      date: '2024-10-15',
-    },
-    {
-      id: 5,
-      candidateName: 'Eve Adams',
-      companyName: 'Innovate Minds',
-      status: 'Offer Extended',
-      date: '2024-10-22',
-    },
-  ])
+  const [interviewData, setInterviewData] = useState([])
+  const [candidateOptions, setCandidateOptions] = useState([])
+  const [companyOptions, setCompanyOptions] = useState([])
 
   const [showAddForm, setShowAddForm] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [currentEditInterview, setCurrentEditInterview] = useState(null) // Stores the interview being edited
 
+  const fetchInterviews = async () => {
+    const response = await api.get('/interview')
+    setInterviewData(response.data)
+  }
+
+  const fetchOptions = async () => {
+    const response = await api.get('/interview/search')
+    setCandidateOptions(response.data.candidates)
+    setCompanyOptions(response.data.companies)
+  }
+  useEffect(() => {
+    fetchInterviews()
+    fetchOptions()
+  }, [showAddForm])
+
   // State for the "Add New Interview" form
   const [newInterview, setNewInterview] = useState({
     candidateName: '',
     companyName: '',
+    job: '',
     status: 'Scheduled', // Default status
     date: '',
   })
@@ -76,8 +59,9 @@ const InterviewTracker = () => {
     setNewInterview((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleAddSubmit = (e) => {
+  const handleAddSubmit = async (e) => {
     e.preventDefault()
+    console.log(newInterview)
     if (
       !newInterview.candidateName ||
       !newInterview.companyName ||
@@ -86,15 +70,15 @@ const InterviewTracker = () => {
       alert('Please fill in all fields.')
       return
     }
-
-    const newId = Math.max(...interviewData.map((item) => item.id), 0) + 1
-    setInterviewData((prev) => [...prev, { ...newInterview, id: newId }])
-    setNewInterview({
-      candidateName: '',
-      companyName: '',
-      status: 'Scheduled',
-      date: '',
-    })
+    const sendInterview = {
+      candidateId: newInterview.candidateName,
+      jobId: newInterview.job,
+      status: newInterview.status,
+      companyId: newInterview.companyName,
+      date: newInterview.date,
+    }
+    const response = await api.post('/interview', sendInterview)
+    console.log(response.data)
     setShowAddForm(false)
   }
 
@@ -151,15 +135,20 @@ const InterviewTracker = () => {
                 className='block text-sm font-medium text-gray-700'>
                 Candidate Name
               </label>
-              <input
-                type='text'
+              <select
                 id='candidateName'
                 name='candidateName'
                 value={newInterview.candidateName}
                 onChange={handleAddInputChange}
-                className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-                required
-              />
+                className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'>
+                <option value=''>Select a Candidate</option>
+                {/* Default empty option */}
+                {candidateOptions.map((candidate) => (
+                  <option key={candidate._id} value={candidate._id}>
+                    {candidate.name} {/* Display company name to user */}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label
@@ -167,11 +156,31 @@ const InterviewTracker = () => {
                 className='block text-sm font-medium text-gray-700'>
                 Company Name
               </label>
-              <input
-                type='text'
+              <select
                 id='companyName'
                 name='companyName'
                 value={newInterview.companyName}
+                onChange={handleAddInputChange}
+                className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'>
+                <option value=''>Select a Candidate</option>
+                {companyOptions.map((company) => (
+                  <option key={company._id} value={company._id}>
+                    {company.name} {/* Display company name to user */}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label
+                htmlFor='job'
+                className='block text-sm font-medium text-gray-700'>
+                Job Id
+              </label>
+              <input
+                type='text'
+                id='job'
+                name='job'
+                value={newInterview.job}
                 onChange={handleAddInputChange}
                 className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                 required
@@ -241,6 +250,11 @@ const InterviewTracker = () => {
               <th
                 scope='col'
                 className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider'>
+                Job Role
+              </th>
+              <th
+                scope='col'
+                className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider'>
                 Status
               </th>
               <th
@@ -264,6 +278,9 @@ const InterviewTracker = () => {
                 <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
                   {interview.companyName}
                 </td>
+                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
+                  {interview.jobRole}
+                </td>
                 <td className='px-6 py-4 whitespace-nowrap text-sm'>
                   <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
@@ -273,7 +290,7 @@ const InterviewTracker = () => {
                   </span>
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
-                  {interview.date}
+                  {new Date(interview.date).toLocaleDateString()}
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
                   <button

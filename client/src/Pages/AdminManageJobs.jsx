@@ -7,6 +7,7 @@ const AdminManageJobs = () => {
   const [jobs, setJobs] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [company, SetCompany] = useState([])
   const [formState, setFormState] = useState({
     companyId: '',
     role: '',
@@ -29,14 +30,30 @@ const AdminManageJobs = () => {
       setIsLoading(false)
     }
   }
+  const fetchCompanies = async () => {
+    try {
+      const response = await api.get('/company')
+      SetCompany(response.data)
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   useEffect(() => {
     fetchJobs()
+    fetchCompanies()
   }, [showPopup])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormState((prevState) => ({ ...prevState, [name]: value }))
+  }
+  const handleCompanySelectChange = (e) => {
+    const selectedCompanyId = e.target.value
+    setFormState((prevState) => ({
+      ...prevState,
+      companyId: selectedCompanyId,
+    }))
   }
 
   const handleAddJob = async (e) => {
@@ -144,14 +161,22 @@ const AdminManageJobs = () => {
             <form onSubmit={handleAddJob} className='add-job-form'>
               <div className='form-group'>
                 <label htmlFor='id'>Company Id</label>
-                <input
-                  id='id'
+                <select
+                  id='companyId'
                   name='companyId'
-                  value={formState.id}
-                  onChange={handleInputChange}
-                  placeholder='e.g., Company012'
+                  value={formState.companyId}
+                  onChange={handleCompanySelectChange}
                   required
-                />
+                  className='form-select' // Add a class for styling if needed
+                >
+                  <option value=''>Select a Company</option>{' '}
+                  {/* Default empty option */}
+                  {company.map((comp) => (
+                    <option key={comp._id} value={comp._id}>
+                      {comp.name} {/* Display company name to user */}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className='form-group'>
                 <label htmlFor='role'>Job Role</label>
@@ -225,6 +250,7 @@ const AdminManageJobs = () => {
             <table className='jobs-table'>
               <thead>
                 <tr>
+                  <th>Job Id</th>
                   <th>Company</th>
                   <th>Role</th>
                   <th>Experience</th>
@@ -238,6 +264,7 @@ const AdminManageJobs = () => {
                 {jobs.length > 0 ? (
                   jobs.map((job) => (
                     <tr key={job._id}>
+                      <td>{job._id}</td>
                       <td>{job.companyName}</td>
                       <td>{job.role}</td>
                       <td>{job.exp}</td>

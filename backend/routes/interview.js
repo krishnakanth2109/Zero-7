@@ -3,6 +3,12 @@ import Interview from '../models/Interview.js'
 import Candidate from '../models/Candidate.js'
 import jobs from '../models/jobs.js'
 import Companies from '../models/Companies.js'
+import User from '../models/User.js'
+import transporter from '../utils/mail.js'
+import {
+  renderEmailTemplate,
+  prepareCandidateInterview,
+} from '../utils/emailTemplates.js'
 
 const router = express.Router()
 
@@ -112,18 +118,18 @@ router.post('/', async (request, response) => {
       .status(400)
       .send('Wrong Job Id, this jobId does not belong to this company')
   } else {
-    const candidateName = await Candidate.find(
+    const candidate = await Candidate.findOne(
       { _id: candidateId },
-      { name: 1 },
+      { name: 1, email: 1, userId: 1 },
     )
-    if (!candidateName) {
+    if (!candidate) {
       response.status(404).send('candidate does not exists')
     }
-    const jobRole = await jobs.find({ _id: jobId }, { role: 1 })
+    const jobRole = await jobs.findOne({ _id: jobId }, { role: 1 })
     if (!jobRole) {
       response.status(404).send('Job not found')
     }
-    const companyName = await Companies.find({ _id: companyId }, { name: 1 })
+    const companyName = await Companies.findOne({ _id: companyId }, { name: 1 })
     if (!companyName) {
       response.status(404).send('Company not found')
     }
@@ -136,11 +142,33 @@ router.post('/', async (request, response) => {
     })
     await newInterview.save()
     const payload = {
-      candidateName: candidateName,
+      candidateName: candidate.name,
       companyName: companyName,
       status: newInterview.status,
       date: newInterview.date,
     }
+    const recruiter = await User.findById(
+      { _id: candidate.userId },
+      { email: 1, name: 1 },
+    )
+    const templateData = prepareCandidateInterview(
+      request,
+      candidate,
+      recruiter,
+      newInterview,
+      jobRole,
+      companyName,
+    )
+    const htmlContent = renderEmailTemplate('interviewDetails', templateData)
+
+    const mailOptions = {
+      from: process.env.AUTH_MAIL,
+      to: candidate.email,
+      cc: recruiter.email,
+      subject: 'Candidate Enrollment Form Alert',
+      html: htmlContent,
+    }
+    await transporter.sendMail(mailOptions)
     response.status(201).send({ payload })
   }
 })

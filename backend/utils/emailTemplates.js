@@ -45,17 +45,17 @@ export const renderEmailTemplate = (templateName, data = {}) => {
  */
 export const prepareCandidateDetailsForRequester = (request, candidate) => {
   return {
-      REQUESTER_NAME: request.contactPerson,
-      CANDIDATE_NAME: candidate.name,
-      CANDIDATE_ROLE: candidate.role,
-      CANDIDATE_EXP: candidate.exp,
-      CANDIDATE_SKILLS: candidate.skills,
-      CANDIDATE_LOCATION: candidate.location,
-      CANDIDATE_EMAIL: candidate.email,
-      CANDIDATE_PHONE: candidate.phone,
-      CURRENT_YEAR: new Date().getFullYear(),
-  };
-};
+    REQUESTER_NAME: request.contactPerson,
+    CANDIDATE_NAME: candidate.name,
+    CANDIDATE_ROLE: candidate.role,
+    CANDIDATE_EXP: candidate.exp,
+    CANDIDATE_SKILLS: candidate.skills,
+    CANDIDATE_LOCATION: candidate.location,
+    CANDIDATE_EMAIL: candidate.email,
+    CANDIDATE_PHONE: candidate.phone,
+    CURRENT_YEAR: new Date().getFullYear(),
+  }
+}
 // --- END OF NEW FUNCTION ---
 
 /**
@@ -181,6 +181,52 @@ export const prepareCandidateEnrollForAdmin = (userDetails) => {
 export const prepareStudentAcknowledgment = (name) => {
   return {
     NAME: name,
+    CURRENT_DATE: getCurrentDate(),
+  }
+}
+
+export const prepareCandidateInterview = (
+  req,
+  candidate,
+  recruiter,
+  interview,
+  jobRole,
+  companyName,
+) => {
+  // 'virtual' or 'on-site'
+
+  return {
+    // Company Information (assuming from a config object or environment variables)
+    COMPANY_NAME: companyName.name || 'Zero7 Technologies',
+    // Candidate Information
+    CANDIDATE_NAME: candidate.name,
+    JOB_TITLE: jobRole.role, // Assuming jobTitle is on the interview object
+    RECRUITER_EMAIL: recruiter.email, // Assuming recruiterEmail is available
+    RECRUITER_NAME: recruiter.name, // Assuming recruiterName is available
+    SENDER_NAME: recruiter.name || 'The Recruiting Team',
+
+    // Interview Details
+    INTERVIEW_DATE: new Date(interview.date).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }),
+    INTERVIEW_TIME: new Date(interview.date).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    }),
+    TIME_ZONE: interview.timeZone || 'EST', // Assuming timeZone is part of interview or default
+    INTERVIEW_DURATION: interview.duration || '30 minutes', // e.g., '30 minutes', '1 hour'
+    MEETING_LINK: '',
+    COMPANY_ADDRESS: '',
+
+    // Call to Action Links
+    ADD_TO_CALENDAR_LINK: interview.calendarLink || '#', // Generated iCal/Google Calendar link
+
+    // General Information
+    USER_AGENT: getUserAgent(req), // Optional, but good for logs/auditing
     CURRENT_DATE: getCurrentDate(),
   }
 }

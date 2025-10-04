@@ -7,7 +7,9 @@ import * as XLSX from 'xlsx' // Import for Excel functionality
 
 export default function AdminManageCandidates() {
   const [candidates, setCandidates] = useState([])
+  const [userRole, setUserRole] = useState([])
   const [formData, setFormData] = useState({
+    userId: '',
     name: '',
     role: '',
     skills: '',
@@ -39,8 +41,15 @@ export default function AdminManageCandidates() {
     }
   }
 
+  const fetchRecruiter = async () => {
+    const { data } = await api.get('/candidates/search')
+    setUserRole(data.user)
+    console.log(data.user)
+  }
+
   useEffect(() => {
     fetchCandidates()
+    fetchRecruiter()
   }, [])
 
   const handleChange = (e) => {
@@ -50,6 +59,7 @@ export default function AdminManageCandidates() {
   const handleOpenAddModal = () => {
     setEditingId(null)
     setFormData({
+      userId: '',
       name: '',
       role: '',
       skills: '',
@@ -215,6 +225,7 @@ export default function AdminManageCandidates() {
                   <th>Skills</th>
                   <th>Experience</th>
                   <th>Location</th>
+                  <th>Recruiter</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -234,6 +245,7 @@ export default function AdminManageCandidates() {
                       <td>{c.skills || 'N/A'}</td>
                       <td>{c.exp} years</td>
                       <td>{c.location}</td>
+                      <td>{c.userName || 'N/A'}</td>
                       <td className='actions-cell'>
                         <button
                           onClick={() => handleOpenEditModal(c)}
@@ -267,6 +279,24 @@ export default function AdminManageCandidates() {
               </button>
             </div>
             <form onSubmit={handleSubmit} className='candidate-form-modal'>
+              <div className='form-group'>
+                <label>Recruiter Id</label>
+                <select
+                  name='userId'
+                  value={formData.userId}
+                  onChange={handleChange}
+                  required>
+                  <option value=' '>select Recruiter</option>
+                  {userRole &&
+                    userRole.map((user) => {
+                      return (
+                        <option key={user._id} value={user._id}>
+                          {user.name}
+                        </option>
+                      )
+                    })}
+                </select>
+              </div>
               <div className='form-group'>
                 <label>Name</label>
                 <input

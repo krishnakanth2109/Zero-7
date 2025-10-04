@@ -67,7 +67,7 @@ router.post('/forgot-password', async (request, response) => {
   const { email } = request.body
   const user = await Users.findOne({ email })
   if (!user) {
-    response.status(404)
+    response.status(400)
     response.send({ message: 'Invalid Email' })
   } else {
     const otp = crypto.randomInt(10000, 99999).toString()
@@ -97,6 +97,7 @@ router.post('/verify-otp', async (request, response) => {
       email,
       passwordResetOTP: otp,
       passwordResetExpires: { $gt: Date.now() },
+      passwordResetExpires: { $lt: Date.now() + 10 * 60 * 1000 },
     })
     if (user) {
       response.send({ message: 'Otp Verified ✅' })

@@ -3,6 +3,7 @@ const { Schema } = mongoose
 
 const CandidateSchema = new Schema(
   {
+    userId: { type: String, required: true },
     name: { type: String, required: true },
     role: { type: String, required: true },
     exp: { type: String, required: true }, // e.g., "5+ Years"

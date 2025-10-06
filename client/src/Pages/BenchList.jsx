@@ -175,14 +175,64 @@ const BenchList = () => {
       {/* Candidate Enrollment Form */}
       <section className='form-section'>
         <h2>Candidate Enrollment Form</h2>
-        <form onSubmit={handleSubmit} className='enrollment-form'>
-          <input type='text' name='name' placeholder='Your Name' value={formData.name} onChange={handleChange} required />
-          <input type='tel' name='contact' placeholder='Contact Number' value={formData.contact} onChange={handleChange} required />
-          <input type='email' name='email' placeholder='Email Address' value={formData.email} onChange={handleChange} required />
-          <input type='text' name='location' placeholder='Your Location' value={formData.location} onChange={handleChange} required />
-          <input type='text' name='resume' placeholder='Give your Resume link' value={formData.resume} onChange={handleChange} required />
-          <button className='bg-blue-500 py-3 px-2 text-white' type='submit'>Submit</button>
-        </form>
+<form onSubmit={handleSubmit} className='enrollment-form'>
+  <input
+    type='text'
+    name='name'
+    placeholder='Your Name'
+    value={formData.name}
+    onChange={handleChange}
+    required
+    pattern='^[A-Za-z\s]{3,}$'
+    title='Name must be at least 3 letters and contain only alphabets'
+  />
+
+  <input
+    type='tel'
+    name='contact'
+    placeholder='Contact Number'
+    value={formData.contact}
+    onChange={handleChange}
+    required
+    pattern='^\d{10}$'
+    title='Enter a valid 10-digit phone number'
+  />
+
+  <input
+    type='email'
+    name='email'
+    placeholder='Email Address'
+    value={formData.email}
+    onChange={handleChange}
+    required
+    pattern='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    title='Enter a valid email address'
+  />
+
+  <input
+    type='text'
+    name='location'
+    placeholder='Your Location'
+    value={formData.location}
+    onChange={handleChange}
+    required
+    pattern='^[A-Za-z\s]{2,}$'
+    title='Location must contain only letters and at least 2 characters'
+  />
+
+  <input
+    type='text'
+    name='resume'
+    placeholder='Give your Resume link'
+    value={formData.resume}
+    onChange={handleChange}
+    required
+    pattern='https?://.+'
+    title='Enter a valid URL starting with http:// or https://'
+  />
+
+  <button className='bg-blue-500 py-3 px-2 text-white' type='submit'>Submit</button>
+</form>
       </section>
 
       {/* Stats */}

@@ -230,3 +230,7 @@ export const prepareCandidateInterview = (
     CURRENT_DATE: getCurrentDate(),
   }
 }
+
+export const prepareCandidateAdd = () => {
+  return { CURRENT_DATE: getCurrentDate() }
+}

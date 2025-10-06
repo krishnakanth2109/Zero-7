@@ -1,6 +1,11 @@
 import express from 'express'
 import Candidate from '../models/Candidate.js'
 import User from '../models/User.js'
+import {
+  prepareCandidateAdd,
+  renderEmailTemplate,
+} from '../utils/emailTemplates.js'
+import transporter from '../utils/mail.js'
 
 const router = express.Router()
 
@@ -82,6 +87,15 @@ router.post('/', async (req, res) => {
     const newCandidate = new Candidate(req.body)
     // Save the new candidate to the database
     const savedCandidate = await newCandidate.save()
+    const templateData = prepareCandidateAdd()
+    const htmlContent = renderEmailTemplate('enrollStudentAlert', templateData)
+    const mailOptions = {
+      from: process.env.AUTH_MAIL,
+      to: newCandidate.email,
+      subject: 'Candidate Bench List',
+      html: htmlContent,
+    }
+    await transporter.sendMail(mailOptions)
     // Respond with the newly created candidate data
     res.status(201).json(savedCandidate)
   } catch (err) {

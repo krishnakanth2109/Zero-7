@@ -1,33 +1,45 @@
+// File: src/Pages/AdminViewApplications.jsx (Corrected)
+
 import React, { useEffect, useState } from "react";
-import "./AdminViewApplications.css"; // Import the CSS file
+import api from '../api/axios'; // Use your central axios instance
+import "./AdminViewApplications.css";
 
-const Job_Applications_GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwNpys2m9qGngoB2fkcSyhUxkkuegOpzzL_adw47LZoTuhTwCc4q1u5KGh7e7r-8DKI/exec";
+// Helper to construct the full URL for the resume file
+const getResumeUrl = (path) => {
+    // Get the base URL of the backend (e.g., http://localhost:5000)
+    const baseUrl = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace('/api', '');
+    // The path from the DB might contain backslashes on Windows, replace them with forward slashes
+    const correctedPath = path.replace(/\\/g, '/');
+    return `${baseUrl}/${correctedPath}`;
+};
 
-const AdminApplications = () => {
+const AdminViewApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-useEffect(() => {
-  window.handleApplications = (response) => {
-    if (response.result === "success") {
-      setApplications(response.data);
-    } else {
-      setError("Failed to load applications");
-    }
-    setLoading(false); // ✅ Important: stop loading
-  };
+  // --- START OF FIX ---
+  // This useEffect now fetches data from your backend API instead of Google Sheets
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await api.get('/applications');
+        // Sort by most recent submission first
+        const sortedData = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setApplications(sortedData);
+      } catch (err) {
+        console.error("Failed to fetch applications:", err);
+        setError("Failed to load applications. Please ensure the backend is running.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const script = document.createElement("script");
-  script.src = `${Job_Applications_GOOGLE_SHEETS_URL}?callback=handleApplications`;
-  script.async = true; // ✅ Ensure async load
-  document.body.appendChild(script);
-
-  return () => {
-    document.body.removeChild(script);
-    delete window.handleApplications;
-  };
-}, []);
+    fetchApplications();
+  }, []); // The empty array ensures this runs only once when the component mounts
+  // --- END OF FIX ---
 
 
   if (loading) return (
@@ -36,7 +48,8 @@ useEffect(() => {
       <p style={{marginLeft: '15px'}}>Loading applications...</p>
     </div>
   );
-  if (error) return <p>{error}</p>; // ✅ Show error if exists
+
+  if (error) return <p className="error-message">{error}</p>;
 
   return (
     <div className="admin-applications">
@@ -57,19 +70,27 @@ useEffect(() => {
         </thead>
         <tbody>
           {applications.length > 0 ? (
-            applications.map((app, index) => (
-              <tr key={index}>
+            applications.map((app) => (
+              // Use the unique _id from the database as the key
+              <tr key={app._id}>
                 <td>{app.name}</td>
                 <td>{app.contact}</td>
                 <td>{app.email}</td>
                 <td>{app.experience}</td>
-                <td>{app.currentSalary}</td>
-                <td>{app.expectedSalary}</td>
+                <td>{app.currentSalary || 'N/A'}</td>
+                <td>{app.expectedSalary || 'N/A'}</td>
                 <td>{app.location}</td>
-                <td>{app.jobRole}</td>
+                {/* 
+                  Use optional chaining (?.) in case a job has been deleted.
+                  The backend populates `jobId` with the job object.
+                */}
+                <td>{app.jobId?.role || 'Not specified'}</td>
                 <td>
-                  {app.resumeUrl ? (
-                    <a href={app.resumeUrl} target="_blank" rel="noopener noreferrer">View Resume</a>
+                  {app.resume ? (
+                    // Construct the full URL to the resume file on the server
+                    <a href={getResumeUrl(app.resume)} target="_blank" rel="noopener noreferrer">
+                      View Resume
+                    </a>
                   ) : "N/A"}
                 </td>
               </tr>
@@ -85,4 +106,4 @@ useEffect(() => {
   );
 };
 
-export default AdminApplications;
+export default AdminViewApplications;

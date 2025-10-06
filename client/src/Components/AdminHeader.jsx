@@ -1,4 +1,4 @@
-// File: src/Components/AdminHeader.jsx
+// File: src/Components/AdminHeader.jsx (Corrected)
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import { useNotifications } from '../context/NotificationContext';
 
 const AdminHeader = ({ toggleSidebar, isOpen }) => {
   const [user, setUser] = useState({ name: 'Admin', email: '', role: '' });
-  const [searchQuery, setSearchQuery] = useState('');
+  // const [searchQuery, setSearchQuery] = useState(''); // <-- FIX: Removed unused state
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -75,7 +75,8 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
       </div>
       <div className='flex-1'>
         <div className='w-72 max-md:w-32'>
-          <input type='search' placeholder='search' className='w-full bg-gray-200' onChange={(e) => setSearchQuery(e.target.value)} />
+          {/* <-- FIX: Removed unused onChange handler --> */}
+          <input type='search' placeholder='search' className='w-full bg-gray-200' />
         </div>
       </div>
 

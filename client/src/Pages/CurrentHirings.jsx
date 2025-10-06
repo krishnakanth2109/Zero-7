@@ -1,5 +1,7 @@
+// File: src/Pages/CurrentHirings.jsx (Corrected with Resume URL)
+
 import React, { useState, useEffect } from 'react'
-import axios from 'axios' // Import axios for API calls
+import api from '../api/axios' // Use your central axios instance
 import {
   Briefcase,
   User,
@@ -12,19 +14,11 @@ import {
 } from 'lucide-react'
 import './CurrentHirings.css'
 
-// --- CONFIGURATION ---
-// Central place for your API and script URLs
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
-const GOOGLE_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbwNpys2m9qGngoB2fkcSyhUxkkuegOpzzL_adw47LZoTuhTwCc4q1u5KGh7e7r-8DKI/exec'
-
 const CurrentHirings = () => {
-  // State for job data fetched from the backend
   const [jobPositions, setJobPositions] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // State for the inline application form
   const [applyData, setApplyData] = useState({
     name: '',
     contact: '',
@@ -33,105 +27,80 @@ const CurrentHirings = () => {
     currentSalary: '',
     expectedSalary: '',
     location: '',
-    resume: null,
+    resume: '', // This will now hold the resume URL string
   })
 
   const [selectedJobIndex, setSelectedJobIndex] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  // State for the flip cards animation
   const [flippedProcess, setFlippedProcess] = useState([false, false, false])
 
-  // --- DATA FETCHING ---
-  // This hook runs when the component loads to get live job data
   useEffect(() => {
     const fetchJobs = async () => {
       try {
         setIsLoading(true)
         setError(null)
-        const response = await axios.get(`${API_URL}/jobs`)
-        // Sort jobs to show the newest ones first
+        const response = await api.get('/jobs')
         const sortedJobs = response.data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
         )
         setJobPositions(sortedJobs)
       } catch (err) {
         console.error('Error fetching job positions:', err)
-        setError(
-          'Could not load job listings. Please ensure the backend server is running and accessible.',
-        )
+        setError('Could not load job listings. Please try again.')
       } finally {
         setIsLoading(false)
       }
     }
     fetchJobs()
-  }, []) // Empty array means this runs only once
+  }, [])
 
-  // --- HANDLERS ---
   const toggleProcess = (i) => {
     setFlippedProcess((s) => s.map((val, index) => (index === i ? !val : val)))
   }
 
+  // --- FIX 1: Simplified handler for all text inputs ---
   const handleApplyChange = (e) => {
-    const { name, value, files } = e.target
-    if (name === 'resume' && files[0]) {
-      const file = files[0]
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setApplyData((prev) => ({
-          ...prev,
-          resume: {
-            fileName: file.name,
-            mimeType: file.type,
-            data: reader.result.split(',')[1], // Base64 data
-          },
-        }))
-      }
-      reader.readAsDataURL(file)
-    } else {
-      setApplyData((prev) => ({ ...prev, [name]: value }))
-    }
-  }
+    const { name, value } = e.target;
+    setApplyData((prev) => ({ ...prev, [name]: value }));
+  };
 
+  // --- FIX 2: Simplified submit handler for JSON data ---
   const handleApplySubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
     const job = jobPositions[selectedJobIndex]
-    if (!job) return
-
-    const payload = { ...applyData, jobRole: job.role }
+    if (!job || !applyData.resume) {
+        alert('Please provide a link to your resume.');
+        setIsSubmitting(false);
+        return;
+    }
+    
+    // The complete payload, including the job's ID
+    const payload = {
+        ...applyData,
+        jobId: job._id
+    };
 
     try {
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      })
-      const result = await response.json()
-      if (result.result === 'success') {
-        alert(`Application for ${job.role} submitted successfully!`)
-        setApplyData({
-          name: '',
-          contact: '',
-          email: '',
-          experience: '',
-          currentSalary: '',
-          expectedSalary: '',
-          location: '',
-          resume: null,
-        })
-        setSelectedJobIndex(null)
-      } else {
-        throw new Error(result.message || 'Submission failed')
-      }
-    } catch (error) {
-      console.error('Application submission error:', error)
-      alert('There was an error submitting your application. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+      // Post the plain JSON payload to your backend
+      await api.post('/applications', payload);
 
-  // --- UTILITY FUNCTIONS ---
+      alert(`Application for ${job.role} submitted successfully!`);
+      // Reset form
+      setApplyData({
+        name: '', contact: '', email: '', experience: '',
+        currentSalary: '', expectedSalary: '', location: '', resume: '',
+      });
+      setSelectedJobIndex(null);
+      
+    } catch (error) {
+      console.error('Application submission error:', error);
+      alert('There was an error submitting your application. ' + (error.response?.data?.message || 'Please try again.'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const daysAgo = (dateString) => {
     const posted = new Date(dateString)
     const diffDays = Math.floor((new Date() - posted) / (1000 * 60 * 60 * 24))
@@ -144,24 +113,9 @@ const CurrentHirings = () => {
     jobPositions.length > 0 ? jobPositions[0] : { role: 'Exciting Roles' }
 
   const processSteps = [
-    {
-      title: 'Step 1: Application',
-      content:
-        'Fill out the application form with your details and upload your resume.',
-      icon: '📝',
-    },
-    {
-      title: 'Step 2: Screening',
-      content:
-        'Our recruiters screen candidates based on skills and experience. Shortlisted candidates get a call.',
-      icon: '🔍',
-    },
-    {
-      title: 'Step 3: Interviews & Placement',
-      content:
-        'Attend technical & HR interviews. We support scheduling, feedback, and final placement.',
-      icon: '🎯',
-    },
+    { title: 'Step 1: Application', content: 'Fill out the application form with your details and a link to your resume.', icon: '📝', },
+    { title: 'Step 2: Screening', content: 'Our recruiters review your profile. Shortlisted candidates get a call.', icon: '🔍', },
+    { title: 'Step 3: Interviews & Placement', content: 'Attend technical & HR interviews. We support you through the final placement.', icon: '🎯', },
   ]
 
   return (
@@ -191,9 +145,7 @@ const CurrentHirings = () => {
       <section className='intro-section'>
         <h2>We are Hiring!</h2>
         <p>
-          At Zero7 Technologies, we connect freshers and experienced
-          professionals with top companies. Explore our open positions below and
-          apply.
+          At Zero7 Technologies, we connect professionals with top companies. Explore our open positions and apply.
         </p>
       </section>
 
@@ -283,102 +235,49 @@ const CurrentHirings = () => {
                                 className='apply-form'>
                                 <div className='input-group'>
                                   <User size={16} />
-                                  <input
-                                    type='text'
-                                    name='name'
-                                    placeholder='Your Name'
-                                    value={applyData.name}
-                                    onChange={handleApplyChange}
-                                    required
-                                  />
+                                  <input type='text' name='name' placeholder='Your Name' value={applyData.name} onChange={handleApplyChange} required />
                                 </div>
                                 <div className='input-group'>
                                   <Phone size={16} />
-                                  <input
-                                    type='tel'
-                                    name='contact'
-                                    placeholder='Contact Number'
-                                    value={applyData.contact}
-                                    onChange={handleApplyChange}
-                                    required
-                                  />
+                                  <input type='tel' name='contact' placeholder='Contact Number' value={applyData.contact} onChange={handleApplyChange} required />
                                 </div>
                                 <div className='input-group'>
                                   <Mail size={16} />
-                                  <input
-                                    type='email'
-                                    name='email'
-                                    placeholder='Email Address'
-                                    value={applyData.email}
-                                    onChange={handleApplyChange}
-                                    required
-                                  />
+                                  <input type='email' name='email' placeholder='Email Address' value={applyData.email} onChange={handleApplyChange} required />
                                 </div>
                                 <div className='input-group'>
                                   <Clock size={16} />
-                                  <input
-                                    type='text'
-                                    name='experience'
-                                    placeholder='Experience (in years)'
-                                    value={applyData.experience}
-                                    onChange={handleApplyChange}
-                                    required
-                                  />
+                                  <input type='text' name='experience' placeholder='Experience (in years)' value={applyData.experience} onChange={handleApplyChange} required />
                                 </div>
                                 <div className='input-group'>
                                   <DollarSign size={16} />
-                                  <input
-                                    type='text'
-                                    name='currentSalary'
-                                    placeholder='Current Salary (Optional)'
-                                    value={applyData.currentSalary}
-                                    onChange={handleApplyChange}
-                                  />
+                                  <input type='text' name='currentSalary' placeholder='Current Salary (Optional)' value={applyData.currentSalary} onChange={handleApplyChange} />
                                 </div>
                                 <div className='input-group'>
                                   <DollarSign size={16} />
-                                  <input
-                                    type='text'
-                                    name='expectedSalary'
-                                    placeholder='Expected Salary (Optional)'
-                                    value={applyData.expectedSalary}
-                                    onChange={handleApplyChange}
-                                  />
+                                  <input type='text' name='expectedSalary' placeholder='Expected Salary (Optional)' value={applyData.expectedSalary} onChange={handleApplyChange} />
                                 </div>
                                 <div className='input-group'>
                                   <MapPin size={16} />
-                                  <input
-                                    type='text'
-                                    name='location'
-                                    placeholder='Your Location'
-                                    value={applyData.location}
-                                    onChange={handleApplyChange}
-                                    required
-                                  />
+                                  <input type='text' name='location' placeholder='Your Location' value={applyData.location} onChange={handleApplyChange} required />
                                 </div>
-                                <div className='input-group file-input'>
+                                {/* --- FIX 3: Changed file input back to a text input for the URL --- */}
+                                <div className='input-group'>
                                   <FileText size={16} />
                                   <input
-                                    type='file'
+                                    type='url'
                                     name='resume'
-                                    accept='.pdf,.doc,.docx'
+                                    placeholder='Paste link to your Resume (e.g., Google Drive, LinkedIn)'
+                                    value={applyData.resume}
                                     onChange={handleApplyChange}
                                     required
                                   />
                                 </div>
                                 <div className='form-buttons'>
-                                  <button
-                                    type='submit'
-                                    className='submit-apply'
-                                    disabled={isSubmitting}>
-                                    {isSubmitting
-                                      ? 'Submitting...'
-                                      : 'Submit Application'}
+                                  <button type='submit' className='submit-apply' disabled={isSubmitting}>
+                                    {isSubmitting ? 'Submitting...' : 'Submit Application'}
                                   </button>
-                                  <button
-                                    type='button'
-                                    className='cancel-btn'
-                                    onClick={() => setSelectedJobIndex(null)}>
+                                  <button type='button' className='cancel-btn' onClick={() => setSelectedJobIndex(null)}>
                                     Cancel
                                   </button>
                                 </div>
@@ -391,9 +290,7 @@ const CurrentHirings = () => {
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan='7'
-                      style={{ textAlign: 'center', padding: '20px' }}>
+                    <td colSpan='7' style={{ textAlign: 'center', padding: '20px' }}>
                       No open positions at this time. Please check back later.
                     </td>
                   </tr>

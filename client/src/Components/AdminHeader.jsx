@@ -15,8 +15,8 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
   const navigate = useNavigate();
   const { notifications, unreadCount, markAllAsRead } = useNotifications();
   
-  const handleNotificationClick = () => {
-      navigate('/admin/view-requests');
+  const handleNotificationClick = (notification) => {
+      navigate(notification.link || '/admin/dashboard');
       setShowNotifications(false);
       markAllAsRead();
   };
@@ -29,8 +29,7 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
       try {
         const userData = Cookie.get('user');
         if (userData) {
-          const payload = JSON.parse(userData);
-          setUser(payload);
+          setUser(JSON.parse(userData));
         }
       } catch (e) {
         console.error("Failed to parse user cookie", e);
@@ -57,7 +56,6 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
     window.location.href = '/admin';
   };
 
-  // --- FIX: REMOVED DUPLICATE DECLARATION ---
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'success': return '✅';
@@ -77,13 +75,12 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
       </div>
       <div className='flex-1'>
         <div className='w-72 max-md:w-32'>
-          <input type='search' placeholder='search' className='w-full bg-gray-200 ' onChange={(e) => setSearchQuery(e.target.value)} />
+          <input type='search' placeholder='search' className='w-full bg-gray-200' onChange={(e) => setSearchQuery(e.target.value)} />
         </div>
       </div>
 
       {/* Right side */}
       <div className='flex items-center gap-2'>
-        {/* Notifications */}
         <div className='relative' ref={notificationRef}>
           <button
             className='relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg'
@@ -114,7 +111,7 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
                   notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      onClick={handleNotificationClick}
+                      onClick={() => handleNotificationClick(notification)}
                       className={`flex items-start p-4 hover:bg-gray-50 cursor-pointer border-b ${
                         notification.unread ? 'bg-blue-50' : ''
                       }`}>
@@ -139,7 +136,7 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
                 )}
               </div>
               <div className='p-4 border-t'>
-                <button onClick={handleNotificationClick} className='w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium'>
+                <button onClick={() => navigate('/admin/view-requests')} className='w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium'>
                   View All Requests
                 </button>
               </div>
@@ -147,7 +144,6 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
           )}
         </div>
 
-        {/* --- START: RESTORED USER AVATAR AND MENU --- */}
         <div className='relative' ref={userMenuRef}>
           <button
             className='flex items-center space-x-3 p-2 text-gray-700 hover:bg-gray-100 rounded-lg'
@@ -185,16 +181,7 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
               </div>
               <div className='py-2'>
                 <button className='flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
-                  {/* ... SVG for Profile Settings ... */}
-                  <span>Profile Settings</span>
-                </button>
-                <button className='flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
-                  {/* ... SVG for Account Settings ... */}
-                  <span>Account Settings</span>
-                </button>
-                <button className='flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
-                  {/* ... SVG for Help & Support ... */}
-                  <span>Help & Support</span>
+                  Profile Settings
                 </button>
                 <hr className='my-2 border-gray-200' />
                 <button
@@ -209,7 +196,6 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
             </div>
           )}
         </div>
-        {/* --- END: RESTORED USER AVATAR AND MENU --- */}
       </div>
     </header>
   );

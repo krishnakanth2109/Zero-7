@@ -46,17 +46,19 @@ import Nonittraining from './Pages/Nonittraining.jsx'
 import ViewEnrollments from './Pages/AdminStudentEnrollment.jsx'
 import InterviewTracker from './Pages/AdminInterviews.jsx'
 import AdminManageCompanies from './Pages/AdminManageCompanies.jsx'
+// --- 1. IMPORT THE PROVIDER ---
+import { NotificationProvider } from './context/NotificationContext';
+
 
 const LoginPage = () => {
   const navigate = useNavigate()
   useEffect(() => {
     const hasToken = Cookie.get('token')
-
     if (hasToken) {
-      console.log('User already authenticated, redirecting to dashboard...')
       navigate('/admin/dashboard', { replace: true })
     }
   }, [navigate])
+  
   const handleLoginSuccess = () => {
     navigate('/admin/dashboard')
   }
@@ -65,7 +67,7 @@ const LoginPage = () => {
 
 const PrivateRoute = ({ children }) => {
   const token = Cookie.get('token')
-  const isAuthenticated = token
+  const isAuthenticated = !!token // More robust check
 
   if (!isAuthenticated) {
     return <Navigate to='/admin' replace />
@@ -79,71 +81,64 @@ function App() {
   const isAdminPage = location.pathname.startsWith('/admin')
 
   return (
-    <div className='App'>
-      {!isAdminPage && <Navbar />}
-      <div className='content'>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/about' element={<About />} />
-          <Route path='/services' element={<Services />} />
-          <Route path='/testimonials' element={<Testimonials />} />
-          <Route path='/new-batches' element={<NewBatches />} />
-          <Route path='/bench-list' element={<BenchList />} />
-          <Route path='/blog' element={<Blog />} />
-          <Route path='/faqs' element={<FAQs />} />
-          <Route path='/contact' element={<Contact />} />
-          <Route path='/college-connect' element={<CollegeConnect />} />
-          <Route path='/current-hirings' element={<CurrentHirings />} />
-          <Route path='/digital-courses' element={<DigitalCourses />} />
-          <Route
-            path='/services/payroll-services'
-            element={<PayrollServices />}
-          />
-          <Route
-            path='/services/resume-marketing'
-            element={<Resumemarketing />}
-          />
-          <Route
-            path='/services/college-connect'
-            element={<CollegeConnect />}
-          />
-          <Route path='/services/it-training' element={<Ittraining />} />
-          <Route path='/services/non-it-training' element={<Nonittraining />} />
-          <Route path='/admin' element={<LoginPage />} />
-          <Route
-            path='/admin/*'
-            element={
-              <PrivateRoute>
-                <AdminLayout />
-              </PrivateRoute>
-            }>
-            <Route path='dashboard' element={<AdminDashboard />} />
-            <Route path='it-programs' element={<AdminItPrograms />} />
-            <Route path='non-it-programs' element={<AdminNonItPrograms />} />
-            <Route path='forms' element={<AdminForms />} />
-            <Route path='manage-jobs' element={<AdminManageJobs />} />
-            <Route path='applications' element={<AdminViewApplications />} />
-            <Route path='new-batch-dashboard' element={<NewBatchDashboard />} />
-            <Route path='manage-blogs' element={<ManageBlogs />} />
-            <Route path='studentenrollment' element={<ViewEnrollments />} />
-            <Route path='interviews' element={<InterviewTracker />} />
-            <Route path='companies' element={<AdminManageCompanies />} />
+    // --- 2. WRAP YOUR ENTIRE APP CONTENT WITH THE PROVIDER ---
+    <NotificationProvider>
+      <div className='App'>
+        {!isAdminPage && <Navbar />}
+        <div className='content'>
+          <Routes>
+            {/* --- Public Routes --- */}
+            <Route path='/' element={<Home />} />
+            <Route path='/about' element={<About />} />
+            <Route path='/services' element={<Services />} />
+            <Route path='/testimonials' element={<Testimonials />} />
+            <Route path='/new-batches' element={<NewBatches />} />
+            <Route path='/bench-list' element={<BenchList />} />
+            <Route path='/blog' element={<Blog />} />
+            <Route path='/faqs' element={<FAQs />} />
+            <Route path='/contact' element={<Contact />} />
+            <Route path='/college-connect' element={<CollegeConnect />} />
+            <Route path='/current-hirings' element={<CurrentHirings />} />
+            <Route path='/digital-courses' element={<DigitalCourses />} />
+            <Route path='/services/payroll-services' element={<PayrollServices />} />
+            <Route path='/services/resume-marketing' element={<Resumemarketing />} />
+            <Route path='/services/college-connect' element={<CollegeConnect />} />
+            <Route path='/services/it-training' element={<Ittraining />} />
+            <Route path='/services/non-it-training' element={<Nonittraining />} />
+
+            {/* --- Admin Login Route --- */}
+            <Route path='/admin' element={<LoginPage />} />
+
+            {/* --- Protected Admin Routes --- */}
             <Route
-              path='manage-candidates'
-              element={<AdminManageCandidates />}
-            />
-            <Route path='view-requests' element={<AdminViewRequests />} />
-            <Route path='manage-managers' element={<AdminManageManagers />} />
-            <Route
-              path='manage-recruiters'
-              element={<AdminManageRecruiters />}
-            />
-          </Route>
-        </Routes>
+              path='/admin/*'
+              element={
+                <PrivateRoute>
+                  <AdminLayout />
+                </PrivateRoute>
+              }>
+              <Route path='dashboard' element={<AdminDashboard />} />
+              <Route path='it-programs' element={<AdminItPrograms />} />
+              <Route path='non-it-programs' element={<AdminNonItPrograms />} />
+              <Route path='forms' element={<AdminForms />} />
+              <Route path='manage-jobs' element={<AdminManageJobs />} />
+              <Route path='applications' element={<AdminViewApplications />} />
+              <Route path='new-batch-dashboard' element={<NewBatchDashboard />} />
+              <Route path='manage-blogs' element={<ManageBlogs />} />
+              <Route path='studentenrollment' element={<ViewEnrollments />} />
+              <Route path='interviews' element={<InterviewTracker />} />
+              <Route path='companies' element={<AdminManageCompanies />} />
+              <Route path='manage-candidates' element={<AdminManageCandidates />} />
+              <Route path='view-requests' element={<AdminViewRequests />} />
+              <Route path='manage-managers' element={<AdminManageManagers />} />
+              <Route path='manage-recruiters' element={<AdminManageRecruiters />} />
+            </Route>
+          </Routes>
+        </div>
+        {!isAdminPage && <Footer />}
+        {!isAdminPage && <FloatingWhatsApp />}
       </div>
-      {!isAdminPage && <Footer />}
-      {!isAdminPage && <FloatingWhatsApp />}
-    </div>
+    </NotificationProvider>
   )
 }
 

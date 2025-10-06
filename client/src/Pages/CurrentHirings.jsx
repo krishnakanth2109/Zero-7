@@ -155,9 +155,8 @@ const CurrentHirings = () => {
           {processSteps.map((step, i) => (
             <div
               key={i}
-              className={`process-card ${
-                flippedProcess[i] ? 'is-flipped' : ''
-              }`}
+              className={`process-card ${flippedProcess[i] ? 'is-flipped' : ''
+                }`}
               onClick={() => toggleProcess(i)}
               tabIndex={0}
               role='button'

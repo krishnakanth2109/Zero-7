@@ -104,9 +104,17 @@ const CurrentHirings = () => {
     try {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        body: JSON.stringify(payload),
+        mode: "no-cors",
+        headers: {
+          "Contact-Type": "application/json",
+          "Allow-Control-Allow-Origin": "*",
+        },
+        body: payload,
       })
+      const text = await response.text();
+      console.log("RAW RESPONSE:", text);
       const result = await response.json()
+      console.log(result)
       if (result.result === 'success') {
         alert(`Application for ${job.role} submitted successfully!`)
         setApplyData({
@@ -203,9 +211,8 @@ const CurrentHirings = () => {
           {processSteps.map((step, i) => (
             <div
               key={i}
-              className={`process-card ${
-                flippedProcess[i] ? 'is-flipped' : ''
-              }`}
+              className={`process-card ${flippedProcess[i] ? 'is-flipped' : ''
+                }`}
               onClick={() => toggleProcess(i)}
               tabIndex={0}
               role='button'

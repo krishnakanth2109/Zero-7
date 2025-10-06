@@ -249,13 +249,13 @@ export default function AdminManageCandidates() {
                       <td className='actions-cell'>
                         <button
                           onClick={() => handleOpenEditModal(c)}
-                          className='btn btn-icon btn-edit'
+                          className='btn-icon btn-edit'
                           title='Edit'>
                           <Edit size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(c._id)}
-                          className='btn btn-icon btn-delete'
+                          className='btn-icon btn-delete'
                           title='Delete'>
                           <Trash2 size={16} />
                         </button>

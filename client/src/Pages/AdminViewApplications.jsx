@@ -45,6 +45,22 @@ const AdminViewApplications = () => {
 
     fetchApplications()
   }, []) // The empty array ensures this runs only once when the component mounts
+
+  const handleReject = async (id) => {
+    try {
+      const confirmDelete = window.confirm(
+        'Are you sure you want to reject this candidate?',
+      )
+      if (!confirmDelete) return
+
+      await api.delete(`/applications/${id}`) // DELETE request to backend
+      setApplications((prev) => prev.filter((app) => app._id !== id)) // Update UI
+      alert('Candidate rejected successfully ❌')
+    } catch (err) {
+      console.error('Failed to reject candidate:', err)
+      alert('Failed to reject candidate ❌')
+    }
+  }
   // --- END OF FIX ---
 
   if (loading)
@@ -72,6 +88,7 @@ const AdminViewApplications = () => {
             <th>Location</th>
             <th>Job Role</th>
             <th>Resume</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -79,13 +96,14 @@ const AdminViewApplications = () => {
             applications.map((app) => (
               // Use the unique _id from the database as the key
               <tr key={app._id}>
-                <td>{app.name}</td>
-                <td>{app.contact}</td>
-                <td>{app.email}</td>
-                <td>{app.experience}</td>
+                <td>{app.name || 'N/A'}</td>
+                <td>{app.contact || 'N/A'}</td>
+                <td>{app.email || 'N/A'}</td>
+                <td>{app.experience || 'N/A'}</td>
                 <td>{app.currentSalary || 'N/A'}</td>
                 <td>{app.expectedSalary || 'N/A'}</td>
-                <td>{app.location}</td>
+                <td>{app.location || 'N/A'}</td>
+
                 {/* 
                   Use optional chaining (?.) in case a job has been deleted.
                   The backend populates `jobId` with the job object.
@@ -103,6 +121,11 @@ const AdminViewApplications = () => {
                   ) : (
                     'N/A'
                   )}
+                </td>
+                <td
+                  style={{ color: 'red', cursor: 'pointer' }}
+                  onClick={() => handleReject(app._id)}>
+                  Reject
                 </td>
               </tr>
             ))

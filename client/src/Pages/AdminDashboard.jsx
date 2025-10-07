@@ -1,7 +1,7 @@
 // File: src/Pages/AdminDashboard.jsx
 
 import { useState, useEffect } from 'react'
-import { jwtDecode } from 'jwt-decode'
+import Cookie from 'js-cookie'
 import {
   Briefcase,
   UserCheck,
@@ -31,7 +31,7 @@ const capitalize = (s) => {
 }
 
 export default function AdminDashboard() {
-  const [userRole, setUserRole] = useState(null)
+  const [user, setUser] = useState({})
 
   // --- START: DYNAMIC STATE FOR ALL CARDS ---
   const [stats, setStats] = useState({
@@ -49,10 +49,11 @@ export default function AdminDashboard() {
   useEffect(() => {
     // Logic to get user role from token
     const token = localStorage.getItem('token')
+    const data = Cookie.get('user')
+    const user = JSON.parse(data)
     if (token) {
       try {
-        const decodedUser = jwtDecode(token)
-        setUserRole(decodedUser.role)
+        setUser(user)
       } catch (error) {
         console.error('Invalid token:', error)
       }
@@ -195,9 +196,9 @@ export default function AdminDashboard() {
       <div className='admin-main flex-1 rounded-2xl p-6 border-border flex flex-col md:flex-row items-start md:items-center justify-between'>
         <div>
           <h1 className='text-3xl font-bold'>
-            Welcome back, {capitalize(userRole) || 'Admin'}!
+            Welcome back, {capitalize(user.name) || 'Admin'}!
           </h1>
-          <span>Here&apos;s your recruitment dashboard today.</span>
+          <span>Here&apos;s your {user.role} dashboard today.</span>
         </div>
       </div>
 

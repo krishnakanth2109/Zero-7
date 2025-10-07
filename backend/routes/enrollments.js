@@ -27,28 +27,28 @@ router.post('/', async (req, res) => {
         location,
       })
       const savedEnrollment = await newEnrollment.save()
-      const templateData = prepareCandidateEnrollForAdmin(newEnrollment)
-      const htmlContent = renderEmailTemplate('enrollmentAlert', templateData)
+      // const templateData = prepareCandidateEnrollForAdmin(newEnrollment)
+      // const htmlContent = renderEmailTemplate('enrollmentAlert', templateData)
 
-      const mailOptions = {
-        from: process.env.AUTH_MAIL,
-        to: process.env.AUTH_MAIL,
-        subject: 'Candidate Enrollment Form Alert',
-        html: htmlContent,
-      }
-      await transporter.sendMail(mailOptions)
-      const template = prepareStudentAcknowledgment(newEnrollment.name)
-      const html = renderEmailTemplate(
-        'enrollmentStudentConfirmation',
-        template,
-      )
-      const mail = {
-        from: process.env.AUTH_MAIL,
-        to: newEnrollment.email,
-        subject: 'Thank You for Your Response',
-        html: html,
-      }
-      await transporter.sendMail(mail)
+      // const mailOptions = {
+      //   from: process.env.AUTH_MAIL,
+      //   to: process.env.AUTH_MAIL,
+      //   subject: 'Candidate Enrollment Form Alert',
+      //   html: htmlContent,
+      // }
+      // await transporter.sendMail(mailOptions)
+      // const template = prepareStudentAcknowledgment(newEnrollment.name)
+      // const html = renderEmailTemplate(
+      //   'enrollmentStudentConfirmation',
+      //   template,
+      // )
+      // const mail = {
+      //   from: process.env.AUTH_MAIL,
+      //   to: newEnrollment.email,
+      //   subject: 'Thank You for Your Response',
+      //   html: html,
+      // }
+      // await transporter.sendMail(mail)
       res.status(201).json(savedEnrollment)
     }
   } catch (err) {

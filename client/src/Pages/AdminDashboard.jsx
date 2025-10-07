@@ -32,6 +32,7 @@ const capitalize = (s) => {
 
 export default function AdminDashboard() {
   const [user, setUser] = useState({})
+  const [applications, setApplications] = useState([])
 
   // --- START: DYNAMIC STATE FOR ALL CARDS ---
   const [stats, setStats] = useState({
@@ -56,6 +57,16 @@ export default function AdminDashboard() {
         setUser(user)
       } catch (error) {
         console.error('Invalid token:', error)
+      }
+    }
+
+    const fetchApplications = async () => {
+      try {
+        const data = await api.get('/applications')
+        setApplications(data.data)
+        console.log(data.data)
+      } catch (err) {
+        console.err(err.data)
       }
     }
 
@@ -110,6 +121,7 @@ export default function AdminDashboard() {
     }
 
     fetchStats()
+    fetchApplications()
     // --- END: DYNAMIC DATA FETCHING LOGIC ---
   }, []) // The empty array ensures this logic runs only once on component mount
 
@@ -121,59 +133,6 @@ export default function AdminDashboard() {
     { month: 'Apr', applications: 95, interviews: 32, hired: 12 },
     { month: 'May', applications: 115, interviews: 38, hired: 15 },
     { month: 'Jun', applications: 128, interviews: 45, hired: 18 },
-  ]
-
-  const recentApplicates = [
-    {
-      candidate: 'Joe Doe',
-      position: 'Full Stack Developer',
-      Experience: '3-10 years',
-      Location: 'Hyderabad',
-      Skills: ['React js', 'Node js', 'Docker'],
-      Phone: 8121211111,
-      AppliedDate: '19/09/2025',
-      Status: 'Active',
-    },
-    {
-      candidate: 'Sarah Smith',
-      position: 'Frontend Developer',
-      Experience: '2-5 years',
-      Location: 'Bangalore',
-      Skills: ['React js', 'TypeScript', 'CSS'],
-      Phone: 9876543210,
-      AppliedDate: '18/09/2025',
-      Status: 'InActive',
-    },
-    {
-      candidate: 'Mike Johnson',
-      position: 'Backend Developer',
-      Experience: '4-8 years',
-      Location: 'Mumbai',
-      Skills: ['Node js', 'Python', 'MongoDB'],
-      Phone: 7654321098,
-      AppliedDate: '17/09/2025',
-      Status: 'Active',
-    },
-    {
-      candidate: 'Emily Chen',
-      position: 'DevOps Engineer',
-      Experience: '5-7 years',
-      Location: 'Pune',
-      Skills: ['AWS', 'Docker', 'Kubernetes'],
-      Phone: 8899776655,
-      AppliedDate: '16/09/2025',
-      Status: 'InActive',
-    },
-    {
-      candidate: 'Alex Kumar',
-      position: 'UI/UX Designer',
-      Experience: '3-6 years',
-      Location: 'Chennai',
-      Skills: ['Figma', 'Adobe XD', 'Sketch'],
-      Phone: 9988776655,
-      AppliedDate: '15/09/2025',
-      Status: 'Active',
-    },
   ]
 
   // Reusable card component to reduce repetition
@@ -345,47 +304,28 @@ export default function AdminDashboard() {
                 <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
                   Location
                 </th>
-                <th className='p-3 text-left text-sm font-semibold'>Skills</th>
                 <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
                   Phone
                 </th>
                 <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
                   Applied Date
                 </th>
-                <th className='p-3 text-left text-sm font-semibold'>Status</th>
-                <th className='p-3 text-left text-sm font-semibold'>Action</th>
               </tr>
             </thead>
             <tbody className='divide-y divide-gray-100'>
-              {recentApplicates.map((applicante, index) => (
-                <tr key={index} className='hover:bg-gray-50'>
-                  <td className='p-3'>{applicante.candidate}</td>
-                  <td className='p-3'>{applicante.position}</td>
-                  <td className='p-3'>{applicante.Experience}</td>
+              {applications.map((applicante) => (
+                <tr key={applicante._id} className='hover:bg-gray-50'>
+                  <td className='p-3'>{applicante.name}</td>
+                  <td className='p-3'>{applicante.jobId.role}</td>
+                  <td className='p-3'>{applicante.experience}</td>
                   <td className='hidden lg:table-cell p-3'>
-                    {applicante.Location}
-                  </td>
-                  <td className='p-3'>{applicante.Skills.join(', ')}</td>
-                  <td className='hidden lg:table-cell p-3'>
-                    {applicante.Phone}
+                    {applicante.location}
                   </td>
                   <td className='hidden lg:table-cell p-3'>
-                    {applicante.AppliedDate}
+                    {applicante.contact}
                   </td>
-                  <td className='p-3'>
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        applicante.Status === 'Active'
-                          ? 'text-green-600 bg-green-100'
-                          : 'text-red-600 bg-red-100'
-                      }`}>
-                      {applicante.Status}
-                    </span>
-                  </td>
-                  <td className='p-3'>
-                    <button className='text-blue-600 hover:text-blue-800'>
-                      View
-                    </button>
+                  <td className='hidden lg:table-cell p-3'>
+                    {new Date(applicante.updatedAt).toLocaleDateString('EN-IN')}
                   </td>
                 </tr>
               ))}

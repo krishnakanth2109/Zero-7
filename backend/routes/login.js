@@ -88,6 +88,7 @@ router.post('/login', async (request, response) => {
       // }
       // const jwt = jwtToken.sign(payload, process.env.MY_SECRET_KEY)
       // await transporter.sendMail(mailOptions)
+      const jwt = jwtToken.sign(payload, process.env.MY_SECRET_KEY)
       response.send({ payload, token: jwt })
     }
   }

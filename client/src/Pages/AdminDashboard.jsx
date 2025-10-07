@@ -66,7 +66,7 @@ export default function AdminDashboard() {
         setApplications(data.data)
         console.log(data.data)
       } catch (err) {
-        console.err(err.data)
+        console.error(err.data)
       }
     }
 

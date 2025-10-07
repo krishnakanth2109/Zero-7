@@ -15,6 +15,9 @@ import {
 import api from '../api/axios' // Import the central axios instance
 import './AdminDashboard.css'
 import {
+  Cell,
+  Pie,
+  PieChart,
   Area,
   AreaChart,
   XAxis,
@@ -49,7 +52,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Logic to get user role from token
-    
+
     const data = Cookie.get('user')
     console.log(data)
     const user = JSON.parse(data)
@@ -135,6 +138,43 @@ export default function AdminDashboard() {
     { month: 'May', applications: 115, interviews: 38, hired: 15 },
     { month: 'Jun', applications: 128, interviews: 45, hired: 18 },
   ]
+
+  const data = [
+    { name: 'Total Candidates', value: stats.totalCandidates },
+    { name: 'Active Jobs', value: stats.activeJobs },
+    { name: 'Bench Requests', value: stats.benchRequests },
+    { name: 'Partner Companies', value: stats.partnerCompanies },
+    { name: 'Colleges', value: stats.colleges },
+    { name: 'Placements', value: stats.placements },
+    { name: 'Interviews', value: stats.interviews },
+  ]
+
+  const RADIAN = Math.PI / 180
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+
+  const renderCustomizedLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+  }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+    const x = cx + radius * Math.cos(-(midAngle ?? 0) * RADIAN)
+    const y = cy + radius * Math.sin(-(midAngle ?? 0) * RADIAN)
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill='white'
+        textAnchor={x > cx ? 'start' : 'end'}
+        dominantBaseline='central'>
+        {`${((percent ?? 1) * 100).toFixed(0)}%`}
+      </text>
+    )
+  }
 
   // Reusable card component to reduce repetition
   const StatCard = ({ title, value, subtext, icon, percentage }) => (
@@ -280,6 +320,41 @@ export default function AdminDashboard() {
             Job Status Distribution
           </div>
           {/* Placeholder for a second chart */}
+          <ResponsiveContainer height={400} width='100%'>
+            <PieChart width={400} height={400}>
+              <Pie
+                data={data}
+                cx='50%'
+                cy='50%'
+                labelLine={false}
+                label={renderCustomizedLabel}
+                outerRadius={80}
+                fill='#8884d8'
+                dataKey='value'>
+                {data.map((entry, index) => (
+                  <Cell
+                    key={`cell-${entry.name}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                // Optional: Customize content
+                formatter={(value, name, props) => [
+                  `${value} persons`,
+                  props.payload.name,
+                ]}
+                // Optional: Customize style
+                itemStyle={{ color: '#333' }}
+                contentStyle={{
+                  backgroundColor: '#fff',
+                  border: '1px solid #ccc',
+                  borderRadius: '5px',
+                }}
+                labelStyle={{ fontWeight: 'bold' }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
       </div>
 

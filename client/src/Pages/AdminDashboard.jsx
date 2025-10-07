@@ -49,10 +49,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Logic to get user role from token
-    const token = localStorage.getItem('token')
+    
     const data = Cookie.get('user')
+    console.log(data)
     const user = JSON.parse(data)
-    if (token) {
+    if (data) {
       try {
         setUser(user)
       } catch (error) {

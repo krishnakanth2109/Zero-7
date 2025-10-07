@@ -80,13 +80,12 @@ router.post('/login', async (request, response) => {
       //   text: `${user.role} successfully logged in: ${user.email}`,
       //   html: htmlContent,
       // }
-      // const payload = {
-      //   name: user.name,
-      //   email: user.email,
-      //   role: user.role,
-      //   employeeId: user.employeeId,
-      // }
-      // const jwt = jwtToken.sign(payload, process.env.MY_SECRET_KEY)
+      const payload = {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        employeeId: user.employeeId,
+      }
       // await transporter.sendMail(mailOptions)
       const jwt = jwtToken.sign(payload, process.env.MY_SECRET_KEY)
       response.send({ payload, token: jwt })

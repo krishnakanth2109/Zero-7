@@ -49,45 +49,45 @@ router.post('/login', async (request, response) => {
   } else {
     const checkPassword = await bcrypt.compare(password, user.password)
     if (!checkPassword) {
-      const templateData = prepareFailedLoginData(
-        request,
-        user.email,
-        user.role,
-      )
-      const htmlContent = renderEmailTemplate('failedLoginAlert', templateData)
+      // const templateData = prepareFailedLoginData(
+      //   request,
+      //   user.email,
+      //   user.role,
+      // )
+      // const htmlContent = renderEmailTemplate('failedLoginAlert', templateData)
 
-      const mailOptions = {
-        from: process.env.AUTH_MAIL,
-        to: user.email,
-        subject: '🚫 Security Alert - Invalid Password Attempt',
-        text: `Invalid password attempt for ${user.role} email: ${email}`,
-        html: htmlContent,
-      }
-      await transporter.sendMail(mailOptions)
+      // const mailOptions = {
+      //   from: process.env.AUTH_MAIL,
+      //   to: user.email,
+      //   subject: '🚫 Security Alert - Invalid Password Attempt',
+      //   text: `Invalid password attempt for ${user.role} email: ${email}`,
+      //   html: htmlContent,
+      // }
+      // await transporter.sendMail(mailOptions)
       response.send({ message: 'User Password is Invalid' })
     } else {
-      const templateData = prepareSuccessLoginData(
-        request,
-        user.email,
-        user.role,
-      )
-      const htmlContent = renderEmailTemplate('loginAlert', templateData)
+      // const templateData = prepareSuccessLoginData(
+      //   request,
+      //   user.email,
+      //   user.role,
+      // )
+      // const htmlContent = renderEmailTemplate('loginAlert', templateData)
 
-      const mailOptions = {
-        from: process.env.AUTH_MAIL,
-        to: user.email,
-        subject: `✅ Security Alert - ${user.role} Login Successful`,
-        text: `${user.role} successfully logged in: ${user.email}`,
-        html: htmlContent,
-      }
-      const payload = {
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        employeeId: user.employeeId,
-      }
-      const jwt = jwtToken.sign(payload, process.env.MY_SECRET_KEY)
-      await transporter.sendMail(mailOptions)
+      // const mailOptions = {
+      //   from: process.env.AUTH_MAIL,
+      //   to: user.email,
+      //   subject: `✅ Security Alert - ${user.role} Login Successful`,
+      //   text: `${user.role} successfully logged in: ${user.email}`,
+      //   html: htmlContent,
+      // }
+      // const payload = {
+      //   name: user.name,
+      //   email: user.email,
+      //   role: user.role,
+      //   employeeId: user.employeeId,
+      // }
+      // const jwt = jwtToken.sign(payload, process.env.MY_SECRET_KEY)
+      // await transporter.sendMail(mailOptions)
       response.send({ payload, token: jwt })
     }
   }

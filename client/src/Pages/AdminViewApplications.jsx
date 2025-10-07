@@ -4,29 +4,19 @@ import React, { useEffect, useState } from "react";
 import api from '../api/axios'; // Use your central axios instance
 import "./AdminViewApplications.css";
 
-// Helper to construct the full URL for the resume file
-const getResumeUrl = (path) => {
-    // Get the base URL of the backend (e.g., http://localhost:5000)
-    const baseUrl = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace('/api', '');
-    // The path from the DB might contain backslashes on Windows, replace them with forward slashes
-    const correctedPath = path.replace(/\\/g, '/');
-    return `${baseUrl}/${correctedPath}`;
-};
+// --- FIX: The getResumeUrl helper function is no longer needed and has been removed. ---
 
 const AdminViewApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // --- START OF FIX ---
-  // This useEffect now fetches data from your backend API instead of Google Sheets
   useEffect(() => {
     const fetchApplications = async () => {
       try {
         setLoading(true);
         setError(null);
         const response = await api.get('/applications');
-        // Sort by most recent submission first
         const sortedData = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setApplications(sortedData);
       } catch (err) {
@@ -38,8 +28,7 @@ const AdminViewApplications = () => {
     };
 
     fetchApplications();
-  }, []); // The empty array ensures this runs only once when the component mounts
-  // --- END OF FIX ---
+  }, []);
 
 
   if (loading) return (
@@ -71,7 +60,6 @@ const AdminViewApplications = () => {
         <tbody>
           {applications.length > 0 ? (
             applications.map((app) => (
-              // Use the unique _id from the database as the key
               <tr key={app._id}>
                 <td>{app.name}</td>
                 <td>{app.contact}</td>
@@ -80,18 +68,16 @@ const AdminViewApplications = () => {
                 <td>{app.currentSalary || 'N/A'}</td>
                 <td>{app.expectedSalary || 'N/A'}</td>
                 <td>{app.location}</td>
-                {/* 
-                  Use optional chaining (?.) in case a job has been deleted.
-                  The backend populates `jobId` with the job object.
-                */}
                 <td>{app.jobId?.role || 'Not specified'}</td>
                 <td>
+                  {/* --- START OF FIX --- */}
+                  {/* We now use app.resume directly in the href attribute */}
                   {app.resume ? (
-                    // Construct the full URL to the resume file on the server
-                    <a href={getResumeUrl(app.resume)} target="_blank" rel="noopener noreferrer">
+                    <a href={app.resume} target="_blank" rel="noopener noreferrer">
                       View Resume
                     </a>
                   ) : "N/A"}
+                  {/* --- END OF FIX --- */}
                 </td>
               </tr>
             ))

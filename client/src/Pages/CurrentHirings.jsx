@@ -70,15 +70,15 @@ const CurrentHirings = () => {
     setIsSubmitting(true)
     const job = jobPositions[selectedJobIndex]
     if (!job || !applyData.resume) {
-        alert('Please provide a link to your resume.');
-        setIsSubmitting(false);
-        return;
+      alert('Please provide a link to your resume.');
+      setIsSubmitting(false);
+      return;
     }
-    
+
     // The complete payload, including the job's ID
     const payload = {
-        ...applyData,
-        jobId: job._id
+      ...applyData,
+      jobId: job._id
     };
 
     try {
@@ -92,7 +92,7 @@ const CurrentHirings = () => {
         currentSalary: '', expectedSalary: '', location: '', resume: '',
       });
       setSelectedJobIndex(null);
-      
+
     } catch (error) {
       console.error('Application submission error:', error);
       alert('There was an error submitting your application. ' + (error.response?.data?.message || 'Please try again.'));
@@ -229,38 +229,103 @@ const CurrentHirings = () => {
                               <h3>
                                 <Briefcase size={18} /> Apply for {job.role}
                               </h3>
-                              <form
-                                onSubmit={handleApplySubmit}
-                                className='apply-form'>
+                              <form onSubmit={handleApplySubmit} className='apply-form'>
                                 <div className='input-group'>
                                   <User size={16} />
-                                  <input type='text' name='name' placeholder='Your Name' value={applyData.name} onChange={handleApplyChange} required />
+                                  <input
+                                    type='text'
+                                    name='name'
+                                    placeholder='Your Name'
+                                    value={applyData.name}
+                                    onChange={handleApplyChange}
+                                    required
+                                    pattern='^[A-Za-z\s]{3,}$'
+                                    title='Name must be at least 3 letters and contain only alphabets'
+                                  />
                                 </div>
+
                                 <div className='input-group'>
                                   <Phone size={16} />
-                                  <input type='tel' name='contact' placeholder='Contact Number' value={applyData.contact} onChange={handleApplyChange} required />
+                                  <input
+                                    type='tel'
+                                    name='contact'
+                                    placeholder='Contact Number'
+                                    value={applyData.contact}
+                                    onChange={handleApplyChange}
+                                    required
+                                    pattern='^\d{10}$'
+                                    title='Enter a valid 10-digit phone number'
+                                  />
                                 </div>
+
                                 <div className='input-group'>
                                   <Mail size={16} />
-                                  <input type='email' name='email' placeholder='Email Address' value={applyData.email} onChange={handleApplyChange} required />
+                                  <input
+                                    type='email'
+                                    name='email'
+                                    placeholder='Email Address'
+                                    value={applyData.email}
+                                    onChange={handleApplyChange}
+                                    required
+                                    pattern='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+                                    title='Enter a valid email address'
+                                  />
                                 </div>
+
                                 <div className='input-group'>
                                   <Clock size={16} />
-                                  <input type='text' name='experience' placeholder='Experience (in years)' value={applyData.experience} onChange={handleApplyChange} required />
+                                  <input
+                                    type='text'
+                                    name='experience'
+                                    placeholder='Experience (in years)'
+                                    value={applyData.experience}
+                                    onChange={handleApplyChange}
+                                    required
+                                    pattern='^\d+(\.\d{1,2})?$'
+                                    title='Enter a valid number of years (e.g., 2 or 2.5)'
+                                  />
                                 </div>
+
                                 <div className='input-group'>
                                   <DollarSign size={16} />
-                                  <input type='text' name='currentSalary' placeholder='Current Salary (Optional)' value={applyData.currentSalary} onChange={handleApplyChange} />
+                                  <input
+                                    type='text'
+                                    name='currentSalary'
+                                    placeholder='Current Salary (Optional)'
+                                    value={applyData.currentSalary}
+                                    onChange={handleApplyChange}
+                                    pattern='^\d+(\.\d{1,2})?$'
+                                    title='Enter a valid salary amount (e.g., 50000 or 50000.50)'
+                                  />
                                 </div>
+
                                 <div className='input-group'>
                                   <DollarSign size={16} />
-                                  <input type='text' name='expectedSalary' placeholder='Expected Salary (Optional)' value={applyData.expectedSalary} onChange={handleApplyChange} />
+                                  <input
+                                    type='text'
+                                    name='expectedSalary'
+                                    placeholder='Expected Salary (Optional)'
+                                    value={applyData.expectedSalary}
+                                    onChange={handleApplyChange}
+                                    pattern='^\d+(\.\d{1,2})?$'
+                                    title='Enter a valid salary amount (e.g., 60000 or 60000.75)'
+                                  />
                                 </div>
+
                                 <div className='input-group'>
                                   <MapPin size={16} />
-                                  <input type='text' name='location' placeholder='Your Location' value={applyData.location} onChange={handleApplyChange} required />
+                                  <input
+                                    type='text'
+                                    name='location'
+                                    placeholder='Your Location'
+                                    value={applyData.location}
+                                    onChange={handleApplyChange}
+                                    required
+                                    pattern='^[A-Za-z\s]{2,}$'
+                                    title='Location must contain only letters and at least 2 characters'
+                                  />
                                 </div>
-                                {/* --- FIX 3: Changed file input back to a text input for the URL --- */}
+
                                 <div className='input-group'>
                                   <FileText size={16} />
                                   <input
@@ -270,8 +335,11 @@ const CurrentHirings = () => {
                                     value={applyData.resume}
                                     onChange={handleApplyChange}
                                     required
+                                    pattern='https?://.+'
+                                    title='Enter a valid URL starting with http:// or https://'
                                   />
                                 </div>
+
                                 <div className='form-buttons'>
                                   <button type='submit' className='submit-apply' disabled={isSubmitting}>
                                     {isSubmitting ? 'Submitting...' : 'Submit Application'}
@@ -281,6 +349,7 @@ const CurrentHirings = () => {
                                   </button>
                                 </div>
                               </form>
+
                             </div>
                           </td>
                         </tr>

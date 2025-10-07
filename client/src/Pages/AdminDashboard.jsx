@@ -68,12 +68,14 @@ export default function AdminDashboard() {
           candidatesResponse,
           jobsResponse,
           requestsResponse,
+          numberofCompanies,
           interviewsResponse,
           collegeResponse,
         ] = await Promise.all([
           api.get('/candidates').catch((e) => ({ data: [] })),
           api.get('/jobs').catch((e) => ({ data: [] })),
           api.get('/request-info').catch((e) => ({ data: [] })),
+          api.get('/company').catch((e) => ({ data: [] })),
           api.get('/interview').catch((e) => ({ data: [] })), // Assumes an /interviews endpoint exists
           api.get('/college-connect').catch((e) => ({ data: [] })), // Assumes a /college-connect endpoint exists
         ])
@@ -95,7 +97,7 @@ export default function AdminDashboard() {
           totalCandidates: candidatesResponse.data.length,
           activeJobs: jobsResponse.data.length,
           benchRequests: pendingRequests.length,
-          partnerCompanies: uniqueCompanies.size,
+          partnerCompanies: numberofCompanies.data.length,
           colleges: collegeResponse.data.length,
           placements: approvedRequests.length, // Logic: a placement is an approved request
           interviews: interviewsResponse.data.length,

@@ -9,7 +9,7 @@ const InterviewSchema = new mongoose.Schema(
     userId: { type: String, ref: 'recruiter' },
     date: { type: Date, required: true },
     approvalStatus: {
-      type: Date,
+      type: String,
       enum: ['approved', 'rejected', 'pending'],
       default: 'pending',
     },

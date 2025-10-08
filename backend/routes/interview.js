@@ -9,13 +9,18 @@ import {
   renderEmailTemplate,
   prepareCandidateInterview,
 } from '../utils/emailTemplates.js'
-import Notification from '../models/notifications.js'; 
+import Notification from '../models/notifications.js'
 const router = express.Router()
 
 router.get('/', async (request, response) => {
   try {
     const pipeline = [
       // Stage 1: Convert String IDs to ObjectId for lookups where target _id is ObjectId
+      {
+        $match: {
+          approvalStatus: 'approved',
+        },
+      },
       {
         $addFields: {
           candidateObjectId: { $toObjectId: '$candidateId' },

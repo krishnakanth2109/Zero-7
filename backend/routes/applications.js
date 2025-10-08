@@ -1,10 +1,9 @@
-// File: backend/routes/applications.js (Corrected for Resume URL)
+// File: backend/routes/applications.js
 
 import express from 'express';
 const router = express.Router();
 import Application from '../models/Application.js';
-// We no longer need 'upload' from multer for this route
-// import upload from '../middleware/upload.js'; 
+import Notification from '../models/notifications.js'; // <-- Corrected Import
 
 // GET all applications
 router.get('/', async (req, res) => {
@@ -16,30 +15,36 @@ router.get('/', async (req, res) => {
     }
 });
 
-// --- FIX: Removed the 'upload.single('resume')' middleware ---
 // POST a new application
 router.post('/', async (req, res) => {
     try {
-        // All data, including the resume URL, is now in req.body
-        const { jobId, name, contact, email, experience, currentSalary, expectedSalary, location, resume } = req.body;
+        const { jobId, name, resume } = req.body;
         
         if (!resume) {
             return res.status(400).json({ message: 'A link to the resume is required.' });
         }
 
-        // Create a new application instance with the data from the request body
-        const newApplication = new Application({
-            jobId, name, contact, email, experience, currentSalary, expectedSalary, location, resume
-        });
-
+        const newApplication = new Application(req.body);
         const savedApplication = await newApplication.save();
 
-        // --- Notification Logic (Remains the same) ---
-        const io = req.app.get('io');
+        // Populate job details to get the role name
         await savedApplication.populate('jobId', 'role');
-        io.emit('newApplication', { 
-            message: `New application from ${name} for the ${savedApplication.jobId.role} role.` 
+        
+        const io = req.app.get('io');
+        const message = `New application from ${name} for the ${savedApplication.jobId.role} role.`;
+
+        // --- ADDED: Save Notification ---
+        const notification = new Notification({
+            title: 'New Job Application',
+            message: message,
+            type: 'success',
+            link: '/admin/applications'
         });
+        await notification.save();
+        // --------------------------------
+
+        // Emit real-time event
+        io.emit('newApplication', { message });
 
         res.status(201).json(savedApplication);
     } catch (err) {
@@ -51,6 +56,7 @@ router.post('/', async (req, res) => {
 // DELETE /api/applications/:id
 router.delete('/:id', async (req, res) => {
   try {
+<<<<<<< Updated upstream
     await Application.findByIdAndDelete(req.params.id)
     res.json({ message: 'Application deleted successfully' })
   } catch (err) {
@@ -58,5 +64,13 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+=======
+    await Application.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Application deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete application' });
+  }
+});
+>>>>>>> Stashed changes
 
 export default router;

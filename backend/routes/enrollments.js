@@ -1,23 +1,24 @@
 // File: backend/routes/enrollments.js
 
-import express from 'express' // <-- Changed from require to import
-const router = express.Router()
-
-import Enrollment from '../models/Enrollment.js'
+import express from 'express';
+const router = express.Router();
+import Enrollment from '../models/Enrollment.js';
+import Notification from '../models/notifications.js'; // <-- Corrected Import
 import {
   renderEmailTemplate,
   prepareCandidateEnrollForAdmin,
   prepareStudentAcknowledgment,
-} from '../utils/emailTemplates.js'
-import transporter from '../utils/mail.js'
+} from '../utils/emailTemplates.js';
+import transporter from '../utils/mail.js';
 
 // POST a new enrollment
 router.post('/', async (req, res) => {
   try {
-    const { name, contact, email, location } = req.body
-    // Add a check to make sure a file was uploaded
-    const emailCheck = await Enrollment.findOne({ email })
+    const { name, email } = req.body;
+    const emailCheck = await Enrollment.findOne({ email });
+    
     if (emailCheck) {
+<<<<<<< Updated upstream
       res.send({ message: 'You are Already Enrolled' })
     } else {
       const newEnrollment = new Enrollment({
@@ -50,11 +51,53 @@ router.post('/', async (req, res) => {
       // }
       // await transporter.sendMail(mail)
       res.status(201).json(savedEnrollment)
+=======
+      return res.send({ message: 'You are Already Enrolled' });
+>>>>>>> Stashed changes
     }
-  } catch (err) {
-    res.status(400).json({ message: err.message })
-  }
-})
+    
+    const newEnrollment = new Enrollment(req.body);
+    const savedEnrollment = await newEnrollment.save();
+    
+    // --- Email Logic ---
+    const adminTemplate = prepareCandidateEnrollForAdmin(newEnrollment);
+    const adminHtml = renderEmailTemplate('enrollmentAlert', adminTemplate);
+    await transporter.sendMail({
+      from: process.env.AUTH_MAIL,
+      to: process.env.AUTH_MAIL,
+      subject: 'Candidate Enrollment Form Alert',
+      html: adminHtml,
+    });
+    
+    const studentTemplate = prepareStudentAcknowledgment(name);
+    const studentHtml = renderEmailTemplate('enrollmentStudentConfirmation', studentTemplate);
+    await transporter.sendMail({
+      from: process.env.AUTH_MAIL,
+      to: email,
+      subject: 'Thank You for Your Response',
+      html: studentHtml,
+    });
+    // --- End Email Logic ---
 
-// (Add GET route for admin)
-export default router
+    // --- ADDED: Notification Logic ---
+    const io = req.app.get('io');
+    const message = `New enrollment from student: ${name}.`;
+
+    const notification = new Notification({
+        title: 'New Enrollment',
+        message: message,
+        type: 'info',
+        link: '/admin/studentenrollment'
+    });
+    await notification.save();
+    
+    io.emit('newEnrollment', { message });
+    // -------------------------
+
+    res.status(201).json(savedEnrollment);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+export default router;

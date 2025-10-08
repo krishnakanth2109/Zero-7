@@ -1,5 +1,6 @@
-// File: src/Pages/AdminViewApplications.jsx (Corrected)
+// File: src/Pages/AdminViewApplications.jsx (Merged and Corrected)
 
+<<<<<<< Updated upstream
 import React, { useEffect, useState } from 'react'
 import api from '../api/axios' // Use your central axios instance
 import './AdminViewApplications.css'
@@ -18,6 +19,11 @@ const getResumeUrl = (path) => {
   return `${baseUrl}/${correctedPath}`
 }
 >>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
+=======
+import React, { useEffect, useState } from 'react';
+import api from '../api/axios'; // Use your central axios instance
+import './AdminViewApplications.css';
+>>>>>>> Stashed changes
 
 const AdminViewApplications = () => {
   const [applications, setApplications] = useState([])
@@ -31,7 +37,10 @@ const AdminViewApplications = () => {
         setLoading(true);
         setError(null);
         const response = await api.get('/applications');
-        const sortedData = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // Sort by most recent submission first
+        const sortedData = response.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        );
         setApplications(sortedData);
 =======
         setLoading(true)
@@ -44,10 +53,17 @@ const AdminViewApplications = () => {
         setApplications(sortedData)
 >>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
       } catch (err) {
+<<<<<<< Updated upstream
         console.error('Failed to fetch applications:', err)
         setError(
           'Failed to load applications. Please ensure the backend is running.',
         )
+=======
+        console.error('Failed to fetch applications:', err);
+        setError(
+          'Failed to load applications. Please ensure the backend is running.',
+        );
+>>>>>>> Stashed changes
       } finally {
         setLoading(false)
       }
@@ -55,6 +71,7 @@ const AdminViewApplications = () => {
 
 <<<<<<< HEAD
     fetchApplications();
+<<<<<<< Updated upstream
   }, []);
 =======
     fetchApplications()
@@ -77,6 +94,29 @@ const AdminViewApplications = () => {
   }
   // --- END OF FIX ---
 >>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
+=======
+  }, []); // The empty array ensures this runs only once when the component mounts
+
+  // Function to handle the "Reject" action, which deletes the application
+  const handleReject = async (id) => {
+    try {
+      const confirmReject = window.confirm(
+        'Are you sure you want to reject and delete this application? This action cannot be undone.',
+      );
+      if (!confirmReject) return;
+
+      // Send a DELETE request to the backend API
+      await api.delete(`/applications/${id}`);
+      
+      // Immediately remove the application from the local state to update the UI
+      setApplications((prev) => prev.filter((app) => app._id !== id));
+      alert('Application rejected and removed successfully.');
+    } catch (err) {
+      console.error('Failed to reject application:', err);
+      alert('Failed to reject the application. Please try again.');
+    }
+  };
+>>>>>>> Stashed changes
 
   if (loading)
     return (
@@ -84,9 +124,15 @@ const AdminViewApplications = () => {
         <div className='spinner'></div>
         <p style={{ marginLeft: '15px' }}>Loading applications...</p>
       </div>
+<<<<<<< Updated upstream
     )
 
   if (error) return <p className='error-message'>{error}</p>
+=======
+    );
+
+  if (error) return <p className='error-message'>{error}</p>;
+>>>>>>> Stashed changes
 
   return (
     <div className='admin-applications'>
@@ -103,7 +149,11 @@ const AdminViewApplications = () => {
             <th>Location</th>
             <th>Job Role</th>
             <th>Resume</th>
+<<<<<<< Updated upstream
             <th>Status</th>
+=======
+            <th>Action</th> {/* Changed "Status" to "Action" for clarity */}
+>>>>>>> Stashed changes
           </tr>
         </thead>
         <tbody>
@@ -116,6 +166,7 @@ const AdminViewApplications = () => {
                 <td>{app.experience || 'N/A'}</td>
                 <td>{app.currentSalary || 'N/A'}</td>
                 <td>{app.expectedSalary || 'N/A'}</td>
+<<<<<<< Updated upstream
 <<<<<<< HEAD
                 <td>{app.location}</td>
 =======
@@ -127,10 +178,13 @@ const AdminViewApplications = () => {
                 */}
 >>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
                 <td>{app.jobId?.role || 'Not specified'}</td>
+=======
+                <td>{app.location || 'N/A'}</td>
+                <td>{app.jobId?.role || 'Job Not Found'}</td>
+>>>>>>> Stashed changes
                 <td>
-                  {/* --- START OF FIX --- */}
-                  {/* We now use app.resume directly in the href attribute */}
                   {app.resume ? (
+<<<<<<< Updated upstream
 <<<<<<< HEAD
                     <a href={app.resume} target="_blank" rel="noopener noreferrer">
                       View Resume
@@ -145,21 +199,44 @@ const AdminViewApplications = () => {
                       rel='noopener noreferrer'>
                       View Resume
                     </a>
+=======
+                    // Use the resume URL directly
+                    <a
+                      href={app.resume}
+                      target='_blank'
+                      rel='noopener noreferrer'>
+                      View Resume
+                    </a>
+>>>>>>> Stashed changes
                   ) : (
                     'N/A'
                   )}
                 </td>
+<<<<<<< Updated upstream
                 <td
                   style={{ color: 'red', cursor: 'pointer' }}
                   onClick={() => handleReject(app._id)}>
                   Reject
 >>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
+=======
+                <td>
+                  <button
+                    className="reject-button" // Add a class for styling
+                    onClick={() => handleReject(app._id)}>
+                    Reject
+                  </button>
+>>>>>>> Stashed changes
                 </td>
               </tr>
             ))
           ) : (
             <tr>
+<<<<<<< Updated upstream
               <td colSpan='9'>No applications yet</td>
+=======
+              {/* Updated colSpan to match the new number of columns */}
+              <td colSpan='10'>No applications yet</td>
+>>>>>>> Stashed changes
             </tr>
           )}
         </tbody>

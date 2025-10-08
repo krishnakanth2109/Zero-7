@@ -1,6 +1,6 @@
 import express from 'express'
 import Company from '../models/Companies.js'
-
+import Notification from '../models/notifications.js'; 
 const router = express.Router()
 
 // GET all companies

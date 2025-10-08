@@ -1,6 +1,6 @@
 import RegisterDemo from "../models/RegisterDemo.js";
 import express from "express";
-
+import Notification from '../models/notifications.js'; 
 const router = express.Router()
 
 router.get('/', async (req , res) => {

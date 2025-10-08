@@ -52,11 +52,18 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Logic to get user role from token
+<<<<<<< Updated upstream
 
     const data = Cookie.get('user')
     console.log(data)
     const user = JSON.parse(data)
     if (data) {
+=======
+    const token = localStorage.getItem('token')
+    const data = Cookie.get('user')
+    const user = JSON.parse(data)
+    if (token) {
+>>>>>>> Stashed changes
       try {
         setUser(user)
       } catch (error) {
@@ -70,7 +77,11 @@ export default function AdminDashboard() {
         setApplications(data.data)
         console.log(data.data)
       } catch (err) {
+<<<<<<< Updated upstream
         console.error(err.data)
+=======
+        console.err(err.data)
+>>>>>>> Stashed changes
       }
     }
 
@@ -139,6 +150,7 @@ export default function AdminDashboard() {
     { month: 'Jun', applications: 128, interviews: 45, hired: 18 },
   ]
 
+<<<<<<< Updated upstream
   const data = [
     { name: 'Total Candidates', value: stats.totalCandidates },
     { name: 'Active Jobs', value: stats.activeJobs },
@@ -176,6 +188,8 @@ export default function AdminDashboard() {
     )
   }
 
+=======
+>>>>>>> Stashed changes
   // Reusable card component to reduce repetition
   const StatCard = ({ title, value, subtext, icon, percentage }) => (
     <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1'>

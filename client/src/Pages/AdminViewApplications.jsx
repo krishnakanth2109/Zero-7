@@ -1,6 +1,7 @@
 // File: src/Pages/AdminViewApplications.jsx (Merged and Corrected)
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import React, { useEffect, useState } from 'react'
 import api from '../api/axios' // Use your central axios instance
 import './AdminViewApplications.css'
@@ -19,6 +20,11 @@ const getResumeUrl = (path) => {
   return `${baseUrl}/${correctedPath}`
 }
 >>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
+=======
+import React, { useEffect, useState } from 'react';
+import api from '../api/axios'; // Use your central axios instance
+import './AdminViewApplications.css';
+>>>>>>> Stashed changes
 =======
 import React, { useEffect, useState } from 'react';
 import api from '../api/axios'; // Use your central axios instance
@@ -54,15 +60,21 @@ const AdminViewApplications = () => {
 >>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
       } catch (err) {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         console.error('Failed to fetch applications:', err)
         setError(
           'Failed to load applications. Please ensure the backend is running.',
         )
 =======
+=======
+>>>>>>> Stashed changes
         console.error('Failed to fetch applications:', err);
         setError(
           'Failed to load applications. Please ensure the backend is running.',
         );
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       } finally {
         setLoading(false)
@@ -71,6 +83,7 @@ const AdminViewApplications = () => {
 
 <<<<<<< HEAD
     fetchApplications();
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
   }, []);
 =======
@@ -118,6 +131,30 @@ const AdminViewApplications = () => {
   };
 >>>>>>> Stashed changes
 
+=======
+  }, []); // The empty array ensures this runs only once when the component mounts
+
+  // Function to handle the "Reject" action, which deletes the application
+  const handleReject = async (id) => {
+    try {
+      const confirmReject = window.confirm(
+        'Are you sure you want to reject and delete this application? This action cannot be undone.',
+      );
+      if (!confirmReject) return;
+
+      // Send a DELETE request to the backend API
+      await api.delete(`/applications/${id}`);
+      
+      // Immediately remove the application from the local state to update the UI
+      setApplications((prev) => prev.filter((app) => app._id !== id));
+      alert('Application rejected and removed successfully.');
+    } catch (err) {
+      console.error('Failed to reject application:', err);
+      alert('Failed to reject the application. Please try again.');
+    }
+  };
+
+>>>>>>> Stashed changes
   if (loading)
     return (
       <div className='loading-spinner-container'>
@@ -125,9 +162,15 @@ const AdminViewApplications = () => {
         <p style={{ marginLeft: '15px' }}>Loading applications...</p>
       </div>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     )
 
   if (error) return <p className='error-message'>{error}</p>
+=======
+    );
+
+  if (error) return <p className='error-message'>{error}</p>;
+>>>>>>> Stashed changes
 =======
     );
 
@@ -150,7 +193,11 @@ const AdminViewApplications = () => {
             <th>Job Role</th>
             <th>Resume</th>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             <th>Status</th>
+=======
+            <th>Action</th> {/* Changed "Status" to "Action" for clarity */}
+>>>>>>> Stashed changes
 =======
             <th>Action</th> {/* Changed "Status" to "Action" for clarity */}
 >>>>>>> Stashed changes
@@ -166,6 +213,7 @@ const AdminViewApplications = () => {
                 <td>{app.experience || 'N/A'}</td>
                 <td>{app.currentSalary || 'N/A'}</td>
                 <td>{app.expectedSalary || 'N/A'}</td>
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< HEAD
                 <td>{app.location}</td>
@@ -208,10 +256,24 @@ const AdminViewApplications = () => {
                       View Resume
                     </a>
 >>>>>>> Stashed changes
+=======
+                <td>{app.location || 'N/A'}</td>
+                <td>{app.jobId?.role || 'Job Not Found'}</td>
+                <td>
+                  {app.resume ? (
+                    // Use the resume URL directly
+                    <a
+                      href={app.resume}
+                      target='_blank'
+                      rel='noopener noreferrer'>
+                      View Resume
+                    </a>
+>>>>>>> Stashed changes
                   ) : (
                     'N/A'
                   )}
                 </td>
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
                 <td
                   style={{ color: 'red', cursor: 'pointer' }}
@@ -219,12 +281,17 @@ const AdminViewApplications = () => {
                   Reject
 >>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
 =======
+=======
+>>>>>>> Stashed changes
                 <td>
                   <button
                     className="reject-button" // Add a class for styling
                     onClick={() => handleReject(app._id)}>
                     Reject
                   </button>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                 </td>
               </tr>
@@ -232,7 +299,12 @@ const AdminViewApplications = () => {
           ) : (
             <tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
               <td colSpan='9'>No applications yet</td>
+=======
+              {/* Updated colSpan to match the new number of columns */}
+              <td colSpan='10'>No applications yet</td>
+>>>>>>> Stashed changes
 =======
               {/* Updated colSpan to match the new number of columns */}
               <td colSpan='10'>No applications yet</td>

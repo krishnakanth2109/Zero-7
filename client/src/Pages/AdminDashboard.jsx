@@ -78,7 +78,11 @@ export default function AdminDashboard() {
         console.log(data.data)
       } catch (err) {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         console.error(err.data)
+=======
+        console.err(err.data)
+>>>>>>> Stashed changes
 =======
         console.err(err.data)
 >>>>>>> Stashed changes
@@ -151,6 +155,7 @@ export default function AdminDashboard() {
   ]
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   const data = [
     { name: 'Total Candidates', value: stats.totalCandidates },
     { name: 'Active Jobs', value: stats.activeJobs },
@@ -188,6 +193,8 @@ export default function AdminDashboard() {
     )
   }
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   // Reusable card component to reduce repetition

@@ -218,6 +218,7 @@ const BenchList = () => {
       <section className='form-section'>
         <h2>Candidate Enrollment Form</h2>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <form onSubmit={handleSubmit} className='enrollment-form'>
           <input
             type='text'
@@ -281,6 +282,8 @@ const BenchList = () => {
           </button>
         </form>
 =======
+=======
+>>>>>>> Stashed changes
 <form onSubmit={handleSubmit} className='enrollment-form'>
   <input
     type='text'
@@ -339,6 +342,9 @@ const BenchList = () => {
 
   <button className='bg-blue-500 py-3 px-2 text-white' type='submit'>Submit</button>
 </form>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       </section>
 

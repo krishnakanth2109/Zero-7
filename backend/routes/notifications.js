@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
     } catch (err) {
         console.error("Error fetching notifications:", err);
         res.status(500).json({ message: "Server error while fetching notifications." });
-    }
+    } b
 });
 
 /**

@@ -52,6 +52,7 @@ export default function AdminSidebar({ isOpen }) {
     ...commonLinks,
     { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
     { path: '/admin/manage-candidates', label: 'Manage Candidates', icon: UserRound },
+    { path: '/admin/candidateList', label: 'Candidates Approvals', icon: UserRound },
     { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
     { path: '/admin/companies', label: 'Manage Companies', icon: Building },
     { path: '/admin/studentenrollment', label: 'Student Enrollment', icon: Store },
@@ -60,7 +61,9 @@ export default function AdminSidebar({ isOpen }) {
     { path: '/admin/manage-recruiters', label: 'Add Recruiter', icon: UserSearch },
     { path: '/admin/manage-managers', label: 'Add Managers', icon: UserCog },
     { path: '/admin/manage-blogs', label: 'Manage Blogs', icon: Shield },
+    { path: '/admin/new-batch-dashboard', label: 'New Batches', icon: FileUser },  
     { path: '/admin/it-programs', label: 'IT Programs', icon: HardDrive, isDropdown: true },
+
 
   ]
 
@@ -70,6 +73,7 @@ export default function AdminSidebar({ isOpen }) {
        ...commonLinks,
       { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
       { path: '/admin/manage-candidates', label: 'Manage Candidates', icon: UserRound },
+      { path: '/admin/candidateList', label: 'Candidates Approvals', icon: UserRound },
       { path: '/admin/companies', label: 'Manage Companies', icon: Building },
       { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
       { path: '/admin/studentenrollment', label: 'Student Enrollment', icon: Store },

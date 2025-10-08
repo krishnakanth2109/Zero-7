@@ -181,9 +181,7 @@ export default function AdminDashboard() {
             Welcome back, {capitalize(user.name) || 'Admin'}!
           </h1>
           <span>Here&apos;s your {user.role} dashboard today.</span>
-<button type="button" onClick={handleSendEmail}>
-  Send Email
-</button>
+
         </div>
       </div>
 

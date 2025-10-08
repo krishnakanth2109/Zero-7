@@ -4,9 +4,6 @@ import React, { useEffect, useState } from 'react'
 import api from '../api/axios' // Use your central axios instance
 import './AdminViewApplications.css'
 
-<<<<<<< HEAD
-// --- FIX: The getResumeUrl helper function is no longer needed and has been removed. ---
-=======
 // Helper to construct the full URL for the resume file
 const getResumeUrl = (path) => {
   // Get the base URL of the backend (e.g., http://localhost:5000)
@@ -17,7 +14,6 @@ const getResumeUrl = (path) => {
   const correctedPath = path.replace(/\\/g, '/')
   return `${baseUrl}/${correctedPath}`
 }
->>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
 
 const AdminViewApplications = () => {
   const [applications, setApplications] = useState([])
@@ -27,13 +23,6 @@ const AdminViewApplications = () => {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-<<<<<<< HEAD
-        setLoading(true);
-        setError(null);
-        const response = await api.get('/applications');
-        const sortedData = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setApplications(sortedData);
-=======
         setLoading(true)
         setError(null)
         const response = await api.get('/applications')
@@ -42,7 +31,6 @@ const AdminViewApplications = () => {
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
         )
         setApplications(sortedData)
->>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
       } catch (err) {
         console.error('Failed to fetch applications:', err)
         setError(
@@ -53,10 +41,6 @@ const AdminViewApplications = () => {
       }
     }
 
-<<<<<<< HEAD
-    fetchApplications();
-  }, []);
-=======
     fetchApplications()
   }, []) // The empty array ensures this runs only once when the component mounts
 
@@ -76,7 +60,6 @@ const AdminViewApplications = () => {
     }
   }
   // --- END OF FIX ---
->>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
 
   if (loading)
     return (
@@ -116,28 +99,17 @@ const AdminViewApplications = () => {
                 <td>{app.experience || 'N/A'}</td>
                 <td>{app.currentSalary || 'N/A'}</td>
                 <td>{app.expectedSalary || 'N/A'}</td>
-<<<<<<< HEAD
-                <td>{app.location}</td>
-=======
                 <td>{app.location || 'N/A'}</td>
 
                 {/* 
                   Use optional chaining (?.) in case a job has been deleted.
                   The backend populates `jobId` with the job object.
                 */}
->>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
                 <td>{app.jobId?.role || 'Not specified'}</td>
                 <td>
                   {/* --- START OF FIX --- */}
                   {/* We now use app.resume directly in the href attribute */}
                   {app.resume ? (
-<<<<<<< HEAD
-                    <a href={app.resume} target="_blank" rel="noopener noreferrer">
-                      View Resume
-                    </a>
-                  ) : "N/A"}
-                  {/* --- END OF FIX --- */}
-=======
                     // Construct the full URL to the resume file on the server
                     <a
                       href={app.resume}
@@ -153,7 +125,6 @@ const AdminViewApplications = () => {
                   style={{ color: 'red', cursor: 'pointer' }}
                   onClick={() => handleReject(app._id)}>
                   Reject
->>>>>>> 241581076bec5f15d8d2088c59014fb878a1c0c6
                 </td>
               </tr>
             ))

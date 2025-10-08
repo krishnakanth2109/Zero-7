@@ -129,6 +129,19 @@ export default function AdminDashboard() {
     // --- END: DYNAMIC DATA FETCHING LOGIC ---
   }, []) // The empty array ensures this logic runs only once on component mount
 
+const handleSendEmail = () => {
+  const email = "myakalasumanthreddy@gmail.com";
+  const subject = encodeURIComponent("Partnership Proposal");
+  const body = encodeURIComponent(
+    "Hello,\n\nWe are excited to collaborate with your institution. Please find the attached proposal document for review.\n\nBest regards,\nM. Sumanth Reddy\nZero7 Team"
+  );
+
+  window.open(
+    `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
+    "_blank"
+  );
+};
+
   // Hardcoded data for charts and recent applications table
   const applicationsTrend = [
     { month: 'Jan', applications: 45, interviews: 12, hired: 3 },
@@ -201,6 +214,9 @@ export default function AdminDashboard() {
             Welcome back, {capitalize(user.name) || 'Admin'}!
           </h1>
           <span>Here&apos;s your {user.role} dashboard today.</span>
+<button type="button" onClick={handleSendEmail}>
+  Send Email
+</button>
         </div>
       </div>
 

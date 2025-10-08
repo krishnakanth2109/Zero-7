@@ -151,24 +151,24 @@ router.post('/', async (request, response) => {
       { _id: candidate.userId },
       { email: 1, name: 1 },
     )
-    const templateData = prepareCandidateInterview(
-      request,
-      candidate,
-      recruiter,
-      newInterview,
-      jobRole,
-      companyName,
-    )
-    const htmlContent = renderEmailTemplate('interviewDetails', templateData)
+    // const templateData = prepareCandidateInterview(
+    //   request,
+    //   candidate,
+    //   recruiter,
+    //   newInterview,
+    //   jobRole,
+    //   companyName,
+    // )
+    // const htmlContent = renderEmailTemplate('interviewDetails', templateData)
 
-    const mailOptions = {
-      from: process.env.AUTH_MAIL,
-      to: candidate.email,
-      cc: recruiter.email,
-      subject: 'Candidate Enrollment Form Alert',
-      html: htmlContent,
-    }
-    await transporter.sendMail(mailOptions)
+    // const mailOptions = {
+    //   from: process.env.AUTH_MAIL,
+    //   to: candidate.email,
+    //   cc: recruiter.email,
+    //   subject: 'Candidate Enrollment Form Alert',
+    //   html: htmlContent,
+    // }
+    // await transporter.sendMail(mailOptions)
     response.status(201).send({ payload })
   }
 })

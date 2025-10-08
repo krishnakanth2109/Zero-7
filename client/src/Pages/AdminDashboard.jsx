@@ -1,7 +1,7 @@
 // File: src/Pages/AdminDashboard.jsx
 
 import { useState, useEffect } from 'react'
-import { jwtDecode } from 'jwt-decode'
+import Cookie from 'js-cookie'
 import {
   Briefcase,
   UserCheck,
@@ -15,6 +15,9 @@ import {
 import api from '../api/axios' // Import the central axios instance
 import './AdminDashboard.css'
 import {
+  Cell,
+  Pie,
+  PieChart,
   Area,
   AreaChart,
   XAxis,
@@ -31,7 +34,8 @@ const capitalize = (s) => {
 }
 
 export default function AdminDashboard() {
-  const [userRole, setUserRole] = useState(null)
+  const [user, setUser] = useState({})
+  const [applications, setApplications] = useState([])
 
   // --- START: DYNAMIC STATE FOR ALL CARDS ---
   const [stats, setStats] = useState({
@@ -48,13 +52,25 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Logic to get user role from token
-    const token = localStorage.getItem('token')
-    if (token) {
+
+    const data = Cookie.get('user')
+    console.log(data)
+    const user = JSON.parse(data)
+    if (data) {
       try {
-        const decodedUser = jwtDecode(token)
-        setUserRole(decodedUser.role)
+        setUser(user)
       } catch (error) {
         console.error('Invalid token:', error)
+      }
+    }
+
+    const fetchApplications = async () => {
+      try {
+        const data = await api.get('/applications')
+        setApplications(data.data)
+        console.log(data.data)
+      } catch (err) {
+        console.error(err.data)
       }
     }
 
@@ -67,12 +83,14 @@ export default function AdminDashboard() {
           candidatesResponse,
           jobsResponse,
           requestsResponse,
+          numberofCompanies,
           interviewsResponse,
           collegeResponse,
         ] = await Promise.all([
           api.get('/candidates').catch((e) => ({ data: [] })),
           api.get('/jobs').catch((e) => ({ data: [] })),
           api.get('/request-info').catch((e) => ({ data: [] })),
+          api.get('/company').catch((e) => ({ data: [] })),
           api.get('/interview').catch((e) => ({ data: [] })), // Assumes an /interviews endpoint exists
           api.get('/college-connect').catch((e) => ({ data: [] })), // Assumes a /college-connect endpoint exists
         ])
@@ -94,7 +112,7 @@ export default function AdminDashboard() {
           totalCandidates: candidatesResponse.data.length,
           activeJobs: jobsResponse.data.length,
           benchRequests: pendingRequests.length,
-          partnerCompanies: uniqueCompanies.size,
+          partnerCompanies: numberofCompanies.data.length,
           colleges: collegeResponse.data.length,
           placements: approvedRequests.length, // Logic: a placement is an approved request
           interviews: interviewsResponse.data.length,
@@ -107,6 +125,7 @@ export default function AdminDashboard() {
     }
 
     fetchStats()
+    fetchApplications()
     // --- END: DYNAMIC DATA FETCHING LOGIC ---
   }, []) // The empty array ensures this logic runs only once on component mount
 
@@ -120,58 +139,42 @@ export default function AdminDashboard() {
     { month: 'Jun', applications: 128, interviews: 45, hired: 18 },
   ]
 
-  const recentApplicates = [
-    {
-      candidate: 'Joe Doe',
-      position: 'Full Stack Developer',
-      Experience: '3-10 years',
-      Location: 'Hyderabad',
-      Skills: ['React js', 'Node js', 'Docker'],
-      Phone: 8121211111,
-      AppliedDate: '19/09/2025',
-      Status: 'Active',
-    },
-    {
-      candidate: 'Sarah Smith',
-      position: 'Frontend Developer',
-      Experience: '2-5 years',
-      Location: 'Bangalore',
-      Skills: ['React js', 'TypeScript', 'CSS'],
-      Phone: 9876543210,
-      AppliedDate: '18/09/2025',
-      Status: 'InActive',
-    },
-    {
-      candidate: 'Mike Johnson',
-      position: 'Backend Developer',
-      Experience: '4-8 years',
-      Location: 'Mumbai',
-      Skills: ['Node js', 'Python', 'MongoDB'],
-      Phone: 7654321098,
-      AppliedDate: '17/09/2025',
-      Status: 'Active',
-    },
-    {
-      candidate: 'Emily Chen',
-      position: 'DevOps Engineer',
-      Experience: '5-7 years',
-      Location: 'Pune',
-      Skills: ['AWS', 'Docker', 'Kubernetes'],
-      Phone: 8899776655,
-      AppliedDate: '16/09/2025',
-      Status: 'InActive',
-    },
-    {
-      candidate: 'Alex Kumar',
-      position: 'UI/UX Designer',
-      Experience: '3-6 years',
-      Location: 'Chennai',
-      Skills: ['Figma', 'Adobe XD', 'Sketch'],
-      Phone: 9988776655,
-      AppliedDate: '15/09/2025',
-      Status: 'Active',
-    },
+  const data = [
+    { name: 'Total Candidates', value: stats.totalCandidates },
+    { name: 'Active Jobs', value: stats.activeJobs },
+    { name: 'Bench Requests', value: stats.benchRequests },
+    { name: 'Partner Companies', value: stats.partnerCompanies },
+    { name: 'Colleges', value: stats.colleges },
+    { name: 'Placements', value: stats.placements },
+    { name: 'Interviews', value: stats.interviews },
   ]
+
+  const RADIAN = Math.PI / 180
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+
+  const renderCustomizedLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+  }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+    const x = cx + radius * Math.cos(-(midAngle ?? 0) * RADIAN)
+    const y = cy + radius * Math.sin(-(midAngle ?? 0) * RADIAN)
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill='white'
+        textAnchor={x > cx ? 'start' : 'end'}
+        dominantBaseline='central'>
+        {`${((percent ?? 1) * 100).toFixed(0)}%`}
+      </text>
+    )
+  }
 
   // Reusable card component to reduce repetition
   const StatCard = ({ title, value, subtext, icon, percentage }) => (
@@ -195,9 +198,9 @@ export default function AdminDashboard() {
       <div className='admin-main flex-1 rounded-2xl p-6 border-border flex flex-col md:flex-row items-start md:items-center justify-between'>
         <div>
           <h1 className='text-3xl font-bold'>
-            Welcome back, {capitalize(userRole) || 'Admin'}!
+            Welcome back, {capitalize(user.name) || 'Admin'}!
           </h1>
-          <span>Here&apos;s your recruitment dashboard today.</span>
+          <span>Here&apos;s your {user.role} dashboard today.</span>
         </div>
       </div>
 
@@ -317,6 +320,41 @@ export default function AdminDashboard() {
             Job Status Distribution
           </div>
           {/* Placeholder for a second chart */}
+          <ResponsiveContainer height={400} width='100%'>
+            <PieChart width={400} height={400}>
+              <Pie
+                data={data}
+                cx='50%'
+                cy='50%'
+                labelLine={false}
+                label={renderCustomizedLabel}
+                outerRadius={80}
+                fill='#8884d8'
+                dataKey='value'>
+                {data.map((entry, index) => (
+                  <Cell
+                    key={`cell-${entry.name}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                // Optional: Customize content
+                formatter={(value, name, props) => [
+                  `${value} persons`,
+                  props.payload.name,
+                ]}
+                // Optional: Customize style
+                itemStyle={{ color: '#333' }}
+                contentStyle={{
+                  backgroundColor: '#fff',
+                  border: '1px solid #ccc',
+                  borderRadius: '5px',
+                }}
+                labelStyle={{ fontWeight: 'bold' }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
@@ -342,47 +380,28 @@ export default function AdminDashboard() {
                 <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
                   Location
                 </th>
-                <th className='p-3 text-left text-sm font-semibold'>Skills</th>
                 <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
                   Phone
                 </th>
                 <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
                   Applied Date
                 </th>
-                <th className='p-3 text-left text-sm font-semibold'>Status</th>
-                <th className='p-3 text-left text-sm font-semibold'>Action</th>
               </tr>
             </thead>
             <tbody className='divide-y divide-gray-100'>
-              {recentApplicates.map((applicante, index) => (
-                <tr key={index} className='hover:bg-gray-50'>
-                  <td className='p-3'>{applicante.candidate}</td>
-                  <td className='p-3'>{applicante.position}</td>
-                  <td className='p-3'>{applicante.Experience}</td>
+              {applications.map((applicante) => (
+                <tr key={applicante._id} className='hover:bg-gray-50'>
+                  <td className='p-3'>{applicante.name}</td>
+                  <td className='p-3'>{applicante.jobId.role}</td>
+                  <td className='p-3'>{applicante.experience}</td>
                   <td className='hidden lg:table-cell p-3'>
-                    {applicante.Location}
-                  </td>
-                  <td className='p-3'>{applicante.Skills.join(', ')}</td>
-                  <td className='hidden lg:table-cell p-3'>
-                    {applicante.Phone}
+                    {applicante.location}
                   </td>
                   <td className='hidden lg:table-cell p-3'>
-                    {applicante.AppliedDate}
+                    {applicante.contact}
                   </td>
-                  <td className='p-3'>
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        applicante.Status === 'Active'
-                          ? 'text-green-600 bg-green-100'
-                          : 'text-red-600 bg-red-100'
-                      }`}>
-                      {applicante.Status}
-                    </span>
-                  </td>
-                  <td className='p-3'>
-                    <button className='text-blue-600 hover:text-blue-800'>
-                      View
-                    </button>
+                  <td className='hidden lg:table-cell p-3'>
+                    {new Date(applicante.updatedAt).toLocaleDateString('EN-IN')}
                   </td>
                 </tr>
               ))}

@@ -81,9 +81,6 @@ app.get('/', (req, res) => {
 app.use('/api/it-programs', itProgramsRoutes)
 app.use('/api/non-it-programs', nonItProgramsRoutes)
 app.use('/api/forms', formRoutes)
-app.use('/api/jobs', jobsRoutes)
-app.use('/api/enrollments', enrollmentsRoutes)
-app.use('/api/applications', applicationsRoutes)
 app.use('/api/batches', batchRoutes)
 app.use('/api/blogs', blogRoutes)
 app.use('/api/candidates', candidateRoutes) // <-- ADD THIS

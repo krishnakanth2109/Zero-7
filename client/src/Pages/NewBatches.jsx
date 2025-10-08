@@ -209,7 +209,9 @@ const NewBatches = () => {
   return (
     <>
       <div className='batches-container'>
-        <h2 className='batches-title'>New Batches</h2>
+        <div className='flex'>
+          <h2 className='batches-title'>New Batches</h2>
+        </div>
         <div className='search-container'>
           <div className='search-box'>
             <input

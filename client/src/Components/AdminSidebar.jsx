@@ -261,6 +261,17 @@ export default function AdminSidebar({ isOpen }) {
               <span className='link-text'>Manage Candidates</span>
             </div>
           </Link>
+          <Link
+            to='/admin/candidateList'
+            className={`sidebar-link ${
+              isActive('/admin/candidateList') ? 'active' : ''
+            }`}
+            data-tooltip='Candidate List'>
+            <div className='dashboard-icon'>
+              <UserRound style={{ width: '18px', flexShrink: 0 }} />{' '}
+              <span className='link-text'>Candidates List</span>
+            </div>
+          </Link>
 
           <Link
             to='/admin/view-requests'

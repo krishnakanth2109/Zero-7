@@ -8,6 +8,11 @@ const InterviewSchema = new mongoose.Schema(
     companyId: { type: String, required: true },
     userId: { type: String, ref: 'recruiter' },
     date: { type: Date, required: true },
+    approvalStatus: {
+      type: Date,
+      enum: ['approved', 'rejected', 'pending'],
+      default: 'pending',
+    },
   },
   { timestamps: true },
 ) // Added timestamps for createdAt and updatedAt

@@ -1,60 +1,79 @@
 // File: backend/routes/enrollments.js
 
-import express from 'express' // <-- Changed from require to import
-const router = express.Router()
-
-import Enrollment from '../models/Enrollment.js'
+import express from 'express';
+import Enrollment from '../models/Enrollment.js';
+import Notification from '../models/notifications.js'; // <-- CORRECTED: Import path is singular
 import {
   renderEmailTemplate,
   prepareCandidateEnrollForAdmin,
   prepareStudentAcknowledgment,
-} from '../utils/emailTemplates.js'
-import transporter from '../utils/mail.js'
+} from '../utils/emailTemplates.js';
+import transporter from '../utils/mail.js';
 
-// POST a new enrollment
+const router = express.Router();
+
+/**
+ * @route   POST /api/enrollments
+ * @desc    Create a new student enrollment
+ * @access  Public
+ */
 router.post('/', async (req, res) => {
   try {
-    const { name, contact, email, location } = req.body
-    // Add a check to make sure a file was uploaded
-    const emailCheck = await Enrollment.findOne({ email })
+    const { name, email } = req.body;
+
+    // Check if the student has already enrolled
+    const emailCheck = await Enrollment.findOne({ email });
     if (emailCheck) {
-      res.send({ message: 'You are Already Enrolled' })
-    } else {
-      const newEnrollment = new Enrollment({
-        name,
-        contact,
-        email,
-        location,
-      })
-      const savedEnrollment = await newEnrollment.save()
-      // const templateData = prepareCandidateEnrollForAdmin(newEnrollment)
-      // const htmlContent = renderEmailTemplate('enrollmentAlert', templateData)
-
-      // const mailOptions = {
-      //   from: process.env.AUTH_MAIL,
-      //   to: process.env.AUTH_MAIL,
-      //   subject: 'Candidate Enrollment Form Alert',
-      //   html: htmlContent,
-      // }
-      // await transporter.sendMail(mailOptions)
-      // const template = prepareStudentAcknowledgment(newEnrollment.name)
-      // const html = renderEmailTemplate(
-      //   'enrollmentStudentConfirmation',
-      //   template,
-      // )
-      // const mail = {
-      //   from: process.env.AUTH_MAIL,
-      //   to: newEnrollment.email,
-      //   subject: 'Thank You for Your Response',
-      //   html: html,
-      // }
-      // await transporter.sendMail(mail)
-      res.status(201).json(savedEnrollment)
+      // Use return to stop execution
+      return res.status(409).json({ message: 'You are already enrolled.' });
     }
-  } catch (err) {
-    res.status(400).json({ message: err.message })
-  }
-})
+    
+    // Create and save the new enrollment record
+    const newEnrollment = new Enrollment(req.body);
+    const savedEnrollment = await newEnrollment.save();
+    
+    // --- Email Sending Logic ---
+    // 1. Send an alert email to the admin
+    const adminTemplate = prepareCandidateEnrollForAdmin(newEnrollment);
+    const adminHtml = renderEmailTemplate('enrollmentAlert', adminTemplate);
+    await transporter.sendMail({
+      from: process.env.AUTH_MAIL,
+      to: process.env.AUTH_MAIL,
+      subject: 'Candidate Enrollment Form Alert',
+      html: adminHtml,
+    });
+    
+    // 2. Send an acknowledgment email to the student
+    const studentTemplate = prepareStudentAcknowledgment(name);
+    const studentHtml = renderEmailTemplate('enrollmentStudentConfirmation', studentTemplate);
+    await transporter.sendMail({
+      from: process.env.AUTH_MAIL,
+      to: email,
+      subject: 'Thank You for Your Response',
+      html: studentHtml,
+    });
+    // --- End Email Logic ---
 
-// (Add GET route for admin)
-export default router
+    // --- Notification Logic ---
+    const io = req.app.get('io');
+    const message = `New enrollment from student: ${name}.`;
+
+    const notification = new Notification({
+        title: 'New Enrollment',
+        message: message,
+        type: 'info',
+        link: '/admin/studentenrollment'
+    });
+    await notification.save();
+    
+    io.emit('newEnrollment', { message });
+    // -------------------------
+
+    res.status(201).json(savedEnrollment);
+  } catch (err) {
+    console.error("Error creating enrollment:", err);
+    res.status(400).json({ message: "Failed to create enrollment.", error: err.message });
+  }
+});
+
+export default router;

@@ -2,38 +2,69 @@
 
 import express from 'express';
 import RequestInfo from '../models/RequestInfo.js';
-import Candidate from '../models/Candidate.js'; // <-- IMPORT CANDIDATE MODEL
-import transporter from '../utils/mail.js';     // <-- IMPORT NODEMAILER TRANSPORTER
-import { renderEmailTemplate, prepareCandidateDetailsForRequester } from '../utils/emailTemplates.js'; // <-- IMPORT EMAIL UTILS
+import Candidate from '../models/Candidate.js';
+import transporter from '../utils/mail.js';
+import { renderEmailTemplate, prepareCandidateDetailsForRequester } from '../utils/emailTemplates.js';
+import Notification from '../models/notifications.js'; // <-- CORRECTED: Import path is singular
 
 const router = express.Router();
 
-// GET all submitted requests (for admin)
+/**
+ * @route   GET /api/request-info
+ * @desc    Get all submitted requests (for admin)
+ * @access  Admin
+ */
 router.get("/", async (req, res) => {
   try {
     const requests = await RequestInfo.find().sort({ createdAt: -1 });
     res.json(requests);
-  } catch (err) {
+  } catch (err)
+ {
+    console.error("Error fetching info requests:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST a new info request (from public form)
+/**
+ * @route   POST /api/request-info
+ * @desc    Submit a new info request (from public form)
+ * @access  Public
+ */
 router.post("/", async (req, res) => {
   try {
-    const request = new RequestInfo(req.body);
-    await request.save();
+    // 1. Create and save the new request from the request body
+    const newRequest = new RequestInfo(req.body);
+    await newRequest.save();
     
     const io = req.app.get('io');
-    io.emit('newInfoRequest', { message: `New candidate request from ${req.body.companyName}` });
+    const message = `New candidate request from ${newRequest.companyName}`;
+
+    // 2. --- SAVE NOTIFICATION TO DATABASE ---
+    const notification = new Notification({
+        title: 'New Candidate Request',
+        message: message,
+        type: 'info',
+        link: '/admin/view-requests' // Link for the admin panel
+    });
+    await notification.save();
+    // -----------------------------------------
     
+    // 3. Emit a real-time event to connected admin clients
+    io.emit('newInfoRequest', { message });
+    
+    // 4. Send a success response to the client
     res.status(201).json({ message: "Request submitted successfully!" });
   } catch (err) {
+    console.error("Error submitting info request:", err);
     res.status(400).json({ error: err.message });
   }
 });
 
-// PUT (update) a request's status (for admin actions: approve/reject)
+/**
+ * @route   PUT /api/request-info/:id
+ * @desc    Update a request's status (approve/reject)
+ * @access  Admin
+ */
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -46,35 +77,27 @@ router.put("/:id", async (req, res) => {
     const updatedRequest = await RequestInfo.findByIdAndUpdate(
       id,
       { status },
-      { new: true }
+      { new: true } // This option returns the updated document
     );
 
     if (!updatedRequest) {
       return res.status(404).json({ error: "Request not found." });
     }
     
-    // --- START: NEW EMAIL SENDING LOGIC ON APPROVAL ---
+    // --- Email Sending Logic on Approval ---
     if (status === 'approved') {
         try {
-            // 1. Find the full details of the requested candidate by name
             const candidate = await Candidate.findOne({ name: updatedRequest.candidateName });
 
             if (candidate) {
-                // 2. Prepare data for the email template
                 const templateData = prepareCandidateDetailsForRequester(updatedRequest, candidate);
-
-                // 3. Render the HTML content for the email
                 const htmlContent = renderEmailTemplate('candidateDetails', templateData);
-
-                // 4. Configure mail options
                 const mailOptions = {
                     from: process.env.AUTH_MAIL,
-                    to: updatedRequest.email, // Send to the person who made the request
+                    to: updatedRequest.email,
                     subject: `Candidate Information Approved: ${candidate.name}`,
                     html: htmlContent,
                 };
-
-                // 5. Send the email
                 await transporter.sendMail(mailOptions);
                 console.log(`✅ Candidate details for '${candidate.name}' sent to ${updatedRequest.email}.`);
             } else {
@@ -82,12 +105,12 @@ router.put("/:id", async (req, res) => {
             }
         } catch (emailError) {
             console.error(`❌ Failed to send candidate details email for request ID ${id}:`, emailError);
-            // We don't fail the API request here, just log the email error.
-            // The status update itself was successful.
+            // We log the error but don't fail the API request, as the status update was successful.
         }
     }
-    // --- END: NEW EMAIL SENDING LOGIC ---
+    // --- End Email Logic ---
 
+    // Emit a real-time event for status change
     const io = req.app.get('io');
     io.emit('requestStatusChange', updatedRequest);
 

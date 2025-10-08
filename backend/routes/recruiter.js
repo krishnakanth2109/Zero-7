@@ -3,7 +3,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/User.js'; // <-- IMPORTANT: We use the unified User model
-
+import Notification from '../models/notifications.js'; 
 const router = express.Router();
 
 // GET all users with the 'recruiter' role

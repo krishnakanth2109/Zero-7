@@ -1,23 +1,20 @@
 // File: src/Pages/AdminDashboard.jsx
 
-import { useState, useEffect } from 'react'
-import Cookie from 'js-cookie'
+import { useState, useEffect } from 'react';
+import Cookie from 'js-cookie';
 import {
   Briefcase,
   UserCheck,
   UsersRound,
   Building2,
   TrendingUp,
-  BookUser, // New Icon for Interviews
-  School, // New Icon for Colleges
-  Award, // New Icon for Placements
-} from 'lucide-react'
-import api from '../api/axios' // Import the central axios instance
-import './AdminDashboard.css'
+  BookUser,
+  School,
+  Award,
+} from 'lucide-react';
+import api from '../api/axios'; // Import the central axios instance
+import './AdminDashboard.css';
 import {
-  Cell,
-  Pie,
-  PieChart,
   Area,
   AreaChart,
   XAxis,
@@ -25,19 +22,20 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from 'recharts'
+  PieChart,
+  Pie,
+  Cell, // Cell is needed for custom pie chart colors
+} from 'recharts';
 
 // Helper function to capitalize the first letter of a string
 const capitalize = (s) => {
-  if (typeof s !== 'string' || !s) return ''
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
+  if (typeof s !== 'string' || !s) return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
 
 export default function AdminDashboard() {
-  const [user, setUser] = useState({})
-  const [applications, setApplications] = useState([])
-
-  // --- START: DYNAMIC STATE FOR ALL CARDS ---
+  const [user, setUser] = useState({});
+  const [applications, setApplications] = useState([]);
   const [stats, setStats] = useState({
     totalCandidates: 0,
     activeJobs: 0,
@@ -46,44 +44,38 @@ export default function AdminDashboard() {
     colleges: 0,
     placements: 0,
     interviews: 0,
-  })
-  const [loadingStats, setLoadingStats] = useState(true)
-  // --- END: DYNAMIC STATE ---
+  });
+  const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
-    // Logic to get user role from token
-
-    const data = Cookie.get('user')
-    console.log(data)
-    const user = JSON.parse(data)
-    if (data) {
+    // Logic to get user info from cookie
+    const userData = Cookie.get('user');
+    if (userData) {
       try {
-        setUser(user)
+        setUser(JSON.parse(userData));
       } catch (error) {
-        console.error('Invalid token:', error)
+        console.error('Invalid user data in cookie:', error);
       }
     }
 
+    // Fetches the most recent applications for the table
     const fetchApplications = async () => {
       try {
-        const data = await api.get('/applications')
-        setApplications(data.data)
-        console.log(data.data)
+        const response = await api.get('/applications');
+        setApplications(response.data);
       } catch (err) {
-        console.error(err.data)
+        console.error('Failed to fetch applications:', err);
       }
-    }
+    };
 
-    // --- START: DYNAMIC DATA FETCHING LOGIC ---
+    // Fetches all statistics for the top cards
     const fetchStats = async () => {
       try {
-        // Fetch all data concurrently for better performance.
-        // Added .catch() to each promise to prevent one failed request from stopping all others.
         const [
           candidatesResponse,
           jobsResponse,
           requestsResponse,
-          numberofCompanies,
+          companiesResponse,
           interviewsResponse,
           collegeResponse,
         ] = await Promise.all([
@@ -91,58 +83,40 @@ export default function AdminDashboard() {
           api.get('/jobs').catch((e) => ({ data: [] })),
           api.get('/request-info').catch((e) => ({ data: [] })),
           api.get('/company').catch((e) => ({ data: [] })),
-          api.get('/interview').catch((e) => ({ data: [] })), // Assumes an /interviews endpoint exists
-          api.get('/college-connect').catch((e) => ({ data: [] })), // Assumes a /college-connect endpoint exists
-        ])
+          api.get('/interview').catch((e) => ({ data: [] })),
+          api.get('/college-connect').catch((e) => ({ data: [] })),
+        ]);
 
-        // Process the fetched data
         const pendingRequests = requestsResponse.data.filter(
           (req) => req.status === 'pending',
-        )
+        );
         const approvedRequests = requestsResponse.data.filter(
           (req) => req.status === 'approved',
-        )
-
-        // Count unique company names from the requests as "Partner Companies"
-        const uniqueCompanies = new Set(
-          requestsResponse.data.map((r) => r.companyName),
-        )
+        );
 
         setStats({
           totalCandidates: candidatesResponse.data.length,
           activeJobs: jobsResponse.data.length,
           benchRequests: pendingRequests.length,
-          partnerCompanies: numberofCompanies.data.length,
+          partnerCompanies: companiesResponse.data.length,
           colleges: collegeResponse.data.length,
           placements: approvedRequests.length, // Logic: a placement is an approved request
           interviews: interviewsResponse.data.length,
-        })
+        });
       } catch (error) {
-        console.error('Failed to fetch dashboard stats:', error)
+        console.error('Failed to fetch dashboard stats:', error);
       } finally {
-        setLoadingStats(false)
+        setLoadingStats(false);
       }
-    }
+    };
 
-    fetchStats()
-    fetchApplications()
-    // --- END: DYNAMIC DATA FETCHING LOGIC ---
-  }, []) // The empty array ensures this logic runs only once on component mount
+    fetchStats();
+    fetchApplications();
+  }, []);
 
-const handleSendEmail = () => {
-  const email = "myakalasumanthreddy@gmail.com";
-  const subject = encodeURIComponent("Partnership Proposal");
-  const body = encodeURIComponent(
-    "Hello,\n\nWe are excited to collaborate with your institution. Please find the attached proposal document for review.\n\nBest regards,\nM. Sumanth Reddy\nZero7 Team"
-  );
+  // --- Data and configuration for Charts ---
 
-  window.open(
-    `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`,
-    "_blank"
-  );
-};
-
-  // Hardcoded data for charts and recent applications table
+  // Data for the Area Chart (Application Trends)
   const applicationsTrend = [
     { month: 'Jan', applications: 45, interviews: 12, hired: 3 },
     { month: 'Feb', applications: 52, interviews: 18, hired: 5 },
@@ -150,46 +124,39 @@ const handleSendEmail = () => {
     { month: 'Apr', applications: 95, interviews: 32, hired: 12 },
     { month: 'May', applications: 115, interviews: 38, hired: 15 },
     { month: 'Jun', applications: 128, interviews: 45, hired: 18 },
-  ]
+  ];
 
-  const data = [
-    { name: 'Total Candidates', value: stats.totalCandidates },
+  // Data for the Pie Chart (Job Status Distribution)
+  const pieChartData = [
+    { name: 'Candidates', value: stats.totalCandidates },
     { name: 'Active Jobs', value: stats.activeJobs },
-    { name: 'Bench Requests', value: stats.benchRequests },
-    { name: 'Partner Companies', value: stats.partnerCompanies },
-    { name: 'Colleges', value: stats.colleges },
     { name: 'Placements', value: stats.placements },
     { name: 'Interviews', value: stats.interviews },
-  ]
+  ];
 
-  const RADIAN = Math.PI / 180
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+  const PIE_CHART_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const RADIAN = Math.PI / 180;
 
-  const renderCustomizedLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-  }) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
-    const x = cx + radius * Math.cos(-(midAngle ?? 0) * RADIAN)
-    const y = cy + radius * Math.sin(-(midAngle ?? 0) * RADIAN)
+  // Custom label renderer for the Pie Chart
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     return (
       <text
         x={x}
         y={y}
-        fill='white'
+        fill="white"
         textAnchor={x > cx ? 'start' : 'end'}
-        dominantBaseline='central'>
-        {`${((percent ?? 1) * 100).toFixed(0)}%`}
+        dominantBaseline="central"
+      >
+        {`${(percent * 100).toFixed(0)}%`}
       </text>
-    )
-  }
+    );
+  };
 
-  // Reusable card component to reduce repetition
+  // Reusable StatCard component
   const StatCard = ({ title, value, subtext, icon, percentage }) => (
     <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1'>
       <div className='flex items-center justify-between'>
@@ -204,7 +171,7 @@ const handleSendEmail = () => {
         <p className='text-sm text-[#64748b]'>{subtext}</p>
       </div>
     </div>
-  )
+  );
 
   return (
     <div className='flex flex-col gap-4 overflow-auto'>
@@ -222,153 +189,64 @@ const handleSendEmail = () => {
 
       {/* Card Container */}
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2'>
-        <StatCard
-          title='Total Candidates'
-          value={stats.totalCandidates}
-          subtext='on bench'
-          icon={<UsersRound className='stroke-red-500 stroke-2' />}
-          percentage='+12%'
-        />
-        <StatCard
-          title='Active Jobs'
-          value={stats.activeJobs}
-          subtext='new this week'
-          icon={<Briefcase className='stroke-red-500 stroke-2' />}
-          percentage='+3%'
-        />
-        <StatCard
-          title='Bench Requests'
-          value={stats.benchRequests}
-          subtext='awaiting approval'
-          icon={<UserCheck className='stroke-red-500 stroke-2' />}
-          percentage={`+${stats.benchRequests}`}
-        />
-        <StatCard
-          title='Partner Companies'
-          value={stats.partnerCompanies}
-          subtext='actively hiring'
-          icon={<Building2 className='stroke-red-500 stroke-2' />}
-          percentage='+12%'
-        />
-        <StatCard
-          title='Colleges'
-          value={stats.colleges}
-          subtext='Colleges under us'
-          icon={<School className='stroke-red-500 stroke-2' />}
-          percentage='+12%'
-        />
-        <StatCard
-          title='Placements'
-          value={stats.placements}
-          subtext='Candidates Placed'
-          icon={<Award className='stroke-red-500 stroke-2' />}
-          percentage='+12%'
-        />
-        <StatCard
-          title='Interviews'
-          value={stats.interviews}
-          subtext='Interviews scheduled'
-          icon={<BookUser className='stroke-red-500 stroke-2' />}
-          percentage='+12%'
-        />
+        <StatCard title='Total Candidates' value={stats.totalCandidates} subtext='on bench' icon={<UsersRound className='stroke-red-500 stroke-2' />} percentage='+12%' />
+        <StatCard title='Active Jobs' value={stats.activeJobs} subtext='new this week' icon={<Briefcase className='stroke-red-500 stroke-2' />} percentage='+3%' />
+        <StatCard title='Bench Requests' value={stats.benchRequests} subtext='awaiting approval' icon={<UserCheck className='stroke-red-500 stroke-2' />} percentage={`+${stats.benchRequests}`} />
+        <StatCard title='Partner Companies' value={stats.partnerCompanies} subtext='actively hiring' icon={<Building2 className='stroke-red-500 stroke-2' />} percentage='+12%' />
+        <StatCard title='Colleges' value={stats.colleges} subtext='Colleges under us' icon={<School className='stroke-red-500 stroke-2' />} percentage='+12%' />
+        <StatCard title='Placements' value={stats.placements} subtext='Candidates Placed' icon={<Award className='stroke-red-500 stroke-2' />} percentage='+12%' />
+        <StatCard title='Interviews' value={stats.interviews} subtext='Interviews scheduled' icon={<BookUser className='stroke-red-500 stroke-2' />} percentage='+12%' />
       </div>
 
       {/* Charts */}
       <div className='flex flex-col md:flex-row gap-4 mt-4'>
+        {/* Area Chart */}
         <div className='bg-white rounded-xl w-full md:w-1/2 p-4'>
           <div className='flex gap-2 text-xl font-bold mb-4'>
             <TrendingUp className='stroke-2 stroke-red-500' />
             Application Trends
           </div>
           <ResponsiveContainer height={300} width='100%'>
-            <AreaChart
-              data={applicationsTrend}
-              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <AreaChart data={applicationsTrend} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
-                <linearGradient id='applications' x1='0' y1='0' x2='0' y2='1'>
-                  <stop offset='5%' stopColor='#dc2626' stopOpacity={0.8} />
-                  <stop offset='95%' stopColor='#dc2626' stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id='interviews' x1='0' y1='0' x2='0' y2='1'>
-                  <stop offset='5%' stopColor='#0da2e7' stopOpacity={0.8} />
-                  <stop offset='95%' stopColor='#0da2e7' stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id='hired' x1='0' y1='0' x2='0' y2='1'>
-                  <stop offset='5%' stopColor='#16a34a' stopOpacity={0.8} />
-                  <stop offset='95%' stopColor='#16a34a' stopOpacity={0} />
-                </linearGradient>
+                <linearGradient id='applications' x1='0' y1='0' x2='0' y2='1'><stop offset='5%' stopColor='#dc2626' stopOpacity={0.8} /><stop offset='95%' stopColor='#dc2626' stopOpacity={0} /></linearGradient>
+                <linearGradient id='interviews' x1='0' y1='0' x2='0' y2='1'><stop offset='5%' stopColor='#0da2e7' stopOpacity={0.8} /><stop offset='95%' stopColor='#0da2e7' stopOpacity={0} /></linearGradient>
+                <linearGradient id='hired' x1='0' y1='0' x2='0' y2='1'><stop offset='5%' stopColor='#16a34a' stopOpacity={0.8} /><stop offset='95%' stopColor='#16a34a' stopOpacity={0} /></linearGradient>
               </defs>
               <XAxis dataKey='month' />
               <YAxis />
-              <CartesianGrid
-                horizontal={false}
-                vertical={false}
-                strokeDasharray='3 3'
-              />
+              <CartesianGrid horizontal={false} vertical={false} strokeDasharray='3 3' />
               <Tooltip />
-              <Area
-                type='monotone'
-                dataKey='applications'
-                stroke='#dc2626'
-                fillOpacity={1}
-                fill='url(#applications)'
-              />
-              <Area
-                type='monotone'
-                dataKey='interviews'
-                stroke='#0da2e7'
-                fillOpacity={1}
-                fill='url(#interviews)'
-              />
-              <Area
-                type='monotone'
-                dataKey='hired'
-                stroke='#16a34a'
-                fillOpacity={1}
-                fill='url(#hired)'
-              />
+              <Area type='monotone' dataKey='applications' stroke='#dc2626' fillOpacity={1} fill='url(#applications)' />
+              <Area type='monotone' dataKey='interviews' stroke='#0da2e7' fillOpacity={1} fill='url(#interviews)' />
+              <Area type='monotone' dataKey='hired' stroke='#16a34a' fillOpacity={1} fill='url(#hired)' />
             </AreaChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Pie Chart */}
         <div className='bg-white rounded-xl w-full md:w-1/2 p-4'>
-          <div className='flex gap-2 text-xl font-bold'>
+          <div className='flex gap-2 text-xl font-bold mb-4'>
             <Briefcase className='stroke-2 stroke-red-500' />
-            Job Status Distribution
+            Hiring Overview
           </div>
-          {/* Placeholder for a second chart */}
-          <ResponsiveContainer height={400} width='100%'>
-            <PieChart width={400} height={400}>
+          <ResponsiveContainer height={300} width='100%'>
+            <PieChart>
               <Pie
-                data={data}
+                data={pieChartData}
                 cx='50%'
                 cy='50%'
                 labelLine={false}
                 label={renderCustomizedLabel}
-                outerRadius={80}
+                outerRadius={120}
                 fill='#8884d8'
-                dataKey='value'>
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${entry.name}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
+                dataKey='value'
+              >
+                {pieChartData.map((entry, index) => (
+                  <Cell key={`cell-${entry.name}`} fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip
-                // Optional: Customize content
-                formatter={(value, name, props) => [
-                  `${value} persons`,
-                  props.payload.name,
-                ]}
-                // Optional: Customize style
-                itemStyle={{ color: '#333' }}
-                contentStyle={{
-                  backgroundColor: '#fff',
-                  border: '1px solid #ccc',
-                  borderRadius: '5px',
-                }}
-                labelStyle={{ fontWeight: 'bold' }}
-              />
+              <Tooltip />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -384,41 +262,23 @@ const handleSendEmail = () => {
           <table className='w-full'>
             <thead className='bg-gray-50'>
               <tr>
-                <th className='p-3 text-left text-sm font-semibold'>
-                  Candidate
-                </th>
-                <th className='p-3 text-left text-sm font-semibold'>
-                  Position
-                </th>
-                <th className='p-3 text-left text-sm font-semibold'>
-                  Experience
-                </th>
-                <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
-                  Location
-                </th>
-                <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
-                  Phone
-                </th>
-                <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
-                  Applied Date
-                </th>
+                <th className='p-3 text-left text-sm font-semibold'>Candidate</th>
+                <th className='p-3 text-left text-sm font-semibold'>Position</th>
+                <th className='p-3 text-left text-sm font-semibold'>Experience</th>
+                <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>Location</th>
+                <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>Phone</th>
+                <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>Applied Date</th>
               </tr>
             </thead>
             <tbody className='divide-y divide-gray-100'>
-              {applications.map((applicante) => (
-                <tr key={applicante._id} className='hover:bg-gray-50'>
-                  <td className='p-3'>{applicante.name}</td>
-                  <td className='p-3'>{applicante.jobId.role}</td>
-                  <td className='p-3'>{applicante.experience}</td>
-                  <td className='hidden lg:table-cell p-3'>
-                    {applicante.location}
-                  </td>
-                  <td className='hidden lg:table-cell p-3'>
-                    {applicante.contact}
-                  </td>
-                  <td className='hidden lg:table-cell p-3'>
-                    {new Date(applicante.updatedAt).toLocaleDateString('EN-IN')}
-                  </td>
+              {applications.map((applicant) => (
+                <tr key={applicant._id} className='hover:bg-gray-50'>
+                  <td className='p-3'>{applicant.name}</td>
+                  <td className='p-3'>{applicant.jobId?.role || 'N/A'}</td>
+                  <td className='p-3'>{applicant.experience}</td>
+                  <td className='hidden lg:table-cell p-3'>{applicant.location}</td>
+                  <td className='hidden lg:table-cell p-3'>{applicant.contact}</td>
+                  <td className='hidden lg:table-cell p-3'>{new Date(applicant.createdAt).toLocaleDateString('en-IN')}</td>
                 </tr>
               ))}
             </tbody>
@@ -426,5 +286,5 @@ const handleSendEmail = () => {
         </div>
       </div>
     </div>
-  )
+  );
 }

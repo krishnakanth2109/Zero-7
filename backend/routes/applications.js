@@ -1,62 +1,94 @@
-// File: backend/routes/applications.js (Corrected for Resume URL)
+// File: backend/routes/applications.js
 
 import express from 'express';
-const router = express.Router();
 import Application from '../models/Application.js';
-// We no longer need 'upload' from multer for this route
-// import upload from '../middleware/upload.js'; 
+import Notification from '../models/notifications.js'; // <-- CORRECTED: Path is singular
 
-// GET all applications
+const router = express.Router();
+
+/**
+ * @route   GET /api/applications
+ * @desc    Get all applications, populated with job role
+ * @access  Admin
+ */
 router.get('/', async (req, res) => {
     try {
-        const applications = await Application.find().sort({ createdAt: -1 }).populate('jobId', 'role');
+        const applications = await Application.find()
+            .sort({ createdAt: -1 })
+            .populate('jobId', 'role'); // Populates the 'role' field from the Job model
         res.json(applications);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        console.error("Error fetching applications:", err);
+        res.status(500).json({ message: "Server error while fetching applications." });
     }
 });
 
-// --- FIX: Removed the 'upload.single('resume')' middleware ---
-// POST a new application
+/**
+ * @route   POST /api/applications
+ * @desc    Create a new job application
+ * @access  Public
+ */
 router.post('/', async (req, res) => {
     try {
-        // All data, including the resume URL, is now in req.body
-        const { jobId, name, contact, email, experience, currentSalary, expectedSalary, location, resume } = req.body;
+        const { name, resume } = req.body;
         
+        // Basic validation
         if (!resume) {
             return res.status(400).json({ message: 'A link to the resume is required.' });
         }
 
-        // Create a new application instance with the data from the request body
-        const newApplication = new Application({
-            jobId, name, contact, email, experience, currentSalary, expectedSalary, location, resume
-        });
-
+        // Create and save the new application
+        const newApplication = new Application(req.body);
         const savedApplication = await newApplication.save();
 
-        // --- Notification Logic (Remains the same) ---
-        const io = req.app.get('io');
+        // Populate job details to get the role name for the notification
         await savedApplication.populate('jobId', 'role');
-        io.emit('newApplication', { 
-            message: `New application from ${name} for the ${savedApplication.jobId.role} role.` 
+        
+        const io = req.app.get('io');
+        const message = `New application from ${name} for the ${savedApplication.jobId.role} role.`;
+
+        // --- Save Notification to Database ---
+        const notification = new Notification({
+            title: 'New Job Application',
+            message: message,
+            type: 'success',
+            link: '/admin/applications'
         });
+        await notification.save();
+        // ------------------------------------
+
+        // Emit a real-time event to connected admin clients
+        io.emit('newApplication', { message });
 
         res.status(201).json(savedApplication);
     } catch (err) {
         console.error("Error saving application:", err);
-        res.status(400).json({ message: err.message });
+        // Provide a more specific error for duplicate entries if applicable
+        if (err.code === 11000) {
+            return res.status(409).json({ message: "Duplicate application detected." });
+        }
+        res.status(400).json({ message: "Failed to create application.", error: err.message });
     }
 });
 
-// DELETE /api/applications/:id
+/**
+ * @route   DELETE /api/applications/:id
+ * @desc    Delete an application by its ID
+ * @access  Admin
+ */
 router.delete('/:id', async (req, res) => {
   try {
-    await Application.findByIdAndDelete(req.params.id)
-    res.json({ message: 'Application deleted successfully' })
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to delete application' })
-  }
-})
+    const deletedApplication = await Application.findByIdAndDelete(req.params.id);
+    
+    if (!deletedApplication) {
+        return res.status(404).json({ message: "Application not found." });
+    }
 
+    res.json({ message: 'Application deleted successfully' });
+  } catch (err) {
+    console.error("Error deleting application:", err);
+    res.status(500).json({ message: 'Failed to delete application' });
+  }
+});
 
 export default router;

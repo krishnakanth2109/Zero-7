@@ -9,7 +9,7 @@ import {
   renderEmailTemplate,
   prepareCandidateInterview,
 } from '../utils/emailTemplates.js'
-
+import Notification from '../models/notifications.js'; 
 const router = express.Router()
 
 router.get('/', async (request, response) => {

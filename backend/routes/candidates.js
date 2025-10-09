@@ -55,20 +55,7 @@ router.get('/', async (req, res) => {
           email: 1,
           skills: 1,
           exp: 1,
-          userName: {
-            $cond: {
-              if: { $eq: ['$userDetails.role', 'recruiter'] },
-              then: '$userDetails.name',
-              else: null,
-            },
-          },
-          userRole: {
-            $cond: {
-              if: { $eq: ['$userDetails.role', 'recruiter'] },
-              then: '$userDetails.role',
-              else: null,
-            },
-          },
+          userName: '$userDetails.name',
         },
       },
     ])
@@ -119,20 +106,7 @@ router.get('/pendings', async (req, res) => {
           skills: 1,
           exp: 1,
           status: 1,
-          userName: {
-            $cond: {
-              if: { $eq: ['$userDetails.role', 'recruiter'] },
-              then: '$userDetails.name',
-              else: null,
-            },
-          },
-          userRole: {
-            $cond: {
-              if: { $eq: ['$userDetails.role', 'recruiter'] },
-              then: '$userDetails.role',
-              else: null,
-            },
-          },
+          userName: '$userDetails.name',
         },
       },
     ])

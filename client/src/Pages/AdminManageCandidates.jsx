@@ -2,12 +2,13 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { Edit, Trash2, Download, Upload, PlusCircle, X } from 'lucide-react'
 import api from '../api/axios'
+import Cookie from 'js-cookie'
 import './AdminManageCandidates.css'
 import * as XLSX from 'xlsx' // Import for Excel functionality
 
 export default function AdminManageCandidates() {
   const [candidates, setCandidates] = useState([])
-  const [userRole, setUserRole] = useState([])
+  const [userId, setUserId] = useState()
   const [formData, setFormData] = useState({
     userId: '',
     name: '',
@@ -42,9 +43,9 @@ export default function AdminManageCandidates() {
   }
 
   const fetchRecruiter = async () => {
-    const { data } = await api.get('/candidates/search')
-    setUserRole(data.user)
-    console.log(data.user)
+    const data = Cookie.get('user')
+    const res = JSON.parse(data)
+    setUserId(res.id)
   }
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export default function AdminManageCandidates() {
   const handleOpenAddModal = () => {
     setEditingId(null)
     setFormData({
-      userId: '',
+      userId: userId,
       name: '',
       role: '',
       skills: '',
@@ -83,6 +84,7 @@ export default function AdminManageCandidates() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    console.log(formData)
     try {
       if (editingId) {
         await api.put(`/candidates/${editingId}`, formData)
@@ -280,22 +282,14 @@ export default function AdminManageCandidates() {
             </div>
             <form onSubmit={handleSubmit} className='candidate-form-modal'>
               <div className='form-group'>
-                <label>Recruiter Id</label>
-                <select
+                <label htmlFor='user-id'>Recruiter Id</label>
+                <input
                   name='userId'
-                  value={formData.userId}
+                  id='user-id'
+                  value={userId}
+                  readOnly
                   onChange={handleChange}
-                  required>
-                  <option value=' '>select Recruiter</option>
-                  {userRole &&
-                    userRole.map((user) => {
-                      return (
-                        <option key={user._id} value={user._id}>
-                          {user.name}
-                        </option>
-                      )
-                    })}
-                </select>
+                />
               </div>
               <div className='form-group'>
                 <label>Name</label>

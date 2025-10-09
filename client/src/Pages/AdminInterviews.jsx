@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import api from '../api/axios'
 import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
+import Cookie from 'js-cookie'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
 // Setup the localizer by providing the moment Object
@@ -14,6 +15,7 @@ const InterviewTracker = () => {
   const [companyOptions, setCompanyOptions] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [user, setUser] = useState({})
 
   const [showAddForm, setShowAddForm] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -55,6 +57,9 @@ const InterviewTracker = () => {
   useEffect(() => {
     fetchInterviews()
     fetchOptions()
+    const data = Cookie.get('user')
+    const res = JSON.parse(data)
+    setUser(res.id)
   }, [])
 
   const [newInterview, setNewInterview] = useState({
@@ -62,10 +67,12 @@ const InterviewTracker = () => {
     companyName: '',
     job: '', // This state holds the Job ID
     status: 'Scheduled',
+    interviewLevel: '',
     date: '',
   })
 
   const [editStatus, setEditStatus] = useState('')
+  const [editInterviewLevel, setEditInterviewLevel] = useState('')
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -120,6 +127,7 @@ const InterviewTracker = () => {
 
     setSubmitting(true)
     const sendInterview = {
+      userId: user,
       candidateId: newInterview.candidateName,
       jobId: newInterview.job,
       status: newInterview.status,
@@ -135,6 +143,7 @@ const InterviewTracker = () => {
         companyName: '',
         job: '',
         status: 'Scheduled',
+        interviewLevel: '',
         date: '',
       })
       fetchInterviews() // Re-fetch interviews to update the list and calendar
@@ -151,11 +160,16 @@ const InterviewTracker = () => {
   const openEditModal = (interview) => {
     setCurrentEditInterview(interview)
     setEditStatus(interview.status)
+    setEditInterviewLevel(interview.interviewLevel)
     setShowEditModal(true)
   }
 
   const handleEditStatusChange = (e) => {
     setEditStatus(e.target.value)
+  }
+
+  const handleEditInteviewLevelChange = (e) => {
+    setEditInterviewLevel(e.target.value)
   }
 
   const handleEditSubmit = async (e) => {
@@ -166,6 +180,8 @@ const InterviewTracker = () => {
     try {
       await api.patch(`/interview/${currentEditInterview._id}`, {
         status: editStatus,
+        interviewLevel: editInterviewLevel,
+        approvalStatus: 'pending',
       })
       setShowEditModal(false)
       setCurrentEditInterview(null)
@@ -423,6 +439,29 @@ const InterviewTracker = () => {
                   <option value='Rejected'>Rejected</option>
                 </select>
               </div>
+              {/*  */}
+              <div className='lg:col-span-2 space-y-2'>
+                <label
+                  htmlFor='interviewLevel'
+                  className='block text-sm font-semibold text-gray-700'>
+                  Interview Level
+                </label>
+                <select
+                  id='interviewLevel'
+                  name='interviewLevel'
+                  value={newInterview.interviewLevel}
+                  onChange={handleAddInputChange}
+                  className='w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white shadow-sm'>
+                  <option value='L1' default>
+                    L1
+                  </option>
+                  <option value='L2'>L2</option>
+                  <option value='L3'>L3</option>
+                  <option value='L4'>L4</option>
+                  <option value='L5'>L5</option>
+                  <option value='HR'>HR Round</option>
+                </select>
+              </div>
 
               <div className='lg:col-span-2 flex space-x-4 pt-4'>
                 <button
@@ -484,6 +523,9 @@ const InterviewTracker = () => {
                     Status
                   </th>
                   <th className='px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider'>
+                    Interview Level
+                  </th>
+                  <th className='px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider'>
                     Date
                   </th>
                   <th className='px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider'>
@@ -529,6 +571,11 @@ const InterviewTracker = () => {
                           )}`}></span>
                         {interview.status}
                       </span>
+                    </td>
+                    <td className='px-6 py-4 whitespace-nowrap'>
+                      <div className='text-sm text-gray-600'>
+                        {interview.interviewLevel}
+                      </div>
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
                       {new Date(interview.date).toLocaleDateString('en-US', {
@@ -641,6 +688,26 @@ const InterviewTracker = () => {
                     <option value='Pending Feedback'>Pending Feedback</option>
                     <option value='Offer Extended'>Offer Extended</option>
                     <option value='Rejected'>Rejected</option>
+                  </select>
+                </div>
+                <div className='mb-6'>
+                  <label
+                    htmlFor='editInterviewLevel'
+                    className='block text-sm font-semibold text-gray-700 mb-3'>
+                    Select New Interview Level
+                  </label>
+                  <select
+                    id='editInterviewLevel'
+                    name='editInterviewLevel'
+                    value={editInterviewLevel}
+                    onChange={handleEditInteviewLevelChange}
+                    className='w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white shadow-sm'>
+                    <option value='L1'>L1</option>
+                    <option value='L2'>L2</option>
+                    <option value='L3'>L3</option>
+                    <option value='L4'>L4</option>
+                    <option value='L5'>L5</option>
+                    <option value='HR'>HR Round</option>
                   </select>
                 </div>
                 <div className='flex space-x-4'>

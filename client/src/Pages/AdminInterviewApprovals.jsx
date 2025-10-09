@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import api from '../api/axios';
-import { CheckCircle, XCircle, Search, Filter } from 'lucide-react';
+import { CheckCircle, XCircle, Search, Filter, Download } from 'lucide-react'; // Added Download icon
 
 // Custom Alert Component
 const Alert = ({ message, type, onClose }) => {
@@ -31,7 +31,8 @@ const Alert = ({ message, type, onClose }) => {
 const AdminInterviewApprovals = () => {
   const [interviews, setInterviews] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'pending', 'approved', 'rejected'
+  // Changed filterStatus to an array to hold multiple selected statuses
+  const [selectedApprovalStatuses, setSelectedApprovalStatuses] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('info');
@@ -84,7 +85,6 @@ const AdminInterviewApprovals = () => {
           i._id === interviewId ? { ...i, approvalStatus: 'approved' } : i,
         ),
       );
-      // Counts will automatically re-calculate via useMemo when interviews state updates
       showCustomAlert('Interview approved successfully!', 'success');
     } catch (error) {
       console.error('Error approving interview:', error);
@@ -102,12 +102,22 @@ const AdminInterviewApprovals = () => {
           i._id === interviewId ? { ...i, approvalStatus: 'rejected' } : i,
         ),
       );
-      // Counts will automatically re-calculate via useMemo when interviews state updates
       showCustomAlert('Interview rejected successfully!', 'success');
     } catch (error) {
       console.error('Error rejecting interview:', error);
       showCustomAlert('Failed to reject interview.', 'error');
     }
+  };
+
+  // --- Handle Checkbox Change ---
+  const handleApprovalStatusCheckboxChange = (status) => {
+    setSelectedApprovalStatuses((prevSelected) => {
+      if (prevSelected.includes(status)) {
+        return prevSelected.filter((s) => s !== status); // Remove if already selected
+      } else {
+        return [...prevSelected, status]; // Add if not selected
+      }
+    });
   };
 
   // --- Status Badge Styling ---
@@ -146,12 +156,67 @@ const AdminInterviewApprovals = () => {
         interviewStatus.includes(lowerCaseSearchTerm) || // Check general interview status
         approvalStatus.includes(lowerCaseSearchTerm); // Check approval status
 
-      const matchesFilter =
-        filterStatus === 'all' || interview.approvalStatus === filterStatus;
+      // Check if the interview's approvalStatus is in the selectedApprovalStatuses array
+      const matchesApprovalStatus =
+        selectedApprovalStatuses.length === 0 || // If no checkboxes are selected, show all
+        selectedApprovalStatuses.includes(interview.approvalStatus);
 
-      return matchesSearch && matchesFilter;
+      return matchesSearch && matchesApprovalStatus;
     });
-  }, [interviews, searchTerm, filterStatus]);
+  }, [interviews, searchTerm, selectedApprovalStatuses]); // Dependency on selectedApprovalStatuses
+
+  // --- Export to CSV Functionality ---
+  const handleExport = () => {
+    if (filteredInterviews.length === 0) {
+      showCustomAlert('No data to export.', 'info');
+      return;
+    }
+
+    // Define CSV headers - these match your table headers
+    const headers = [
+      'Candidate Name',
+      'Company Name',
+      'Role',
+      'Interview Level',
+      'Recruiter',
+      'Status',
+      'Approval Status',
+      // Add other relevant fields if needed for export
+    ];
+
+    // Map your filteredInterviews data to the CSV format
+    const csvRows = filteredInterviews.map(interview => {
+      // Ensure values are strings and properly quoted to handle commas within fields
+      return [
+        `"${String(interview.candidateName || '').replace(/"/g, '""')}"`,
+        `"${String(interview.companyName || '').replace(/"/g, '""')}"`,
+        `"${String(interview.jobRole || '').replace(/"/g, '""')}"`,
+        `"${String(interview.interviewLevel || '').replace(/"/g, '""')}"`,
+        `"${String(interview.userName || '').replace(/"/g, '""')}"`,
+        `"${String(interview.status || '').replace(/"/g, '""')}"`,
+        `"${String(interview.approvalStatus || '').replace(/"/g, '""')}"`,
+      ].join(','); // Join fields with a comma
+    });
+
+    // Combine headers and rows
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+
+    // Create a Blob and download it
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) { // Feature detection for download attribute
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'interview_approvals.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showCustomAlert('Data exported successfully!', 'success');
+    } else {
+      showCustomAlert('Your browser does not support downloading files directly.', 'error');
+    }
+  };
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
@@ -198,7 +263,7 @@ const AdminInterviewApprovals = () => {
         </div>
       </div>
 
-      {/* Search and Filter Section */}
+      {/* Search, Filter Checkboxes, and Export Section */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0 sm:space-x-4">
         <div className="relative w-full sm:w-1/2">
           <input
@@ -211,27 +276,48 @@ const AdminInterviewApprovals = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
         </div>
 
-        <div className="relative w-full sm:w-auto">
-          <select
-            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="all">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg
-              className="fill-current h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-            </svg>
-          </div>
+        {/* Checkbox Filters for Approval Status */}
+        <div className="flex items-center space-x-4">
+          <label className="flex items-center space-x-2 text-gray-700">
+            <input
+              type="checkbox"
+              className="form-checkbox h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+              value="approved"
+              checked={selectedApprovalStatuses.includes('approved')}
+              onChange={() => handleApprovalStatusCheckboxChange('approved')}
+            />
+            <span>Approved</span>
+          </label>
+          <label className="flex items-center space-x-2 text-gray-700">
+            <input
+              type="checkbox"
+              className="form-checkbox h-4 w-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
+              value="pending"
+              checked={selectedApprovalStatuses.includes('pending')}
+              onChange={() => handleApprovalStatusCheckboxChange('pending')}
+            />
+            <span>Pending</span>
+          </label>
+          <label className="flex items-center space-x-2 text-gray-700">
+            <input
+              type="checkbox"
+              className="form-checkbox h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              value="rejected"
+              checked={selectedApprovalStatuses.includes('rejected')}
+              onChange={() => handleApprovalStatusCheckboxChange('rejected')}
+            />
+            <span>Rejected</span>
+          </label>
         </div>
+
+        {/* Export Button */}
+        <button
+          onClick={handleExport}
+          className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 mt-4 sm:mt-0"
+          title="Export to CSV"
+        >
+          <Download className="h-5 w-5 mr-2" /> Export
+        </button>
       </div>
 
       {/* Responsive Table Container */}

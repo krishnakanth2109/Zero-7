@@ -201,7 +201,7 @@ router.post('/', async (req, res) => {
       subject: 'Candidate Bench List',
       html: htmlContent,
     }
-    await transporter.sendMail(mailOptions)
+    // await transporter.sendMail(mailOptions)
     // --- End Email Logic ---
 
     // --- Notification Logic ---

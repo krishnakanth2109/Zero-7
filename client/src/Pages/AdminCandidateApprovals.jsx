@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import api from '../api/axios';
-import { CheckCircle, XCircle, Search, Filter } from 'lucide-react'; // Import Filter icon
+import { CheckCircle, XCircle, Search, Filter, Download } from 'lucide-react'; // Added Download icon
 
 // Custom Alert Component
 const Alert = ({ message, type, onClose }) => {
@@ -32,6 +32,9 @@ const AdminCandidateApprovals = () => {
   const [candidates, setCandidates] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'pending', 'approved', 'rejected'
+  const [filterRole, setFilterRole] = useState('all'); // New filter for role
+  const [filterLocation, setFilterLocation] = useState('all'); // New filter for location
+  const [filterRecruiter, setFilterRecruiter] = useState('all'); // New filter for recruiter
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('info');
@@ -73,6 +76,23 @@ const AdminCandidateApprovals = () => {
   useEffect(() => {
     fetchData();
   }, []); // Empty dependency array means this runs once on mount
+
+  // Extract unique values for filters (memoized for performance)
+  const uniqueRoles = useMemo(() => {
+    const roles = new Set(candidates.map(c => c.role).filter(Boolean));
+    return ['all', ...Array.from(roles).sort()];
+  }, [candidates]);
+
+  const uniqueLocations = useMemo(() => {
+    const locations = new Set(candidates.map(c => c.location).filter(Boolean));
+    return ['all', ...Array.from(locations).sort()];
+  }, [candidates]);
+
+  const uniqueRecruiters = useMemo(() => {
+    const recruiters = new Set(candidates.map(c => c.userName).filter(Boolean));
+    return ['all', ...Array.from(recruiters).sort()];
+  }, [candidates]);
+
 
   // --- Action Handlers ---
   const handleApprove = async (candidateId) => {
@@ -122,20 +142,87 @@ const AdminCandidateApprovals = () => {
 
   // Memoized filtered and searched candidates
   const filteredCandidates = useMemo(() => {
-    return candidates.filter((candidate) => {
-      const matchesSearch =
-        candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.skills.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (candidate.userName && candidate.userName.toLowerCase().includes(searchTerm.toLowerCase()));
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
-      const matchesFilter =
+    return candidates.filter((candidate) => {
+      // Search term matching
+      const matchesSearch =
+        (candidate.name && candidate.name.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (candidate.role && candidate.role.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (candidate.location && candidate.location.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (candidate.skills && candidate.skills.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (candidate.userName && candidate.userName.toLowerCase().includes(lowerCaseSearchTerm));
+
+      // Status filter
+      const matchesStatus =
         filterStatus === 'all' || candidate.status === filterStatus;
 
-      return matchesSearch && matchesFilter;
+      // Role filter
+      const matchesRole =
+        filterRole === 'all' || (candidate.role && candidate.role === filterRole);
+
+      // Location filter
+      const matchesLocation =
+        filterLocation === 'all' || (candidate.location && candidate.location === filterLocation);
+
+      // Recruiter filter
+      const matchesRecruiter =
+        filterRecruiter === 'all' || (candidate.userName && candidate.userName === filterRecruiter);
+
+      return matchesSearch && matchesStatus && matchesRole && matchesLocation && matchesRecruiter;
     });
-  }, [candidates, searchTerm, filterStatus]);
+  }, [candidates, searchTerm, filterStatus, filterRole, filterLocation, filterRecruiter]);
+
+  // --- Export to CSV Functionality ---
+  const handleExport = () => {
+    if (filteredCandidates.length === 0) {
+      showCustomAlert('No data to export based on current filters.', 'info');
+      return;
+    }
+
+    // Define CSV headers - these match your table headers
+    const headers = [
+      'Name',
+      'Role',
+      'Location',
+      'Skills',
+      'Recruiter',
+      'Status',
+    ];
+
+    // Map your filteredCandidates data to the CSV format
+    const csvRows = filteredCandidates.map(candidate => {
+      // Ensure values are strings and properly quoted to handle commas within fields
+      return [
+        `"${String(candidate.name || '').replace(/"/g, '""')}"`,
+        `"${String(candidate.role || '').replace(/"/g, '""')}"`,
+        `"${String(candidate.location || '').replace(/"/g, '""')}"`,
+        `"${String(candidate.skills || '').replace(/"/g, '""')}"`,
+        `"${String(candidate.userName || 'N/A').replace(/"/g, '""')}"`,
+        `"${String(candidate.status || '').replace(/"/g, '""')}"`,
+      ].join(','); // Join fields with a comma
+    });
+
+    // Combine headers and rows
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+
+    // Create a Blob and download it
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) { // Feature detection for download attribute
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'candidate_approvals.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showCustomAlert('Data exported successfully!', 'success');
+    } else {
+      showCustomAlert('Your browser does not support downloading files directly.', 'error');
+    }
+  };
+
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
@@ -182,9 +269,9 @@ const AdminCandidateApprovals = () => {
         </div>
       </div>
 
-      {/* Search and Filter Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0 sm:space-x-4">
-        <div className="relative w-full sm:w-1/2">
+      {/* Search, Filter, and Export Section */}
+      <div className="flex flex-col md:flex-row flex-wrap justify-between items-center mb-6 space-y-4 md:space-y-0 md:space-x-4">
+        <div className="relative w-full md:w-1/3 lg:w-1/4">
           <input
             type="text"
             placeholder="Search candidates by name, role, skills..."
@@ -195,7 +282,8 @@ const AdminCandidateApprovals = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
         </div>
 
-        <div className="relative w-full sm:w-auto">
+        {/* Status Filter */}
+        <div className="relative w-full md:w-auto min-w-[150px]">
           <select
             className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
             value={filterStatus}
@@ -216,6 +304,87 @@ const AdminCandidateApprovals = () => {
             </svg>
           </div>
         </div>
+
+        {/* Role Filter */}
+        <div className="relative w-full md:w-auto min-w-[150px]">
+          <select
+            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            value={filterRole}
+            onChange={(e) => setFilterRole(e.target.value)}
+          >
+            {uniqueRoles.map((role) => (
+              <option key={role} value={role}>
+                {role === 'all' ? 'All Roles' : role}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <svg
+              className="fill-current h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Location Filter */}
+        <div className="relative w-full md:w-auto min-w-[150px]">
+          <select
+            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            value={filterLocation}
+            onChange={(e) => setFilterLocation(e.target.value)}
+          >
+            {uniqueLocations.map((location) => (
+              <option key={location} value={location}>
+                {location === 'all' ? 'All Locations' : location}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <svg
+              className="fill-current h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Recruiter Filter */}
+        <div className="relative w-full md:w-auto min-w-[150px]">
+          <select
+            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            value={filterRecruiter}
+            onChange={(e) => setFilterRecruiter(e.target.value)}
+          >
+            {uniqueRecruiters.map((recruiter) => (
+              <option key={recruiter} value={recruiter}>
+                {recruiter === 'all' ? 'All Recruiters' : recruiter}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <svg
+              className="fill-current h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Export Button - Moved to this section for better grouping */}
+        <button
+          onClick={handleExport}
+          className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 w-full md:w-auto mt-4 md:mt-0"
+          title="Export to CSV"
+        >
+          <Download className="h-5 w-5 mr-2" /> Export
+        </button>
       </div>
 
       {/* Responsive Table Container */}
@@ -282,7 +451,7 @@ const AdminCandidateApprovals = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-2">
-                      {candidate.skills.split(',').map((skill, index) => (
+                      {candidate.skills && candidate.skills.split(',').map((skill, index) => (
                         <span
                           key={index}
                           className="px-3 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-full shadow-sm"

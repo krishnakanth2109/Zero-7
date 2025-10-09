@@ -107,13 +107,13 @@ router.get('/', async (request, response) => {
 })
 
 //need to be approved candidate interview route
-router.get('/approvals', async (request, response) => {
+router.get('/all', async (request, response) => {
   try {
     const pipeline = [
       // Stage 1: Convert String IDs to ObjectId for lookups where target _id is ObjectId
       {
         $match: {
-          approvalStatus: 'pending',
+          approvalStatus: { $in: ['pending', 'approved', 'rejected'] },
         },
       },
       {

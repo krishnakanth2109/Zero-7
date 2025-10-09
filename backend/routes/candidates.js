@@ -116,6 +116,56 @@ router.get('/pendings', async (req, res) => {
     res.status(500).json({ error: 'Server error while fetching candidates.' })
   }
 })
+// all candida
+router.get('/all', async (req, res) => {
+  try {
+    const candidates = await Candidate.aggregate([
+      // This pipeline joins candidates with users to get the recruiter's name
+  {
+  $match: {
+    status: { $in: ['pending', 'approved', 'rejected'] }
+  }
+},
+      {
+        $addFields: {
+          userObjectId: {
+            $cond: {
+              if: { $ne: ['$userId', null] },
+              then: { $toObjectId: '$userId' },
+              else: null,
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userObjectId',
+          foreignField: '_id',
+          as: 'userDetails',
+        },
+      },
+      { $unwind: { path: '$userDetails', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          role: 1,
+          location: 1,
+          email: 1,
+          skills: 1,
+          exp: 1,
+          status: 1,
+          userName: '$userDetails.name',
+        },
+      },
+    ])
+    res.json(candidates)
+  } catch (err) {
+    console.error('Error fetching candidates:', err)
+    res.status(500).json({ error: 'Server error while fetching candidates.' })
+  }
+})
 //update status of candidate either approved or reject
 router.patch('/:id/status', async (request, response) => {
   const candidateId = request.params

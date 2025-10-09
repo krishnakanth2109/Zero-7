@@ -107,8 +107,7 @@ export default function AdminSidebar({ isOpen }) {
             <img src='/Logo6.jpg' alt='logo' className='h-[30px] w-[40px]' />
           </div>
           <div className='logo-side-name'>
-            <div className='head-name'>Zero7</div>
-            <div className='head-panel'>Admin Panel</div>
+          
           </div>
         </div>
 

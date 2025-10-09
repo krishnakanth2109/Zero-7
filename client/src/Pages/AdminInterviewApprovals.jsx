@@ -36,16 +36,19 @@ const AdminInterviewApprovals = () => {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('info');
 
-  // Load counts from localStorage on initial render
-  const [approvedCount, setApprovedCount] = useState(() => {
-    return parseInt(localStorage.getItem('interviewApprovedCount')) || 0;
-  });
-  const [rejectedCount, setRejectedCount] = useState(() => {
-    return parseInt(localStorage.getItem('interviewRejectedCount')) || 0;
-  });
-  const [pendingCount, setPendingCount] = useState(() => {
-    return parseInt(localStorage.getItem('interviewPendingCount')) || 0;
-  });
+  // --- Derived Counts (No useState or localStorage for these) ---
+  const pendingCount = useMemo(() => {
+    return interviews.filter(i => i.approvalStatus === 'pending').length;
+  }, [interviews]);
+
+  const approvedCount = useMemo(() => {
+    return interviews.filter(i => i.approvalStatus === 'approved').length;
+  }, [interviews]);
+
+  const rejectedCount = useMemo(() => {
+    return interviews.filter(i => i.approvalStatus === 'rejected').length;
+  }, [interviews]);
+  // --- End Derived Counts ---
 
   // Function to show alerts
   const showCustomAlert = (message, type = 'info') => {
@@ -59,21 +62,7 @@ const AdminInterviewApprovals = () => {
     try {
       const response = await api.get('/interview/all');
       setInterviews(response.data);
-
-      // Recalculate and update counts when data is fetched
-      const allFetchedInterviews = response.data;
-      const initialApproved = allFetchedInterviews.filter(c => c.approvalStatus === 'approved').length;
-      const initialRejected = allFetchedInterviews.filter(c => c.approvalStatus === 'rejected').length;
-      const initialPending = allFetchedInterviews.filter(c => c.approvalStatus === 'pending').length;
-
-      setApprovedCount(initialApproved);
-      setRejectedCount(initialRejected);
-      setPendingCount(initialPending);
-
-      localStorage.setItem('interviewApprovedCount', initialApproved);
-      localStorage.setItem('interviewRejectedCount', initialRejected);
-      localStorage.setItem('interviewPendingCount', initialPending);
-
+      // Counts are now derived automatically from 'interviews' state
     } catch (error) {
       console.error('Error fetching interviews:', error);
       showCustomAlert('Failed to load interviews.', 'error');
@@ -82,20 +71,7 @@ const AdminInterviewApprovals = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
-
-  // Effect to update localStorage whenever counts change
-  useEffect(() => {
-    localStorage.setItem('interviewApprovedCount', approvedCount.toString());
-  }, [approvedCount]);
-
-  useEffect(() => {
-    localStorage.setItem('interviewRejectedCount', rejectedCount.toString());
-  }, [rejectedCount]);
-
-  useEffect(() => {
-    localStorage.setItem('interviewPendingCount', pendingCount.toString());
-  }, [pendingCount]);
+  }, []); // Empty dependency array means this runs once on mount
 
   // --- Action Handlers ---
   const handleApprove = async (interviewId) => {
@@ -104,12 +80,11 @@ const AdminInterviewApprovals = () => {
         approvalStatus: 'approved',
       });
       setInterviews((prevInterviews) =>
-        prevInterviews.map((c) =>
-          c._id === interviewId ? { ...c, approvalStatus: 'approved' } : c,
+        prevInterviews.map((i) =>
+          i._id === interviewId ? { ...i, approvalStatus: 'approved' } : i,
         ),
       );
-      setApprovedCount((prev) => prev + 1);
-      setPendingCount((prev) => prev - 1);
+      // Counts will automatically re-calculate via useMemo when interviews state updates
       showCustomAlert('Interview approved successfully!', 'success');
     } catch (error) {
       console.error('Error approving interview:', error);
@@ -119,19 +94,15 @@ const AdminInterviewApprovals = () => {
 
   const handleReject = async (interviewId) => {
     try {
-      // NOTE: Original code had a typo `/candidates/${interviewId}/status`.
-      // Changed to `/interview/${interviewId}` assuming it should target the interview endpoint.
-      // Please verify your backend endpoint for rejecting interviews.
       await api.patch(`/interview/${interviewId}`, {
         approvalStatus: 'rejected',
       });
       setInterviews((prevInterviews) =>
-        prevInterviews.map((c) =>
-          c._id === interviewId ? { ...c, approvalStatus: 'rejected' } : c,
+        prevInterviews.map((i) =>
+          i._id === interviewId ? { ...i, approvalStatus: 'rejected' } : i,
         ),
       );
-      setRejectedCount((prev) => prev + 1);
-      setPendingCount((prev) => prev - 1);
+      // Counts will automatically re-calculate via useMemo when interviews state updates
       showCustomAlert('Interview rejected successfully!', 'success');
     } catch (error) {
       console.error('Error rejecting interview:', error);
@@ -154,13 +125,26 @@ const AdminInterviewApprovals = () => {
 
   // Memoized filtered and searched interviews
   const filteredInterviews = useMemo(() => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
     return interviews.filter((interview) => {
+      // Ensure properties exist before calling .toLowerCase() or .includes()
+      const candidateName = interview.candidateName ? interview.candidateName.toLowerCase() : '';
+      const companyName = interview.companyName ? interview.companyName.toLowerCase() : '';
+      const jobRole = interview.jobRole ? interview.jobRole.toLowerCase() : '';
+      const interviewLevel = interview.interviewLevel ? interview.interviewLevel.toLowerCase() : '';
+      const recruiterUserName = interview.userName ? interview.userName.toLowerCase() : '';
+      const interviewStatus = interview.status ? interview.status.toLowerCase() : ''; // Added interview.status for search
+      const approvalStatus = interview.approvalStatus ? interview.approvalStatus.toLowerCase() : ''; // Added approvalStatus for search
+
       const matchesSearch =
-        interview.candidateName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        interview.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        interview.jobRole.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        interview.interviewLevel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (interview.userName && interview.userName.toLowerCase().includes(searchTerm.toLowerCase()));
+        candidateName.includes(lowerCaseSearchTerm) ||
+        companyName.includes(lowerCaseSearchTerm) ||
+        jobRole.includes(lowerCaseSearchTerm) ||
+        interviewLevel.includes(lowerCaseSearchTerm) ||
+        recruiterUserName.includes(lowerCaseSearchTerm) ||
+        interviewStatus.includes(lowerCaseSearchTerm) || // Check general interview status
+        approvalStatus.includes(lowerCaseSearchTerm); // Check approval status
 
       const matchesFilter =
         filterStatus === 'all' || interview.approvalStatus === filterStatus;
@@ -219,7 +203,7 @@ const AdminInterviewApprovals = () => {
         <div className="relative w-full sm:w-1/2">
           <input
             type="text"
-            placeholder="Search by candidate name, company, role..."
+            placeholder="Search by candidate name, company, role, status..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -345,7 +329,7 @@ const AdminInterviewApprovals = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                  
+
                       <div className="flex justify-center space-x-3">
                         <button
                           onClick={() => handleApprove(interview._id)}
@@ -362,7 +346,7 @@ const AdminInterviewApprovals = () => {
                           <XCircle className="h-5 w-5" />
                         </button>
                       </div>
-          
+
                   </td>
                 </tr>
               ))

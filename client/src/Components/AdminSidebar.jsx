@@ -66,6 +66,7 @@ export default function AdminSidebar({ isOpen }) {
     { path: '/admin/manage-managers', label: 'Add Managers', icon: UserCog },
     { path: '/admin/manage-blogs', label: 'Manage Blogs', icon: Shield },
     { path: '/admin/new-batch-dashboard', label: 'New Batches', icon: FileUser },  
+    { path: '/admin/forms', label: 'Form', icon: Layers },
     { path: '/admin/it-programs', label: 'IT Programs', icon: HardDrive, isDropdown: true },
 
 

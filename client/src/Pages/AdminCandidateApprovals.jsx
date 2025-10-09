@@ -36,16 +36,19 @@ const AdminCandidateApprovals = () => {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('info');
 
-  // Load counts from localStorage on initial render
-  const [approvedCount, setApprovedCount] = useState(() => {
-    return parseInt(localStorage.getItem('approvedCount')) || 0;
-  });
-  const [rejectedCount, setRejectedCount] = useState(() => {
-    return parseInt(localStorage.getItem('rejectedCount')) || 0;
-  });
-  const [pendingCount, setPendingCount] = useState(() => {
-    return parseInt(localStorage.getItem('pendingCount')) || 0;
-  });
+  // --- Derived Counts (No useState or localStorage for these) ---
+  const pendingCount = useMemo(() => {
+    return candidates.filter(c => c.status === 'pending').length;
+  }, [candidates]);
+
+  const approvedCount = useMemo(() => {
+    return candidates.filter(c => c.status === 'approved').length;
+  }, [candidates]);
+
+  const rejectedCount = useMemo(() => {
+    return candidates.filter(c => c.status === 'rejected').length;
+  }, [candidates]);
+  // --- End Derived Counts ---
 
 
   // Function to show alerts
@@ -58,25 +61,9 @@ const AdminCandidateApprovals = () => {
 
   const fetchData = async () => {
     try {
-      // In a real app, you might fetch all candidates or specific pending ones
-      // For this example, we'll use the initial data structure and then fetch from an endpoint
       const response = await api.get('/candidates/all'); // Assuming this returns all candidates
       setCandidates(response.data);
-
-      // Recalculate and update counts when data is fetched
-      const allFetchedCandidates = response.data;
-      const initialApproved = allFetchedCandidates.filter(c => c.status === 'approved').length;
-      const initialRejected = allFetchedCandidates.filter(c => c.status === 'rejected').length;
-      const initialPending = allFetchedCandidates.filter(c => c.status === 'pending').length;
-
-      setApprovedCount(initialApproved);
-      setRejectedCount(initialRejected);
-      setPendingCount(initialPending);
-
-      localStorage.setItem('approvedCount', initialApproved);
-      localStorage.setItem('rejectedCount', initialRejected);
-      localStorage.setItem('pendingCount', initialPending);
-
+      // Counts are now derived automatically from 'candidates' state
     } catch (error) {
       console.error('Error fetching candidates:', error);
       showCustomAlert('Failed to load candidates.', 'error');
@@ -85,20 +72,7 @@ const AdminCandidateApprovals = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
-
-  // Effect to update localStorage whenever counts change
-  useEffect(() => {
-    localStorage.setItem('approvedCount', approvedCount.toString());
-  }, [approvedCount]);
-
-  useEffect(() => {
-    localStorage.setItem('rejectedCount', rejectedCount.toString());
-  }, [rejectedCount]);
-
-  useEffect(() => {
-    localStorage.setItem('pendingCount', pendingCount.toString());
-  }, [pendingCount]);
+  }, []); // Empty dependency array means this runs once on mount
 
   // --- Action Handlers ---
   const handleApprove = async (candidateId) => {
@@ -109,8 +83,7 @@ const AdminCandidateApprovals = () => {
           c._id === candidateId ? { ...c, status: 'approved' } : c,
         ),
       );
-      setApprovedCount((prev) => prev + 1);
-      setPendingCount((prev) => prev - 1);
+      // Counts will automatically re-calculate via useMemo when candidates state updates
       showCustomAlert('Candidate approved successfully!', 'success');
     } catch (error) {
       console.error('Error approving candidate:', error);
@@ -126,8 +99,7 @@ const AdminCandidateApprovals = () => {
           c._id === candidateId ? { ...c, status: 'rejected' } : c,
         ),
       );
-      setRejectedCount((prev) => prev + 1);
-      setPendingCount((prev) => prev - 1);
+      // Counts will automatically re-calculate via useMemo when candidates state updates
       showCustomAlert('Candidate rejected successfully!', 'success');
     } catch (error) {
       console.error('Error rejecting candidate:', error);
@@ -334,7 +306,7 @@ const AdminCandidateApprovals = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                   
+
                       <div className="flex justify-center space-x-3">
                         <button
                           onClick={() => handleApprove(candidate._id)}
@@ -351,7 +323,7 @@ const AdminCandidateApprovals = () => {
                           <XCircle className="h-5 w-5" />
                         </button>
                       </div>
-                  
+
                   </td>
                 </tr>
               ))

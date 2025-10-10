@@ -1,5 +1,3 @@
-// File: src/Pages/AdminManageRecruiters.jsx
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
     Edit, 
@@ -15,12 +13,14 @@ import {
     IdCard,
     Key,
     FileText,
-    Table
+    Table,
+    ChevronDown, // Added for dropdown indicator
+    ChevronUp // Added for dropdown indicator
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../api/axios';
-import './AdminManageRecruiters.css';
+// No need to import './AdminManageRecruiters.css' anymore
 
 export default function AdminManageRecruiters() {
     const [recruiters, setRecruiters] = useState([]);
@@ -348,77 +348,67 @@ export default function AdminManageRecruiters() {
         setTimeout(() => setSuccess(''), 3000);
     };
 
-    const inputFieldClass = "admin-input-field";
-    const buttonPrimaryClass = "admin-btn-primary";
-    const buttonSecondaryClass = "admin-btn-secondary";
 
     return (
-        <div className="admin-recruiters-container">
-            <div className="admin-recruiters-content">
+        <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8 font-sans">
+            <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-8">
                 {/* Header Section */}
-                <div className="admin-header">
-                    <div className="header-main">
-                        <div className="header-icon">
-                            <Shield className="icon-large" />
+                <div className="mb-8 p-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-blue-500 rounded-full">
+                            <Shield className="w-8 h-8 sm:w-10 sm:h-10" />
                         </div>
-                        <div className="header-text">
-                            <h1 className="header-title">Manage Recruiters</h1>
-                            <p className="header-subtitle">
+                        <div>
+                            <h1 className="text-2xl sm:text-3xl font-bold">Manage Recruiters</h1>
+                            <p className="text-blue-200 text-sm sm:text-base">
                                 Add, update, or remove recruiter accounts from the system
                             </p>
                         </div>
                     </div>
-                    <div className="header-stats">
-                        <div className="stat-card">
-                            <div className="stat-number">{recruiters.length}</div>
-                            <div className="stat-label">Total Recruiters</div>
-                        </div>
+                    <div className="bg-blue-700/50 backdrop-blur-sm px-5 py-2 rounded-lg text-center shadow-inner">
+                        <div className="text-3xl sm:text-4xl font-extrabold">{recruiters.length}</div>
+                        <div className="text-blue-200 text-sm">Total Recruiters</div>
                     </div>
                 </div>
 
                 {/* Alert Messages */}
                 {error && (
-                    <div className="alert alert-error animate-fade-in">
-                        <XCircle className="alert-icon" />
-                        <span>{error}</span>
+                    <div className="mb-6 p-4 flex items-center bg-red-100 border border-red-400 text-red-700 rounded-lg shadow-sm animate-fade-in" role="alert">
+                        <XCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+                        <span className="text-sm font-medium">{error}</span>
                     </div>
                 )}
 
                 {success && (
-                    <div className="alert alert-success animate-fade-in">
-                        <div className="success-icon">✓</div>
-                        <span>{success}</span>
+                    <div className="mb-6 p-4 flex items-center bg-green-100 border border-green-400 text-green-700 rounded-lg shadow-sm animate-fade-in" role="alert">
+                        <div className="w-5 h-5 mr-3 flex-shrink-0 text-lg font-bold">✓</div>
+                        <span className="text-sm font-medium">{success}</span>
                     </div>
                 )}
 
                 {/* Add/Edit Form */}
-                <form onSubmit={handleSubmit} className="admin-form">
-                    <div className="form-header">
-                        <h2 className="form-title">
+                <form onSubmit={handleSubmit} className="mb-10 p-6 bg-gray-50 rounded-lg shadow-md border border-gray-200">
+                    <div className="mb-6 pb-4 border-b border-gray-200 flex items-center justify-between">
+                        <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
                             {editingId ? 'Edit Recruiter' : 'Add New Recruiter'}
                         </h2>
-                        <div className="form-decoration"></div>
                     </div>
                     
-                    <div className="form-grid">
-                        <div className="input-group">
-                            <div className="input-icon">
-                                <UserPlus className="icon-small" />
-                            </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div className="relative">
+                           
                             <input 
                                 name="name" 
                                 value={formData.name} 
                                 onChange={handleChange} 
                                 placeholder="Full Name" 
                                 required 
-                                className={inputFieldClass}
+                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
                             />
                         </div>
 
-                        <div className="input-group">
-                            <div className="input-icon">
-                                <Mail className="icon-small" />
-                            </div>
+                        <div className="relative">
+                            
                             <input 
                                 name="email" 
                                 type="email" 
@@ -426,28 +416,24 @@ export default function AdminManageRecruiters() {
                                 onChange={handleChange} 
                                 placeholder="Email Address" 
                                 required 
-                                className={inputFieldClass}
+                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
                             />
                         </div>
 
-                        <div className="input-group">
-                            <div className="input-icon">
-                                <IdCard className="icon-small" />
-                            </div>
+                        <div className="relative">
+                            
                             <input 
                                 name="employeeID" 
                                 value={formData.employeeID} 
                                 onChange={handleChange} 
                                 placeholder="Employee ID" 
                                 required 
-                                className={inputFieldClass}
+                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
                             />
                         </div>
 
-                        <div className="input-group">
-                            <div className="input-icon">
-                                <Key className="icon-small" />
-                            </div>
+                        <div className="relative">
+                           
                             <input 
                                 name="password" 
                                 type="password" 
@@ -455,78 +441,79 @@ export default function AdminManageRecruiters() {
                                 onChange={handleChange} 
                                 placeholder={editingId ? "New Password (Optional)" : "Password"} 
                                 required={!editingId} 
-                                className={inputFieldClass}
+                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
                             />
                         </div>
                     </div>
 
-                    <div className="form-actions">
+                    <div className="flex justify-end space-x-4">
                         {editingId && (
                             <button 
                                 type="button" 
                                 onClick={resetForm} 
-                                className={buttonSecondaryClass}
+                                className="flex items-center px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 transition duration-200 text-sm font-medium"
                             >
+                                <XCircle className="w-4 h-4 mr-2" />
                                 Cancel Edit
                             </button>
                         )}
                         <button 
                             type="submit" 
                             disabled={submitting} 
-                            className={buttonPrimaryClass}
+                            className="flex items-center px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         >
                             {submitting ? (
                                 <>
-                                    <Loader2 className="button-icon animate-spin" />
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                                     {editingId ? 'Updating...' : 'Adding...'}
                                 </>
                             ) : (
                                 <>
-                                    <UserPlus className="button-icon" />
+                                    <UserPlus className="w-4 h-4 mr-2" />
                                     {editingId ? 'Update Recruiter' : 'Add Recruiter'}
                                 </>
                             )}
                         </button>
                     </div>
                 </form>
-
+ <br />
                 {/* Recruiters Table Section */}
-                <div className="admin-table-section">
-                    <div className="table-header">
-                        <div className="table-title-section">
-                            <h2 className="table-title">All Recruiters</h2>
-                            <div className="table-actions">
-                                <div className="search-box">
-                                    <Search className="search-icon" />
+                <div className="bg-white rounded-lg shadow-md border border-gray-200">
+                    <div className="p-5 border-b border-gray-200">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">All Recruiters</h2>
+                            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                                <div className="relative w-full sm:w-auto">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                                     <input
                                         type="text"
                                         placeholder="Search recruiters..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="search-input"
+                                        className="pl-10 pr-4 py-2 w-full sm:w-64 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700 text-sm"
                                     />
                                 </div>
                                 
-                                <div className="import-export-actions">
+                                <div className="flex flex-wrap items-center gap-3">
                                     {/* Import Excel */}
-                                    <div className="file-input-wrapper">
+                                    <div className="relative">
                                         <input
                                             type="file"
                                             ref={fileInputRef}
                                             onChange={handleImportExcel}
                                             accept=".xlsx, .xls"
-                                            style={{ display: 'none' }}
+                                            className="hidden"
                                             id="excel-import"
                                         />
                                         <button 
                                             onClick={() => fileInputRef.current?.click()}
                                             disabled={importing}
-                                            className="action-btn"
+                                            className="flex items-center px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                                         >
                                             {importing ? (
-                                                <Loader2 className="action-icon animate-spin" />
+                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                                             ) : (
-                                                <Upload className="action-icon" />
+                                                <Upload className="w-4 h-4 mr-2" />
                                             )}
                                             {importing ? 'Importing...' : 'Import Excel'}
                                         </button>
@@ -535,29 +522,35 @@ export default function AdminManageRecruiters() {
                                     {/* Download Template */}
                                     <button 
                                         onClick={downloadTemplate}
-                                        className="action-btn"
+                                        className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-200 text-sm font-medium"
                                     >
-                                        <FileText className="action-icon" />
+                                        <FileText className="w-4 h-4 mr-2" />
                                         Template
                                     </button>
 
                                     {/* Export Dropdown */}
-                                    <div className="export-dropdown" ref={exportMenuRef}>
+                                    <div className="relative" ref={exportMenuRef}>
                                         <button 
-                                            className="action-btn"
+                                            className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 text-sm font-medium"
                                             onClick={() => setShowExportMenu(!showExportMenu)}
                                         >
-                                            <Download className="action-icon" />
-                                            Export
+                                            <Download className="w-4 h-4 mr-2" />
+                                            Export {showExportMenu ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
                                         </button>
                                         {showExportMenu && (
-                                            <div className="export-menu">
-                                                <button onClick={exportToExcel}>
-                                                    <Table className="action-icon" />
+                                            <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl py-1 z-10 border border-gray-200">
+                                                <button 
+                                                    onClick={exportToExcel}
+                                                    className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                >
+                                                    <Table className="w-4 h-4 mr-2" />
                                                     Export Excel
                                                 </button>
-                                                <button onClick={exportToJSON}>
-                                                    <FileText className="action-icon" />
+                                                <button 
+                                                    onClick={exportToJSON}
+                                                    className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                >
+                                                    <FileText className="w-4 h-4 mr-2" />
                                                     Export JSON
                                                 </button>
                                             </div>
@@ -568,71 +561,77 @@ export default function AdminManageRecruiters() {
                         </div>
                     </div>
 
-                    <div className="table-container">
-                        <table className="admin-table">
-                            <thead className="table-header">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
                                 <tr>
                                     <th 
                                         scope="col" 
-                                        className="table-header-cell sortable"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none"
                                         onClick={() => handleSort('name')}
                                     >
-                                        Name
-                                        {sortConfig.key === 'name' && (
-                                            <span className="sort-indicator">
-                                                {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                                            </span>
-                                        )}
+                                        <div className="flex items-center">
+                                            Name
+                                            {sortConfig.key === 'name' && (
+                                                <span className="ml-2">
+                                                    {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                                                </span>
+                                            )}
+                                        </div>
                                     </th>
                                     <th 
                                         scope="col" 
-                                        className="table-header-cell sortable"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none"
                                         onClick={() => handleSort('email')}
                                     >
-                                        Email
-                                        {sortConfig.key === 'email' && (
-                                            <span className="sort-indicator">
-                                                {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                                            </span>
-                                        )}
+                                        <div className="flex items-center">
+                                            Email
+                                            {sortConfig.key === 'email' && (
+                                                <span className="ml-2">
+                                                    {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                                                </span>
+                                            )}
+                                        </div>
                                     </th>
                                     <th 
                                         scope="col" 
-                                        className="table-header-cell sortable"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none"
                                         onClick={() => handleSort('employeeId')}
                                     >
-                                        Employee ID
-                                        {sortConfig.key === 'employeeId' && (
-                                            <span className="sort-indicator">
-                                                {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                                            </span>
-                                        )}
+                                        <div className="flex items-center">
+                                            Employee ID
+                                            {sortConfig.key === 'employeeId' && (
+                                                <span className="ml-2">
+                                                    {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                                                </span>
+                                            )}
+                                        </div>
                                     </th>
-                                    <th scope="col" className="table-header-cell actions-header">
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="table-body">
+                            <tbody className="bg-white divide-y divide-gray-200">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="4" className="table-loading-cell">
-                                            <div className="loading-content">
-                                                <Loader2 className="loading-icon animate-spin" />
-                                                <span>Loading recruiters...</span>
+                                        <td colSpan="4" className="px-6 py-10 text-center text-gray-500">
+                                            <div className="flex flex-col items-center justify-center">
+                                                <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-3" />
+                                                <span className="text-lg font-medium">Loading recruiters...</span>
                                             </div>
                                         </td>
                                     </tr>
                                 ) : filteredRecruiters.length === 0 ? (
                                     <tr>
-                                        <td colSpan="4" className="table-empty-cell">
-                                            <div className="empty-content">
-                                                <UserPlus className="empty-icon" />
-                                                <span>No recruiters found</span>
+                                        <td colSpan="4" className="px-6 py-10 text-center text-gray-500">
+                                            <div className="flex flex-col items-center justify-center">
+                                                <UserPlus className="w-10 h-10 text-gray-400 mb-3" />
+                                                <span className="text-lg font-medium">No recruiters found</span>
                                                 {searchTerm && (
                                                     <button 
                                                         onClick={() => setSearchTerm('')}
-                                                        className="clear-search-btn"
+                                                        className="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200 text-sm"
                                                     >
                                                         Clear search
                                                     </button>
@@ -642,38 +641,38 @@ export default function AdminManageRecruiters() {
                                     </tr>
                                 ) : (
                                     filteredRecruiters.map(recruiter => (
-                                        <tr key={recruiter._id} className="table-row">
-                                            <td className="table-cell name-cell">
-                                                <div className="recruiter-name">
-                                                    {recruiter.name}
-                                                </div>
+                                        <tr key={recruiter._id} className="hover:bg-gray-50 transition duration-150 ease-in-out">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                {recruiter.name}
                                             </td>
-                                            <td className="table-cell email-cell">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                                 {recruiter.email}
                                             </td>
-                                            <td className="table-cell id-cell">
-                                                <span className="employee-id-badge">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                                                     {recruiter.employeeId}
                                                 </span>
                                             </td>
-                                            <td className="table-cell actions-cell">
-                                                <div className="action-buttons">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div className="flex items-center space-x-3">
                                                     <button 
                                                         onClick={() => handleEdit(recruiter)} 
-                                                        className="edit-btn"
+                                                        className="flex items-center text-blue-600 hover:text-blue-900 transition duration-150 ease-in-out hover:scale-105"
+                                                        title="Edit Recruiter"
                                                     >
-                                                        <Edit className="btn-icon" />
+                                                        <Edit className="w-4 h-4 mr-1" />
                                                         Edit
                                                     </button>
                                                     <button 
                                                         onClick={() => handleDelete(recruiter._id)} 
                                                         disabled={deletingId === recruiter._id}
-                                                        className="delete-btn"
+                                                        className="flex items-center text-red-600 hover:text-red-900 transition duration-150 ease-in-out hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        title="Delete Recruiter"
                                                     >
                                                         {deletingId === recruiter._id ? (
-                                                            <Loader2 className="btn-icon animate-spin" />
+                                                            <Loader2 className="w-4 h-4 mr-1 animate-spin" />
                                                         ) : (
-                                                            <Trash2 className="btn-icon" />
+                                                            <Trash2 className="w-4 h-4 mr-1" />
                                                         )}
                                                         Delete
                                                     </button>
@@ -687,13 +686,13 @@ export default function AdminManageRecruiters() {
                     </div>
 
                     {/* Table Footer */}
-                    <div className="table-footer">
-                        <div className="footer-info">
-                            Showing <strong>{filteredRecruiters.length}</strong> of{' '}
-                            <strong>{recruiters.length}</strong> recruiters
+                    <div className="p-5 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between text-sm text-gray-600">
+                        <div className="mb-2 sm:mb-0">
+                            Showing <strong className="font-semibold">{filteredRecruiters.length}</strong> of{' '}
+                            <strong className="font-semibold">{recruiters.length}</strong> recruiters
                             {searchTerm && (
-                                <span className="search-info">
-                                    {' '}for "<strong>{searchTerm}</strong>"
+                                <span className="ml-1">
+                                    {' '}for "<strong className="font-semibold">{searchTerm}</strong>"
                                 </span>
                             )}
                         </div>
@@ -704,4 +703,5 @@ export default function AdminManageRecruiters() {
     );
 }
 
+// Export the component as before
 export { AdminManageRecruiters };

@@ -83,7 +83,7 @@ export default function AdminDashboard() {
           api.get('/jobs').catch((e) => ({ data: [] })),
           api.get('/candidates/pendings').catch((e) => ({ data: [] })),
           api.get('/company').catch((e) => ({ data: [] })),
-          api.get('/interview/all').catch((e) => ({ data: [] })),
+          api.get('/interview').catch((e) => ({ data: [] })),
           api.get('/college-connect').catch((e) => ({ data: [] })),
         ])
 
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
           (req) => req.status === 'pending',
         )
         const placedCandidates = interviewsResponse.data.filter(
-          (req) => (req.status = 'Offer Extented'),
+          (req) => req.status === 'placed',
         )
 
         setStats({

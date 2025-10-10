@@ -258,7 +258,7 @@ const InterviewTracker = () => {
 
         {/* Stats Cards */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
-          {['Scheduled', 'Completed', 'Pending Feedback', 'Offer Extended'].map(
+          {['Scheduled', 'Completed', 'Pending Feedback', 'Offer Extended','placed'].map(
             (status) => (
               <div
                 key={status}
@@ -686,6 +686,7 @@ const InterviewTracker = () => {
                     <option value='Scheduled'>Scheduled</option>
                     <option value='Completed'>Completed</option>
                     <option value='Pending Feedback'>Pending Feedback</option>
+                    <option value='placed'>PLACED</option>
                     <option value='Offer Extended'>Offer Extended</option>
                     <option value='Rejected'>Rejected</option>
                   </select>
@@ -707,6 +708,7 @@ const InterviewTracker = () => {
                     <option value='L3'>L3</option>
                     <option value='L4'>L4</option>
                     <option value='L5'>L5</option>
+                    <option value='placed'>PLACED</option>
                     <option value='HR'>HR Round</option>
                   </select>
                 </div>

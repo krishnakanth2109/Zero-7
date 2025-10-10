@@ -97,7 +97,7 @@ router.get('/', async (request, response) => {
         },
       },
       // Stage 9: Sort the results (optional)
-      { $sort: { date: -1 } }, // Assuming you want to sort by interview date
+      { $sort: { date: 1 } }, // Assuming you want to sort by interview date
     ]
     const result = await Interview.aggregate(pipeline)
     response.send(result)
@@ -204,7 +204,7 @@ router.get('/all', async (request, response) => {
         },
       },
       // Stage 9: Sort the results (optional)
-      { $sort: { createdAt: -1 } }, // Assuming you want to sort by interview date
+      { $sort: { updatedAt: -1 } }, // Assuming you want to sort by interview date
     ]
     const result = await Interview.aggregate(pipeline)
     response.send(result)

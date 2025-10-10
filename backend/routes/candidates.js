@@ -55,10 +55,11 @@ router.get('/', async (req, res) => {
           email: 1,
           skills: 1,
           exp: 1,
+          updatedAt: 1,
           userName: '$userDetails.name',
         },
       },
-      { $sort: { createdAt: -1 } },
+      { $sort: { updatedAt: -1 } },
     ])
     res.json(candidates)
   } catch (err) {
@@ -110,7 +111,7 @@ router.get('/pendings', async (req, res) => {
           userName: '$userDetails.name',
         },
       },
-      { $sort: { createdAt: -1 } },
+      { $sort: { updatedAt: -1 } },
     ])
     res.json(candidates)
   } catch (err) {
@@ -159,9 +160,14 @@ router.get('/all', async (req, res) => {
           exp: 1,
           status: 1,
           userName: '$userDetails.name',
+          updatedAt: 1,
         },
       },
-      { $sort: { createdAt: -1 } },
+      {
+        $sort: {
+          updatedAt: -1,
+        },
+      },
     ])
     res.json(candidates)
   } catch (err) {

@@ -10,7 +10,7 @@ const InterviewSchema = new mongoose.Schema(
     date: { type: Date, required: true },
     interviewLevel: {
       type: String,
-      enum: ['L1', 'L2', 'L3', 'L4', 'L5', 'HR'],
+      enum: ['L1', 'L2', 'L3', 'L4', 'L5', 'HR', 'placed'],
       default: 'L1',
     },
     approvalStatus: {

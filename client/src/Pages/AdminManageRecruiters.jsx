@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { 
-    Edit, 
-    Trash2, 
-    UserPlus, 
-    XCircle, 
-    Loader2, 
+import {
+    Edit,
+    Trash2,
+    UserPlus,
+    XCircle,
+    Loader2,
     Search,
     Download,
     Upload,
@@ -41,7 +41,7 @@ export default function AdminManageRecruiters() {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
     const [importing, setImporting] = useState(false);
     const [showExportMenu, setShowExportMenu] = useState(false);
-    
+
     const fileInputRef = useRef(null);
     const exportMenuRef = useRef(null);
 
@@ -117,7 +117,7 @@ export default function AdminManageRecruiters() {
         setError('');
         setSuccess('');
         setSubmitting(true);
-        
+
         try {
             if (editingId) {
                 await api.put(`/recruiters/${editingId}`, formData);
@@ -128,7 +128,7 @@ export default function AdminManageRecruiters() {
             }
             resetForm();
             await fetchRecruiters();
-            
+
             setTimeout(() => setSuccess(''), 3000);
         } catch (error) {
             console.error("Failed to submit recruiter:", error);
@@ -139,11 +139,11 @@ export default function AdminManageRecruiters() {
     };
 
     const handleEdit = (recruiter) => {
-        setFormData({ 
+        setFormData({
             name: recruiter.name,
             email: recruiter.email,
             employeeID: recruiter.employeeId,
-            password: '' 
+            password: ''
         });
         setEditingId(recruiter._id);
         window.scrollTo({
@@ -161,7 +161,7 @@ export default function AdminManageRecruiters() {
                 await api.delete(`/recruiters/${id}`);
                 setSuccess('Recruiter deleted successfully!');
                 await fetchRecruiters();
-                
+
                 setTimeout(() => setSuccess(''), 3000);
             } catch (error) {
                 console.error("Failed to delete recruiter:", error);
@@ -196,14 +196,14 @@ export default function AdminManageRecruiters() {
             const worksheet = XLSX.utils.json_to_sheet(excelData);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Recruiters');
-            
+
             const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-            const data = new Blob([excelBuffer], { 
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+            const data = new Blob([excelBuffer], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             });
-            
+
             saveAs(data, `recruiters-export-${new Date().toISOString().split('T')[0]}.xlsx`);
-            
+
             setSuccess('Recruiters exported to Excel successfully!');
             setShowExportMenu(false);
             setTimeout(() => setSuccess(''), 3000);
@@ -223,7 +223,7 @@ export default function AdminManageRecruiters() {
         link.download = `recruiters-export-${new Date().toISOString().split('T')[0]}.json`;
         link.click();
         URL.revokeObjectURL(url);
-        
+
         setSuccess('Recruiters exported to JSON successfully!');
         setShowExportMenu(false);
         setTimeout(() => setSuccess(''), 3000);
@@ -245,16 +245,16 @@ export default function AdminManageRecruiters() {
         setSuccess('');
 
         const reader = new FileReader();
-        
+
         reader.onload = async (e) => {
             try {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
-                
+
                 const worksheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[worksheetName];
                 const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                
+
                 if (jsonData.length === 0) {
                     throw new Error('The Excel file is empty or has no data.');
                 }
@@ -263,7 +263,7 @@ export default function AdminManageRecruiters() {
                     if (!row['Name'] || !row['Email'] || !row['Employee ID']) {
                         throw new Error(`Row ${index + 2}: Missing required fields (Name, Email, Employee ID)`);
                     }
-                    
+
                     return {
                         name: row['Name'].toString().trim(),
                         email: row['Email'].toString().trim().toLowerCase(),
@@ -336,14 +336,14 @@ export default function AdminManageRecruiters() {
         const worksheet = XLSX.utils.json_to_sheet(templateData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Template');
-        
+
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        const data = new Blob([excelBuffer], { 
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+        const data = new Blob([excelBuffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
-        
+
         saveAs(data, 'recruiters-import-template.xlsx');
-        
+
         setSuccess('📋 Template downloaded successfully!');
         setTimeout(() => setSuccess(''), 3000);
     };
@@ -389,58 +389,58 @@ export default function AdminManageRecruiters() {
                 {/* Add/Edit Form */}
                 <form onSubmit={handleSubmit} className="mb-10 p-6 bg-gray-50 rounded-lg shadow-md border border-gray-200">
                     <div className="mb-6 pb-4 border-b border-gray-200 flex items-center justify-between">
-                        <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                        <h2 id='scroll-container' className="text-xl sm:text-2xl font-semibold text-gray-800">
                             {editingId ? 'Edit Recruiter' : 'Add New Recruiter'}
                         </h2>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div className="relative">
-                           
-                            <input 
-                                name="name" 
-                                value={formData.name} 
-                                onChange={handleChange} 
-                                placeholder="Full Name" 
-                                required 
+
+                            <input
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                placeholder="Full Name"
+                                required
                                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
                             />
                         </div>
 
                         <div className="relative">
-                            
-                            <input 
-                                name="email" 
-                                type="email" 
-                                value={formData.email} 
-                                onChange={handleChange} 
-                                placeholder="Email Address" 
-                                required 
+
+                            <input
+                                name="email"
+                                type="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="Email Address"
+                                required
                                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
                             />
                         </div>
 
                         <div className="relative">
-                            
-                            <input 
-                                name="employeeID" 
-                                value={formData.employeeID} 
-                                onChange={handleChange} 
-                                placeholder="Employee ID" 
-                                required 
+
+                            <input
+                                name="employeeID"
+                                value={formData.employeeID}
+                                onChange={handleChange}
+                                placeholder="Employee ID"
+                                required
                                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
                             />
                         </div>
 
                         <div className="relative">
-                           
-                            <input 
-                                name="password" 
-                                type="password" 
-                                value={formData.password} 
-                                onChange={handleChange} 
-                                placeholder={editingId ? "New Password (Optional)" : "Password"} 
-                                required={!editingId} 
+
+                            <input
+                                name="password"
+                                type="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder={editingId ? "New Password (Optional)" : "Password"}
+                                required={!editingId}
                                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
                             />
                         </div>
@@ -448,18 +448,18 @@ export default function AdminManageRecruiters() {
 
                     <div className="flex justify-end space-x-4">
                         {editingId && (
-                            <button 
-                                type="button" 
-                                onClick={resetForm} 
+                            <button
+                                type="button"
+                                onClick={resetForm}
                                 className="flex items-center px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 transition duration-200 text-sm font-medium"
                             >
                                 <XCircle className="w-4 h-4 mr-2" />
                                 Cancel Edit
                             </button>
                         )}
-                        <button 
-                            type="submit" 
-                            disabled={submitting} 
+                        <button
+                            type="submit"
+                            disabled={submitting}
                             className="flex items-center px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         >
                             {submitting ? (
@@ -476,7 +476,7 @@ export default function AdminManageRecruiters() {
                         </button>
                     </div>
                 </form>
- <br />
+                <br />
                 {/* Recruiters Table Section */}
                 <div className="bg-white rounded-lg shadow-md border border-gray-200">
                     <div className="p-5 border-b border-gray-200">
@@ -484,7 +484,7 @@ export default function AdminManageRecruiters() {
                             <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">All Recruiters</h2>
                             <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                                 <div className="relative w-full sm:w-auto">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                    {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} /> */}
                                     <input
                                         type="text"
                                         placeholder="Search recruiters..."
@@ -493,7 +493,7 @@ export default function AdminManageRecruiters() {
                                         className="pl-10 pr-4 py-2 w-full sm:w-64 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700 text-sm"
                                     />
                                 </div>
-                                
+
                                 <div className="flex flex-wrap items-center gap-3">
                                     {/* Import Excel */}
                                     <div className="relative">
@@ -505,7 +505,7 @@ export default function AdminManageRecruiters() {
                                             className="hidden"
                                             id="excel-import"
                                         />
-                                        <button 
+                                        <button
                                             onClick={() => fileInputRef.current?.click()}
                                             disabled={importing}
                                             className="flex items-center px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
@@ -520,7 +520,7 @@ export default function AdminManageRecruiters() {
                                     </div>
 
                                     {/* Download Template */}
-                                    <button 
+                                    <button
                                         onClick={downloadTemplate}
                                         className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-200 text-sm font-medium"
                                     >
@@ -530,7 +530,7 @@ export default function AdminManageRecruiters() {
 
                                     {/* Export Dropdown */}
                                     <div className="relative" ref={exportMenuRef}>
-                                        <button 
+                                        <button
                                             className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 text-sm font-medium"
                                             onClick={() => setShowExportMenu(!showExportMenu)}
                                         >
@@ -539,14 +539,14 @@ export default function AdminManageRecruiters() {
                                         </button>
                                         {showExportMenu && (
                                             <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl py-1 z-10 border border-gray-200">
-                                                <button 
+                                                <button
                                                     onClick={exportToExcel}
                                                     className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                                 >
                                                     <Table className="w-4 h-4 mr-2" />
                                                     Export Excel
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={exportToJSON}
                                                     className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                                 >
@@ -565,8 +565,8 @@ export default function AdminManageRecruiters() {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th 
-                                        scope="col" 
+                                    <th
+                                        scope="col"
                                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none"
                                         onClick={() => handleSort('name')}
                                     >
@@ -579,8 +579,8 @@ export default function AdminManageRecruiters() {
                                             )}
                                         </div>
                                     </th>
-                                    <th 
-                                        scope="col" 
+                                    <th
+                                        scope="col"
                                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none"
                                         onClick={() => handleSort('email')}
                                     >
@@ -593,8 +593,8 @@ export default function AdminManageRecruiters() {
                                             )}
                                         </div>
                                     </th>
-                                    <th 
-                                        scope="col" 
+                                    <th
+                                        scope="col"
                                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer select-none"
                                         onClick={() => handleSort('employeeId')}
                                     >
@@ -629,7 +629,7 @@ export default function AdminManageRecruiters() {
                                                 <UserPlus className="w-10 h-10 text-gray-400 mb-3" />
                                                 <span className="text-lg font-medium">No recruiters found</span>
                                                 {searchTerm && (
-                                                    <button 
+                                                    <button
                                                         onClick={() => setSearchTerm('')}
                                                         className="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200 text-sm"
                                                     >
@@ -655,16 +655,22 @@ export default function AdminManageRecruiters() {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex items-center space-x-3">
-                                                    <button 
-                                                        onClick={() => handleEdit(recruiter)} 
+                                                    <button
+                                                        onClick={() => {
+                                                            handleEdit(recruiter);
+                                                            const container = document.getElementById('scroll-container');
+                                                            if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+                                                        }}
+
                                                         className="flex items-center text-blue-600 hover:text-blue-900 transition duration-150 ease-in-out hover:scale-105"
                                                         title="Edit Recruiter"
                                                     >
                                                         <Edit className="w-4 h-4 mr-1" />
                                                         Edit
                                                     </button>
-                                                    <button 
-                                                        onClick={() => handleDelete(recruiter._id)} 
+
+                                                    <button
+                                                        onClick={() => handleDelete(recruiter._id)}
                                                         disabled={deletingId === recruiter._id}
                                                         className="flex items-center text-red-600 hover:text-red-900 transition duration-150 ease-in-out hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                                                         title="Delete Recruiter"

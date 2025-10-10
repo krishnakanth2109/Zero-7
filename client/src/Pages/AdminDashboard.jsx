@@ -93,7 +93,6 @@ export default function AdminDashboard() {
         const placedCandidates = interviewsResponse.data.filter(
           (req) => (req.status = 'Offer Extented'),
         )
-        console.log(placedCandidates)
 
         setStats({
           totalCandidates: candidatesResponse.data.length,
@@ -221,14 +220,16 @@ export default function AdminDashboard() {
             path='candidateList'
           />
         )}
-        <StatCard
-          title='Partner Companies'
-          value={stats.partnerCompanies}
-          subtext='actively hiring'
-          icon={<Building2 className='stroke-red-500 stroke-2' />}
-          percentage='+12%'
-          path='companies'
-        />
+        {user.role !== 'recruiter' && (
+          <StatCard
+            title='Partner Companies'
+            value={stats.partnerCompanies}
+            subtext='actively hiring'
+            icon={<Building2 className='stroke-red-500 stroke-2' />}
+            percentage='+12%'
+            path='companies'
+          />
+        )}
         <StatCard
           title='Colleges'
           value={stats.colleges}

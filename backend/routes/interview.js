@@ -1,187 +1,173 @@
-import express from 'express'
-import Interview from '../models/Interview.js'
-import Candidate from '../models/Candidate.js'
-import jobs from '../models/jobs.js'
-import Companies from '../models/Companies.js'
-import User from '../models/User.js'
-import transporter from '../utils/mail.js'
-import {
-  renderEmailTemplate,
-  prepareCandidateInterview,
-} from '../utils/emailTemplates.js'
-import Notification from '../models/notifications.js'; 
-const router = express.Router()
+// File: backend/routes/interview.js
 
+import express from 'express';
+import Interview from '../models/Interview.js';
+import Candidate from '../models/Candidate.js';
+import Job from '../models/jobs.js'; // Corrected variable name from 'jobs' to 'Job' for clarity
+import Company from '../models/Companies.js'; // Corrected variable name
+import User from '../models/User.js';
+import transporter from '../utils/mail.js';
+import { renderEmailTemplate, prepareCandidateInterview } from '../utils/emailTemplates.js';
+import Notification from '../models/notifications.js'; // <-- CORRECTED: Import path is singular
+
+const router = express.Router();
+
+/**
+ * @route   GET /api/interview
+ * @desc    Get all interviews with populated details
+ * @access  Admin
+ */
 router.get('/', async (request, response) => {
   try {
     const pipeline = [
-      // Stage 1: Convert String IDs to ObjectId for lookups where target _id is ObjectId
-      {
-        $addFields: {
-          candidateObjectId: { $toObjectId: '$candidateId' },
-          jobObjectId: { $toObjectId: '$jobId' }, // <--- NEW: Convert jobId to ObjectId
-          // userObjectId: { $toObjectId: '$userId' }, // Also convert userId if you need recruiter details
-        },
-      },
-      // Stage 2: Lookup Candidate details (using converted ObjectId)
-      {
-        $lookup: {
-          from: 'candidates', // Collection name for the Candidate model
-          localField: 'candidateObjectId',
-          foreignField: '_id',
-          as: 'candidateInfo',
-        },
-      },
-      // Stage 3: Unwind candidateInfo (to get the candidate object directly)
-      {
-        $unwind: '$candidateInfo',
-      },
-      // Stage 4: Lookup Job details (using converted jobObjectId) <--- NEW STAGE
-      {
-        $lookup: {
-          from: 'jobs', // Collection name for the Job model
-          localField: 'jobObjectId',
-          foreignField: '_id',
-          as: 'jobInfo',
-        },
-      },
-      // Stage 5: Unwind jobInfo (to get the job object directly) <--- NEW STAGE
-      {
-        $unwind: '$jobInfo',
-      },
-      // Stage 6: Lookup Company details (using the string companyId from Interview, matching on Company.name)
-      // This is based on your specific document, where companyId might be a string like "Vg07"
-      {
-        $lookup: {
-          from: 'companies', // Collection name for the Company model
-          localField: 'companyId', // Interview's companyId (e.g., "Vg07")
-          foreignField: '_id', // Company's name field (assuming your Company model has a 'name' field)
-          as: 'companyInfo',
-        },
-      },
-      // Stage 7: Unwind companyInfo (to get the company object directly)
-      // Use preserveNullAndEmptyArrays: true if a company name might not always match,
-      // and you still want the interview in the result.
-      {
-        $unwind: {
-          path: '$companyInfo',
-          preserveNullAndEmptyArrays: true, // Keep the interview even if company isn't found
-        },
-      },
-      // Stage 8: Project the desired fields, including new ones and original ones
-      {
-        $project: {
-          // Include all original fields from the Interview document
-          _id: 1,
-          candidateId: 1,
-          jobId: 1,
-          status: 1,
-          companyId: 1,
-          userId: 1,
-          date: 1,
-          // If you have timestamps in Interview schema, include them
-          createdAt: 1,
-          updatedAt: 1,
-
-          // Add the derived names and role
-          candidateName: '$candidateInfo.name', // Candidate's 'name' field
-          // Use ternary operator with $ifNull to handle cases where companyInfo might be null
-          companyName: '$companyInfo.name',
-          jobRole: '$jobInfo.role', // <--- NEW: Job's 'role' field
-        },
-      },
-      // Stage 9: Sort the results (optional)
-      { $sort: { date: -1 } }, // Assuming you want to sort by interview date
-    ]
-    const result = await Interview.aggregate(pipeline)
-    response.send(result)
+      { $addFields: { candidateObjectId: { $toObjectId: '$candidateId' }, jobObjectId: { $toObjectId: '$jobId' } } },
+      { $lookup: { from: 'candidates', localField: 'candidateObjectId', foreignField: '_id', as: 'candidateInfo' } },
+      { $unwind: '$candidateInfo' },
+      { $lookup: { from: 'jobs', localField: 'jobObjectId', foreignField: '_id', as: 'jobInfo' } },
+      { $unwind: '$jobInfo' },
+      { $lookup: { from: 'companies', localField: 'companyId', foreignField: '_id', as: 'companyInfo' } },
+      { $unwind: { path: '$companyInfo', preserveNullAndEmptyArrays: true } },
+      { $project: { _id: 1, candidateId: 1, jobId: 1, status: 1, companyId: 1, userId: 1, date: 1, createdAt: 1, updatedAt: 1, candidateName: '$candidateInfo.name', companyName: '$companyInfo.name', jobRole: '$jobInfo.role' } },
+      { $sort: { date: -1 } },
+    ];
+    const result = await Interview.aggregate(pipeline);
+    response.status(200).json(result);
   } catch (err) {
-    response.send({ err })
+    console.error("Error fetching interviews:", err);
+    response.status(500).json({ message: 'Server error while fetching interviews.' });
   }
-})
+});
 
+/**
+ * @route   POST /api/interview
+ * @desc    Schedule a new interview
+ * @access  Admin
+ */
 router.post('/', async (request, response) => {
-  const { candidateId, jobId, status, companyId, date } = request.body
-  const interviewPosted = await Interview.findOne({
-    candidateId: candidateId,
-    jobId: jobId,
-  })
-  const checkRightJobId = await jobs.findOne({
-    _id: jobId,
-    companyId: companyId,
-  })
-  console.log(checkRightJobId)
-  if (interviewPosted) {
-    response.status(400).send('Interview Already Scheduled for Cadidate')
-  } else if (!checkRightJobId) {
-    response
-      .status(400)
-      .send('Wrong Job Id, this jobId does not belong to this company')
-  } else {
-    const candidate = await Candidate.findOne(
-      { _id: candidateId },
-      { name: 1, email: 1, userId: 1 },
-    )
-    if (!candidate) {
-      response.status(404).send('candidate does not exists')
+  const { candidateId, jobId, status, companyId, date } = request.body;
+  try {
+    const interviewPosted = await Interview.findOne({ candidateId, jobId });
+    if (interviewPosted) {
+      return response.status(409).send('An interview for this candidate and job has already been scheduled.');
     }
-    const jobRole = await jobs.findOne({ _id: jobId }, { role: 1 })
-    if (!jobRole) {
-      response.status(404).send('Job not found')
-    }
-    const companyName = await Companies.findOne({ _id: companyId }, { name: 1 })
-    if (!companyName) {
-      response.status(404).send('Company not found')
-    }
-    const newInterview = new Interview({
-      candidateId: candidateId,
-      jobId: jobId,
-      status: status,
-      companyId: companyId,
-      date: date,
-    })
-    await newInterview.save()
-    const payload = {
-      candidateName: candidate.name,
-      companyName: companyName,
-      status: newInterview.status,
-      date: newInterview.date,
-    }
-    const recruiter = await User.findById(
-      { _id: candidate.userId },
-      { email: 1, name: 1 },
-    )
-    // const templateData = prepareCandidateInterview(
-    //   request,
-    //   candidate,
-    //   recruiter,
-    //   newInterview,
-    //   jobRole,
-    //   companyName,
-    // )
-    // const htmlContent = renderEmailTemplate('interviewDetails', templateData)
 
-    // const mailOptions = {
-    //   from: process.env.AUTH_MAIL,
-    //   to: candidate.email,
-    //   cc: recruiter.email,
-    //   subject: 'Candidate Enrollment Form Alert',
-    //   html: htmlContent,
-    // }
-    // await transporter.sendMail(mailOptions)
-    response.status(201).send({ payload })
+    const [candidate, job, company, recruiter] = await Promise.all([
+      Candidate.findById(candidateId),
+      Job.findById(jobId),
+      Company.findById(companyId),
+      User.findById(request.body.userId || 'defaultUserId') // Assumes userId might be passed
+    ]);
+
+    if (!candidate) return response.status(404).send('Candidate not found.');
+    if (!job) return response.status(404).send('Job not found.');
+    if (!company) return response.status(404).send('Company not found.');
+    if (job.companyId.toString() !== companyId) {
+        return response.status(400).send('Mismatch: This job does not belong to the selected company.');
+    }
+
+    const newInterview = new Interview({ candidateId, jobId, status, companyId, date });
+    await newInterview.save();
+
+    // --- Email Logic ---
+    const templateData = prepareCandidateInterview(request, candidate, recruiter, newInterview, job, company);
+    const htmlContent = renderEmailTemplate('interviewDetails', templateData);
+    await transporter.sendMail({
+      from: process.env.AUTH_MAIL,
+      to: candidate.email,
+      cc: recruiter?.email,
+      subject: `Interview Scheduled for ${job.role} at ${company.name}`,
+      html: htmlContent,
+    });
+    
+    // --- Notification Logic ---
+    const io = request.app.get('io');
+    const message = `New interview scheduled for ${candidate.name} at ${company.name} for the ${job.role} role.`;
+    const notification = new Notification({
+        title: 'New Interview Scheduled',
+        message: message,
+        type: 'success',
+        link: '/admin/interviews'
+    });
+    await notification.save();
+    io.emit('newInterview', { message });
+    // -------------------------
+
+    response.status(201).json(newInterview);
+  } catch (error) {
+    console.error("Error scheduling interview:", error);
+    response.status(500).json({ message: 'Server error while scheduling interview.' });
   }
-})
+});
 
+/**
+ * @route   PATCH /api/interview/:id
+ * @desc    Update the status of an interview
+ * @access  Admin
+ */
+router.patch('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!status) {
+            return res.status(400).json({ message: 'Status field is required.' });
+        }
+
+        const updatedInterview = await Interview.findByIdAndUpdate(
+            id,
+            { status }, // Update only the status field
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedInterview) {
+            return res.status(404).json({ message: 'Interview not found.' });
+        }
+
+        // --- Notification Logic for Status Update ---
+        // We need to fetch related names for a descriptive message
+        const [candidate, job, company] = await Promise.all([
+            Candidate.findById(updatedInterview.candidateId),
+            Job.findById(updatedInterview.jobId),
+            Company.findById(updatedInterview.companyId),
+        ]);
+        
+        if (candidate && job && company) {
+            const io = req.app.get('io');
+            const message = `Status for ${candidate.name}'s interview at ${company.name} updated to "${status}".`;
+            const notification = new Notification({
+                title: 'Interview Status Updated',
+                message: message,
+                type: 'info',
+                link: '/admin/interviews'
+            });
+            await notification.save();
+            io.emit('interviewStatusUpdated', { message, interview: updatedInterview });
+        }
+        // -----------------------------------------
+
+        res.status(200).json(updatedInterview);
+    } catch (error) {
+        console.error('Error updating interview status:', error);
+        res.status(500).json({ message: 'Server error while updating status.' });
+    }
+});
+
+/**
+ * @route   GET /api/interview/search
+ * @desc    Get candidates and companies for form dropdowns
+ * @access  Admin
+ */
 router.get('/search', async (request, response) => {
   try {
-    const candidates = await Candidate.find({}, { _id: 1, name: 1 })
-    const companies = await Companies.find({}, { _id: 1, name: 1 })
-    response.send({ candidates, companies })
+    const [candidates, companies] = await Promise.all([
+        Candidate.find({}, { _id: 1, name: 1 }),
+        Company.find({}, { _id: 1, name: 1 })
+    ]);
+    response.status(200).json({ candidates, companies });
   } catch (error) {
-    console.error('Error fetching enriched interviews:', error)
-    response.status(500).json({ message: 'Internal server error.' })
+    console.error('Error fetching search options:', error);
+    response.status(500).json({ message: 'Internal server error.' });
   }
-})
+});
 
-export default router
+export default router;

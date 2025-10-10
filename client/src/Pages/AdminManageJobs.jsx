@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import api from '../api/axios' // <-- CORRECT: Imports the central API connection
 import './AdminManageJobs.css' // Import the new CSS file
 import * as XLSX from 'xlsx'
-import { FileText } from 'lucide-react'
+import { FilePenLine, FileText, Trash } from 'lucide-react'
 
 const AdminManageJobs = () => {
   const [jobs, setJobs] = useState([])
@@ -444,12 +444,12 @@ const AdminManageJobs = () => {
                         <button
                           onClick={() => handleEditPopup(job)}
                           className='text-indigo-600 hover:text-indigo-900 font-semibold transition-colors duration-200 flex items-center'>
-                          Edit
+                          <FilePenLine />
                         </button>
                         <button
                           onClick={() => handleDeleteJob(job._id)}
                           className='delete-btn'>
-                          Delete
+                         <Trash />
                         </button>
                       </td>
                     </tr>

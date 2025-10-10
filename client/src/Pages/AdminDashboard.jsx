@@ -81,18 +81,19 @@ export default function AdminDashboard() {
         ] = await Promise.all([
           api.get('/candidates').catch((e) => ({ data: [] })),
           api.get('/jobs').catch((e) => ({ data: [] })),
-          api.get('/request-info').catch((e) => ({ data: [] })),
+          api.get('/candidates/pendings').catch((e) => ({ data: [] })),
           api.get('/company').catch((e) => ({ data: [] })),
-          api.get('/interview').catch((e) => ({ data: [] })),
+          api.get('/interview/all').catch((e) => ({ data: [] })),
           api.get('/college-connect').catch((e) => ({ data: [] })),
         ])
 
         const pendingRequests = requestsResponse.data.filter(
           (req) => req.status === 'pending',
         )
-        const approvedRequests = requestsResponse.data.filter(
-          (req) => req.status === 'approved',
+        const placedCandidates = interviewsResponse.data.filter(
+          (req) => (req.status = 'Offer Extented'),
         )
+        console.log(placedCandidates)
 
         setStats({
           totalCandidates: candidatesResponse.data.length,
@@ -100,7 +101,7 @@ export default function AdminDashboard() {
           benchRequests: pendingRequests.length,
           partnerCompanies: companiesResponse.data.length,
           colleges: collegeResponse.data.length,
-          placements: approvedRequests.length, // Logic: a placement is an approved request
+          placements: placedCandidates.length, // Logic: a placement is an approved request
           interviews: interviewsResponse.data.length,
         })
       } catch (error) {
@@ -163,20 +164,22 @@ export default function AdminDashboard() {
   }
 
   // Reusable StatCard component
-  const StatCard = ({ title, value, subtext, icon, percentage }) => (
-    <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1'>
-      <div className='flex items-center justify-between'>
-        <div className='bg-red-200 p-2 rounded-lg'>{icon}</div>
-        {percentage && <p className='text-[#16a34a]'>{percentage}</p>}
+  const StatCard = ({ title, value, subtext, icon, percentage, path }) => (
+    <a href={path}>
+      <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1'>
+        <div className='flex items-center justify-between'>
+          <div className='bg-red-200 p-2 rounded-lg'>{icon}</div>
+          {percentage && <p className='text-[#16a34a]'>{percentage}</p>}
+        </div>
+        <div>
+          <h1 className='text-3xl font-bold mt-3'>
+            {loadingStats ? '...' : value}
+          </h1>
+          <p className='text-lg font-semibold text-[#64748b]'>{title}</p>
+          <p className='text-sm text-[#64748b]'>{subtext}</p>
+        </div>
       </div>
-      <div>
-        <h1 className='text-3xl font-bold mt-3'>
-          {loadingStats ? '...' : value}
-        </h1>
-        <p className='text-lg font-semibold text-[#64748b]'>{title}</p>
-        <p className='text-sm text-[#64748b]'>{subtext}</p>
-      </div>
-    </div>
+    </a>
   )
 
   return (
@@ -198,6 +201,7 @@ export default function AdminDashboard() {
           subtext='on bench'
           icon={<UsersRound className='stroke-red-500 stroke-2' />}
           percentage='+12%'
+          path='manage-candidates'
         />
         <StatCard
           title='Active Jobs'
@@ -205,20 +209,25 @@ export default function AdminDashboard() {
           subtext='new this week'
           icon={<Briefcase className='stroke-red-500 stroke-2' />}
           percentage='+3%'
+          path='manage-jobs'
         />
-        <StatCard
-          title='Bench Requests'
-          value={stats.benchRequests}
-          subtext='awaiting approval'
-          icon={<UserCheck className='stroke-red-500 stroke-2' />}
-          percentage={`+${stats.benchRequests}`}
-        />
+        {user.role !== 'recruiter' && (
+          <StatCard
+            title='Bench Requests'
+            value={stats.benchRequests}
+            subtext='awaiting approval'
+            icon={<UserCheck className='stroke-red-500 stroke-2' />}
+            percentage={`+${stats.benchRequests}`}
+            path='candidateList'
+          />
+        )}
         <StatCard
           title='Partner Companies'
           value={stats.partnerCompanies}
           subtext='actively hiring'
           icon={<Building2 className='stroke-red-500 stroke-2' />}
           percentage='+12%'
+          path='companies'
         />
         <StatCard
           title='Colleges'
@@ -240,6 +249,7 @@ export default function AdminDashboard() {
           subtext='Interviews scheduled'
           icon={<BookUser className='stroke-red-500 stroke-2' />}
           percentage='+12%'
+          path='interviews'
         />
       </div>
 

@@ -121,11 +121,11 @@ router.get('/all', async (req, res) => {
   try {
     const candidates = await Candidate.aggregate([
       // This pipeline joins candidates with users to get the recruiter's name
-  {
-  $match: {
-    status: { $in: ['pending', 'approved', 'rejected'] }
-  }
-},
+      {
+        $match: {
+          status: { $in: ['pending', 'approved', 'rejected'] },
+        },
+      },
       {
         $addFields: {
           userObjectId: {

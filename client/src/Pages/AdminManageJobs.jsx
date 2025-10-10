@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import api from '../api/axios' // <-- CORRECT: Imports the central API connection
 import './AdminManageJobs.css' // Import the new CSS file
 import * as XLSX from 'xlsx'
+import { FileText } from 'lucide-react'
 
 const AdminManageJobs = () => {
   const [jobs, setJobs] = useState([])
@@ -17,6 +18,7 @@ const AdminManageJobs = () => {
     location: '',
   })
   const [showPopup, setShowPopup] = useState(false) // State for controlling the pop-up
+  const [editPopup, setEditPopup] = useState(false)
 
   const fetchJobs = async () => {
     try {
@@ -42,7 +44,7 @@ const AdminManageJobs = () => {
   useEffect(() => {
     fetchJobs()
     fetchCompanies()
-  }, [showPopup])
+  }, [showPopup, editPopup])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -67,6 +69,21 @@ const AdminManageJobs = () => {
     } catch (err) {
       alert(err.response.data)
       console.error('Error adding job:', err)
+    }
+  }
+
+  const handleEditPopup = async (job) => {
+    setFormState(job)
+    setEditPopup(true)
+  }
+  const handleEditJob = async (e) => {
+    e.preventDefault()
+    try {
+      // console.log(formState._id)
+      const response = await api.patch(`jobs/${formState._id}`, formState)
+      setEditPopup(false)
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -126,7 +143,25 @@ const AdminManageJobs = () => {
 
   return (
     <div className='admin-manage-jobs'>
-      <h1 className='main-title'>Admin Job Management</h1>
+      <div className='bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between'>
+        <div className='flex items-center space-x-4'>
+          <div className='bg-white bg-opacity-20 p-3 rounded-full'>
+            <FileText />
+          </div>
+          <div>
+            <h3 className='text-3xl font-bold text-white'>
+              Manage Job Postings
+            </h3>
+            <p className='text-blue-100 text-sm'>
+              Add, update, or remove job listings from the system
+            </p>
+          </div>
+        </div>
+        <div className='text-right'>
+          <p className='text-5xl font-extrabold text-white'>{jobs.length}</p>
+          <p className='text-blue-100 text-sm'>Total Jobs Posted</p>
+        </div>
+      </div>
 
       <button onClick={() => setShowPopup(true)} className='add-new-job-button'>
         Add New Job Posting
@@ -240,6 +275,140 @@ const AdminManageJobs = () => {
           </div>
         </div>
       )}
+      {editPopup && (
+        <div class='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
+          <div class='relative p-8 border w-11/12 max-w-lg shadow-lg rounded-md bg-white'>
+            <button
+              class='absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-semibold'
+              onClick={() => setEditPopup(false)}>
+              &times;
+            </button>
+            <h2 class='text-2xl font-bold text-gray-800 mb-6 text-center'>
+              Edit Job Posting
+            </h2>
+            <form onSubmit={handleEditJob} class='space-y-4'>
+              <div class='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div>
+                  <label
+                    htmlFor='companyId'
+                    class='block text-sm font-medium text-gray-700 mb-1'>
+                    Company
+                  </label>
+                  <select
+                    id='companyId'
+                    name='companyId'
+                    value={formState.companyId}
+                    onChange={handleCompanySelectChange}
+                    required
+                    class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'>
+                    <option value=''>Select a Company</option>
+                    {company.map((comp) => (
+                      <option key={comp._id} value={comp._id}>
+                        {comp.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label
+                    htmlFor='role'
+                    class='block text-sm font-medium text-gray-700 mb-1'>
+                    Job Role
+                  </label>
+                  <input
+                    id='role'
+                    name='role'
+                    type='text'
+                    value={formState.role}
+                    onChange={handleInputChange}
+                    placeholder='e.g., Frontend Developer'
+                    required
+                    class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor='exp'
+                  class='block text-sm font-medium text-gray-700 mb-1'>
+                  Experience
+                </label>
+                <input
+                  id='exp'
+                  name='exp'
+                  type='text'
+                  value={formState.exp}
+                  onChange={handleInputChange}
+                  placeholder='e.g., 0-2 yrs'
+                  required
+                  class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor='skills'
+                  class='block text-sm font-medium text-gray-700 mb-1'>
+                  Skills
+                </label>
+                <input
+                  id='skills'
+                  name='skills'
+                  type='text'
+                  value={formState.skills}
+                  onChange={handleInputChange}
+                  placeholder='e.g., React, JS, HTML'
+                  required
+                  class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor='salary'
+                  class='block text-sm font-medium text-gray-700 mb-1'>
+                  Salary
+                </label>
+                <input
+                  id='salary'
+                  name='salary'
+                  type='text'
+                  value={formState.salary}
+                  onChange={handleInputChange}
+                  placeholder='e.g., 3-4 LPA'
+                  required
+                  class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor='location'
+                  class='block text-sm font-medium text-gray-700 mb-1'>
+                  Location
+                </label>
+                <input
+                  id='location'
+                  name='location'
+                  type='text'
+                  value={formState.location}
+                  onChange={handleInputChange}
+                  placeholder='e.g., Hyderabad'
+                  required
+                  class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                />
+              </div>
+
+              <button
+                type='submit'
+                class='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-6'>
+                Save Changes
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className='listings-container card'>
         <h2>Current Job Listings</h2>
@@ -271,7 +440,12 @@ const AdminManageJobs = () => {
                       <td>{job.skills}</td>
                       <td>{job.salary}</td>
                       <td>{job.location}</td>
-                      <td>
+                      <td className='flex align-center justify-center gap-3 p-5 '>
+                        <button
+                          onClick={() => handleEditPopup(job)}
+                          className='text-indigo-600 hover:text-indigo-900 font-semibold transition-colors duration-200 flex items-center'>
+                          Edit
+                        </button>
                         <button
                           onClick={() => handleDeleteJob(job._id)}
                           className='delete-btn'>

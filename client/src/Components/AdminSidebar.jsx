@@ -54,48 +54,112 @@ export default function AdminSidebar({ isOpen }) {
   const allLinks = [
     ...commonLinks,
     { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
-    { path: 'interviews/approvals', label: 'Interviews Approvals', icon: Hourglass },
-    { path: '/admin/manage-candidates', label: 'Manage Candidates', icon: AlignHorizontalJustifyStart },
-    { path: '/admin/candidateList', label: 'Candidates Approvals', icon: Hourglass },
+    {
+      path: '/admin/interviews/approvals',
+      label: 'Interviews Approvals',
+      icon: Hourglass,
+    },
+    {
+      path: '/admin/manage-candidates',
+      label: 'Manage Candidates',
+      icon: AlignHorizontalJustifyStart,
+    },
+    {
+      path: '/admin/candidateList',
+      label: 'Candidates Approvals',
+      icon: Hourglass,
+    },
     { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
     { path: '/admin/companies', label: 'Manage Companies', icon: Building },
-    { path: '/admin/studentenrollment', label: 'Student Enrollment', icon: Store },
+    {
+      path: '/admin/studentenrollment',
+      label: 'Student Enrollment',
+      icon: Store,
+    },
     { path: '/admin/applications', label: 'View Applications', icon: Layers },
-    { path: '/admin/view-requests', label: 'View Requests', icon: AudioLines, isNotification: true },
-    { path: '/admin/manage-recruiters', label: 'Add Recruiter', icon: UserSearch },
+    {
+      path: '/admin/view-requests',
+      label: 'View Requests',
+      icon: AudioLines,
+      isNotification: true,
+    },
+    {
+      path: '/admin/manage-recruiters',
+      label: 'Add Recruiter',
+      icon: UserSearch,
+    },
     { path: '/admin/manage-managers', label: 'Add Managers', icon: UserCog },
     { path: '/admin/manage-blogs', label: 'Manage Blogs', icon: Shield },
-    { path: '/admin/new-batch-dashboard', label: 'New Batches', icon: FileUser },  
+    {
+      path: '/admin/new-batch-dashboard',
+      label: 'New Batches',
+      icon: FileUser,
+    },
     { path: '/admin/forms', label: 'Form', icon: Layers },
-    { path: '/admin/it-programs', label: 'IT Programs', icon: HardDrive, isDropdown: true },
-
-
+    {
+      path: '/admin/it-programs',
+      label: 'IT Programs',
+      icon: HardDrive,
+      isDropdown: true,
+    },
   ]
 
   // Sidebar config for manager and recruiter
   const sidebarConfig = {
     manager: [
-       ...commonLinks,
+      ...commonLinks,
       { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
-      { path: 'interviews/approvals', label: 'Interviews Approvals', icon: Hourglass},
-  { path: '/admin/manage-candidates', label: 'Manage Candidates', icon: AlignHorizontalJustifyStart },
-      { path: '/admin/candidateList', label: 'Candidates Approvals', icon: Hourglass },
+      {
+        path: 'interviews/approvals',
+        label: 'Interviews Approvals',
+        icon: Hourglass,
+      },
+      {
+        path: '/admin/manage-candidates',
+        label: 'Manage Candidates',
+        icon: AlignHorizontalJustifyStart,
+      },
+      {
+        path: '/admin/candidateList',
+        label: 'Candidates Approvals',
+        icon: Hourglass,
+      },
       { path: '/admin/companies', label: 'Manage Companies', icon: Building },
       { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
-      { path: '/admin/studentenrollment', label: 'Student Enrollment', icon: Store },
-      { path: '/admin/applications', label: 'View Applications', icon: Layers  },
-      { path: '/admin/view-requests', label: 'View Requests', icon: AudioLines, isNotification: true },
-      { path: '/admin/manage-recruiters', label: 'Add Recruiter', icon: UserSearch },
-      { path: '/admin/it-programs', label: 'IT Programs', icon: HardDrive, isDropdown: true },
-   
+      {
+        path: '/admin/studentenrollment',
+        label: 'Student Enrollment',
+        icon: Store,
+      },
+      { path: '/admin/applications', label: 'View Applications', icon: Layers },
+      {
+        path: '/admin/view-requests',
+        label: 'View Requests',
+        icon: AudioLines,
+        isNotification: true,
+      },
+      {
+        path: '/admin/manage-recruiters',
+        label: 'Add Recruiter',
+        icon: UserSearch,
+      },
+      {
+        path: '/admin/it-programs',
+        label: 'IT Programs',
+        icon: HardDrive,
+        isDropdown: true,
+      },
     ],
     recruiter: [
-       ...commonLinks,
+      ...commonLinks,
       { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
-      { path: '/admin/manage-candidates', label: 'Manage Candidates', icon: UserRound },
+      {
+        path: '/admin/manage-candidates',
+        label: 'Manage Candidates',
+        icon: UserRound,
+      },
       { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
     ],
-
   }
 
   // Decide which links to render
@@ -106,15 +170,14 @@ export default function AdminSidebar({ isOpen }) {
   else linksToRender = commonLinks
 
   return (
-    <aside className={`admin-sidebar overflow-scroll ${!isOpen ? 'collapsed' : ''}`}>
+    <aside
+      className={`admin-sidebar overflow-scroll ${!isOpen ? 'collapsed' : ''}`}>
       <div>
         <div className='admin-sidebar-header'>
           <div className='logo-img'>
             <img src='/Logo6.jpg' alt='logo' className='h-[30px] w-[40px]' />
           </div>
-          <div className='logo-side-name'>
-          
-          </div>
+          <div className='logo-side-name'></div>
         </div>
 
         <nav>
@@ -125,7 +188,9 @@ export default function AdminSidebar({ isOpen }) {
                 <div className='dropdown-container' key={link.path}>
                   <div
                     onClick={() => setOpenServices(!openServices)}
-                    className={`sidebar-link services-header ${isSubmenuActive ? 'active' : ''}`}
+                    className={`sidebar-link services-header ${
+                      isSubmenuActive ? 'active' : ''
+                    }`}
                     data-tooltip='Services'>
                     <div className='dashboard-icon'>
                       <HardDrive style={{ width: '18px', flexShrink: 0 }} />{' '}
@@ -133,20 +198,26 @@ export default function AdminSidebar({ isOpen }) {
                     </div>
                     <ChevronDown
                       size={18}
-                      className={`dropdown-arrow ${openServices ? 'rotate' : ''}`}
+                      className={`dropdown-arrow ${
+                        openServices ? 'rotate' : ''
+                      }`}
                     />
                   </div>
                   {openServices && (
                     <div className='submenu'>
                       <Link
                         to='/admin/it-programs'
-                        className={`sidebar-link ${isActive('/admin/it-programs') ? 'active' : ''}`}
+                        className={`sidebar-link ${
+                          isActive('/admin/it-programs') ? 'active' : ''
+                        }`}
                         data-tooltip='IT Services'>
                         IT Services
                       </Link>
                       <Link
                         to='/admin/non-it-programs'
-                        className={`sidebar-link ${isActive('/admin/non-it-programs') ? 'active' : ''}`}
+                        className={`sidebar-link ${
+                          isActive('/admin/non-it-programs') ? 'active' : ''
+                        }`}
                         data-tooltip='Non-IT Services'>
                         Non IT Services
                       </Link>
@@ -160,7 +231,9 @@ export default function AdminSidebar({ isOpen }) {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`sidebar-link ${isActive(link.path) ? 'active' : ''}`}
+                className={`sidebar-link ${
+                  isActive(link.path) ? 'active' : ''
+                }`}
                 data-tooltip={link.label}>
                 <div className='dashboard-icon'>
                   <link.icon style={{ width: '18px', flexShrink: 0 }} />{' '}
@@ -173,7 +246,10 @@ export default function AdminSidebar({ isOpen }) {
             )
           })}
 
-          <button className='logout-btn' onClick={handleLogout} data-tooltip='Logout'>
+          <button
+            className='logout-btn'
+            onClick={handleLogout}
+            data-tooltip='Logout'>
             <LogOut size={18} />
             <span className='link-text'>Logout</span>
           </button>

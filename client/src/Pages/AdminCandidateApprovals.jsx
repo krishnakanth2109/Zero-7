@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import api from '../api/axios';
-import { CheckCircle, XCircle, Search, Filter, Download } from 'lucide-react'; // Added Download icon
+import React, { useState, useEffect, useMemo } from 'react'
+import api from '../api/axios'
+import { CheckCircle, XCircle, Search, Filter, Download } from 'lucide-react' // Added Download icon
 
 // Custom Alert Component
 const Alert = ({ message, type, onClose }) => {
@@ -8,176 +8,183 @@ const Alert = ({ message, type, onClose }) => {
     success: 'bg-green-100 border-green-400 text-green-700',
     error: 'bg-red-100 border-red-400 text-red-700',
     info: 'bg-blue-100 border-blue-400 text-blue-700',
-  };
+  }
 
   return (
     <div
       className={`fixed top-4 right-4 z-50 p-4 rounded-md border ${typeClasses[type]} shadow-lg transition-opacity duration-300 ease-in-out`}
-      role="alert"
-    >
-      <div className="flex items-center justify-between">
-        <span className="block sm:inline">{message}</span>
+      role='alert'>
+      <div className='flex items-center justify-between'>
+        <span className='block sm:inline'>{message}</span>
         <button
           onClick={onClose}
-          className="ml-4 text-gray-700 hover:text-gray-900 focus:outline-none"
-        >
-          <XCircle className="h-5 w-5" />
+          className='ml-4 text-gray-700 hover:text-gray-900 focus:outline-none'>
+          <XCircle className='h-5 w-5' />
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
 const AdminCandidateApprovals = () => {
-  const [candidates, setCandidates] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'pending', 'approved', 'rejected'
-  const [filterRole, setFilterRole] = useState('all'); // New filter for role
-  const [filterLocation, setFilterLocation] = useState('all'); // New filter for location
-  const [filterRecruiter, setFilterRecruiter] = useState('all'); // New filter for recruiter
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('info');
+  const [candidates, setCandidates] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterStatus, setFilterStatus] = useState('all') // 'all', 'pending', 'approved', 'rejected'
+  const [filterRole, setFilterRole] = useState('all') // New filter for role
+  const [filterLocation, setFilterLocation] = useState('all') // New filter for location
+  const [filterRecruiter, setFilterRecruiter] = useState('all') // New filter for recruiter
+  const [showAlert, setShowAlert] = useState(false)
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertType, setAlertType] = useState('info')
 
   // --- Derived Counts (No useState or localStorage for these) ---
   const pendingCount = useMemo(() => {
-    return candidates.filter(c => c.status === 'pending').length;
-  }, [candidates]);
+    return candidates.filter((c) => c.status === 'pending').length
+  }, [candidates])
 
   const approvedCount = useMemo(() => {
-    return candidates.filter(c => c.status === 'approved').length;
-  }, [candidates]);
+    return candidates.filter((c) => c.status === 'approved').length
+  }, [candidates])
 
   const rejectedCount = useMemo(() => {
-    return candidates.filter(c => c.status === 'rejected').length;
-  }, [candidates]);
+    return candidates.filter((c) => c.status === 'rejected').length
+  }, [candidates])
   // --- End Derived Counts ---
-
 
   // Function to show alerts
   const showCustomAlert = (message, type = 'info') => {
-    setAlertMessage(message);
-    setAlertType(type);
-    setShowAlert(true);
-    setTimeout(() => setShowAlert(false), 5000); // Alert disappears after 5 seconds
-  };
+    setAlertMessage(message)
+    setAlertType(type)
+    setShowAlert(true)
+    setTimeout(() => setShowAlert(false), 5000) // Alert disappears after 5 seconds
+  }
 
   const fetchData = async () => {
     try {
-      const response = await api.get('/candidates/all'); // Assuming this returns all candidates
-      setCandidates(response.data);
+      const response = await api.get('/candidates/all') // Assuming this returns all candidates
+      setCandidates(response.data)
       // Counts are now derived automatically from 'candidates' state
     } catch (error) {
-      console.error('Error fetching candidates:', error);
-      showCustomAlert('Failed to load candidates.', 'error');
+      console.error('Error fetching candidates:', error)
+      showCustomAlert('Failed to load candidates.', 'error')
     }
-  };
+  }
 
   useEffect(() => {
-    fetchData();
-  }, []); // Empty dependency array means this runs once on mount
+    fetchData()
+  }, []) // Empty dependency array means this runs once on mount
 
   // Extract unique values for filters (memoized for performance)
   const uniqueRoles = useMemo(() => {
-    const roles = new Set(candidates.map(c => c.role).filter(Boolean));
-    return ['all', ...Array.from(roles).sort()];
-  }, [candidates]);
+    const roles = new Set(candidates.map((c) => c.role).filter(Boolean))
+    return ['all', ...Array.from(roles).sort()]
+  }, [candidates])
 
   const uniqueLocations = useMemo(() => {
-    const locations = new Set(candidates.map(c => c.location).filter(Boolean));
-    return ['all', ...Array.from(locations).sort()];
-  }, [candidates]);
+    const locations = new Set(candidates.map((c) => c.location).filter(Boolean))
+    return ['all', ...Array.from(locations).sort()]
+  }, [candidates])
 
   const uniqueRecruiters = useMemo(() => {
-    const recruiters = new Set(candidates.map(c => c.userName).filter(Boolean));
-    return ['all', ...Array.from(recruiters).sort()];
-  }, [candidates]);
-
+    const recruiters = new Set(
+      candidates.map((c) => c.userName).filter(Boolean),
+    )
+    return ['all', ...Array.from(recruiters).sort()]
+  }, [candidates])
 
   // --- Action Handlers ---
   const handleApprove = async (candidateId) => {
     try {
-      await api.patch(`/candidates/${candidateId}/status`, { status: 'approved' });
+      await api.patch(`/candidates/${candidateId}/status`, {
+        status: 'approved',
+      })
       setCandidates((prevCandidates) =>
         prevCandidates.map((c) =>
           c._id === candidateId ? { ...c, status: 'approved' } : c,
         ),
-      );
+      )
       // Counts will automatically re-calculate via useMemo when candidates state updates
-      showCustomAlert('Candidate approved successfully!', 'success');
+      showCustomAlert('Candidate approved successfully!', 'success')
     } catch (error) {
-      console.error('Error approving candidate:', error);
-      showCustomAlert('Failed to approve candidate.', 'error');
+      console.error('Error approving candidate:', error)
+      showCustomAlert('Failed to approve candidate.', 'error')
     }
-  };
+  }
 
   const handleReject = async (candidateId) => {
     try {
-      await api.patch(`/candidates/${candidateId}/status`, { status: 'rejected' });
+      await api.patch(`/candidates/${candidateId}/status`, {
+        status: 'rejected',
+      })
       setCandidates((prevCandidates) =>
         prevCandidates.map((c) =>
           c._id === candidateId ? { ...c, status: 'rejected' } : c,
         ),
-      );
+      )
       // Counts will automatically re-calculate via useMemo when candidates state updates
-      showCustomAlert('Candidate rejected successfully!', 'success');
+      showCustomAlert('Candidate rejected successfully!', 'success')
     } catch (error) {
-      console.error('Error rejecting candidate:', error);
-      showCustomAlert('Failed to reject candidate.', 'error');
+      console.error('Error rejecting candidate:', error)
+      showCustomAlert('Failed to reject candidate.', 'error')
     }
-  };
+  }
 
   // --- Status Badge Styling ---
   const getStatusClasses = (status) => {
     switch (status) {
       case 'approved':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'rejected':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800'
       case 'pending':
       default:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800'
     }
-  };
+  }
 
   // Memoized filtered and searched candidates
   const filteredCandidates = useMemo(() => {
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const lowerCaseSearchTerm = searchTerm.toLowerCase()
 
     return candidates.filter((candidate) => {
       // Search term matching
       const matchesSearch =
-        (candidate.name && candidate.name.toLowerCase().includes(lowerCaseSearchTerm)) ||
-        (candidate.role && candidate.role.toLowerCase().includes(lowerCaseSearchTerm)) ||
-        (candidate.location && candidate.location.toLowerCase().includes(lowerCaseSearchTerm)) ||
-        (candidate.skills && candidate.skills.toLowerCase().includes(lowerCaseSearchTerm)) ||
-        (candidate.userName && candidate.userName.toLowerCase().includes(lowerCaseSearchTerm));
+        (candidate.name &&
+          candidate.name.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (candidate.role &&
+          candidate.role.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (candidate.location &&
+          candidate.location.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (candidate.skills &&
+          candidate.skills.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (candidate.userName &&
+          candidate.userName.toLowerCase().includes(lowerCaseSearchTerm))
 
       // Status filter
       const matchesStatus =
-        filterStatus === 'all' || candidate.status === filterStatus;
-
-      // Role filter
-      const matchesRole =
-        filterRole === 'all' || (candidate.role && candidate.role === filterRole);
-
-      // Location filter
-      const matchesLocation =
-        filterLocation === 'all' || (candidate.location && candidate.location === filterLocation);
+        filterStatus === 'all' || candidate.status === filterStatus
 
       // Recruiter filter
       const matchesRecruiter =
-        filterRecruiter === 'all' || (candidate.userName && candidate.userName === filterRecruiter);
+        filterRecruiter === 'all' ||
+        (candidate.userName && candidate.userName === filterRecruiter)
 
-      return matchesSearch && matchesStatus && matchesRole && matchesLocation && matchesRecruiter;
-    });
-  }, [candidates, searchTerm, filterStatus, filterRole, filterLocation, filterRecruiter]);
+      return matchesSearch && matchesStatus && matchesRecruiter
+    })
+  }, [
+    candidates,
+    searchTerm,
+    filterStatus,
+    filterRole,
+    filterLocation,
+    filterRecruiter,
+  ])
 
   // --- Export to CSV Functionality ---
   const handleExport = () => {
     if (filteredCandidates.length === 0) {
-      showCustomAlert('No data to export based on current filters.', 'info');
-      return;
+      showCustomAlert('No data to export based on current filters.', 'info')
+      return
     }
 
     // Define CSV headers - these match your table headers
@@ -188,10 +195,10 @@ const AdminCandidateApprovals = () => {
       'Skills',
       'Recruiter',
       'Status',
-    ];
+    ]
 
     // Map your filteredCandidates data to the CSV format
-    const csvRows = filteredCandidates.map(candidate => {
+    const csvRows = filteredCandidates.map((candidate) => {
       // Ensure values are strings and properly quoted to handle commas within fields
       return [
         `"${String(candidate.name || '').replace(/"/g, '""')}"`,
@@ -200,32 +207,35 @@ const AdminCandidateApprovals = () => {
         `"${String(candidate.skills || '').replace(/"/g, '""')}"`,
         `"${String(candidate.userName || 'N/A').replace(/"/g, '""')}"`,
         `"${String(candidate.status || '').replace(/"/g, '""')}"`,
-      ].join(','); // Join fields with a comma
-    });
+      ].join(',') // Join fields with a comma
+    })
 
     // Combine headers and rows
-    const csvContent = [headers.join(','), ...csvRows].join('\n');
+    const csvContent = [headers.join(','), ...csvRows].join('\n')
 
     // Create a Blob and download it
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) { // Feature detection for download attribute
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', 'candidate_approvals.csv');
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      showCustomAlert('Data exported successfully!', 'success');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    if (link.download !== undefined) {
+      // Feature detection for download attribute
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', 'candidate_approvals.csv')
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      showCustomAlert('Data exported successfully!', 'success')
     } else {
-      showCustomAlert('Your browser does not support downloading files directly.', 'error');
+      showCustomAlert(
+        'Your browser does not support downloading files directly.',
+        'error',
+      )
     }
-  };
-
+  }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
+    <div className='container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen'>
       {showAlert && (
         <Alert
           message={alertMessage}
@@ -234,48 +244,48 @@ const AdminCandidateApprovals = () => {
         />
       )}
 
-      <h2 className="text-4xl font-extrabold text-gray-900 mb-8 text-center">
+      <h2 className='text-4xl font-extrabold text-gray-900 mb-8 text-center'>
         Candidate Approval Dashboard
       </h2>
 
       {/* Status Count Containers */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-lg flex items-center justify-between border-b-4 border-yellow-400 transform hover:scale-105 transition-transform duration-200 ease-in-out">
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
+        <div className='bg-white p-6 rounded-xl shadow-lg flex items-center justify-between border-b-4 border-yellow-400 transform hover:scale-105 transition-transform duration-200 ease-in-out'>
           <div>
-            <p className="text-2xl font-bold text-gray-800">{pendingCount}</p>
-            <p className="text-sm text-gray-500">Pending Approvals</p>
+            <p className='text-2xl font-bold text-gray-800'>{pendingCount}</p>
+            <p className='text-sm text-gray-500'>Pending Approvals</p>
           </div>
-          <span className="text-yellow-500 bg-yellow-100 p-3 rounded-full">
-            <Filter className="h-6 w-6" />
+          <span className='text-yellow-500 bg-yellow-100 p-3 rounded-full'>
+            <Filter className='h-6 w-6' />
           </span>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-lg flex items-center justify-between border-b-4 border-green-400 transform hover:scale-105 transition-transform duration-200 ease-in-out">
+        <div className='bg-white p-6 rounded-xl shadow-lg flex items-center justify-between border-b-4 border-green-400 transform hover:scale-105 transition-transform duration-200 ease-in-out'>
           <div>
-            <p className="text-2xl font-bold text-gray-800">{approvedCount}</p>
-            <p className="text-sm text-gray-500">Approved Candidates</p>
+            <p className='text-2xl font-bold text-gray-800'>{approvedCount}</p>
+            <p className='text-sm text-gray-500'>Approved Candidates</p>
           </div>
-          <span className="text-green-500 bg-green-100 p-3 rounded-full">
-            <CheckCircle className="h-6 w-6" />
+          <span className='text-green-500 bg-green-100 p-3 rounded-full'>
+            <CheckCircle className='h-6 w-6' />
           </span>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-lg flex items-center justify-between border-b-4 border-red-400 transform hover:scale-105 transition-transform duration-200 ease-in-out">
+        <div className='bg-white p-6 rounded-xl shadow-lg flex items-center justify-between border-b-4 border-red-400 transform hover:scale-105 transition-transform duration-200 ease-in-out'>
           <div>
-            <p className="text-2xl font-bold text-gray-800">{rejectedCount}</p>
-            <p className="text-sm text-gray-500">Rejected Candidates</p>
+            <p className='text-2xl font-bold text-gray-800'>{rejectedCount}</p>
+            <p className='text-sm text-gray-500'>Rejected Candidates</p>
           </div>
-          <span className="text-red-500 bg-red-100 p-3 rounded-full">
-            <XCircle className="h-6 w-6" />
+          <span className='text-red-500 bg-red-100 p-3 rounded-full'>
+            <XCircle className='h-6 w-6' />
           </span>
         </div>
       </div>
 
       {/* Search, Filter, and Export Section */}
-      <div className="flex flex-col md:flex-row flex-wrap justify-between items-center mb-6 space-y-4 md:space-y-0 md:space-x-4">
-        <div className="relative w-full md:w-1/3 lg:w-1/4">
+      <div className='flex flex-col md:flex-row flex-wrap justify-between items-center mb-6 space-y-4 md:space-y-0 md:space-x-4'>
+        <div className='relative w-full md:w-1/3 lg:w-1/4'>
           <input
-            type="text"
-            placeholder="Search candidates by name, role, skills..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            type='text'
+            placeholder='Search candidates by name, role, skills...'
+            className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -283,96 +293,48 @@ const AdminCandidateApprovals = () => {
         </div>
 
         {/* Status Filter */}
-        <div className="relative w-full md:w-auto min-w-[150px]">
+        <div className='relative w-full md:w-auto min-w-[150px]'>
           <select
-            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            className='block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="all">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
+            onChange={(e) => setFilterStatus(e.target.value)}>
+            <option value='all'>All Statuses</option>
+            <option value='pending'>Pending</option>
+            <option value='approved'>Approved</option>
+            <option value='rejected'>Rejected</option>
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
             <svg
-              className="fill-current h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              className='fill-current h-4 w-4'
+              xmlns='http://www.w3.org/2000/svg'
+              viewBox='0 0 20 20'>
+              <path d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z' />
             </svg>
           </div>
         </div>
 
         {/* Role Filter */}
-        <div className="relative w-full md:w-auto min-w-[150px]">
-          <select
-            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-            value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value)}
-          >
-            {uniqueRoles.map((role) => (
-              <option key={role} value={role}>
-                {role === 'all' ? 'All Roles' : role}
-              </option>
-            ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg
-              className="fill-current h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-            </svg>
-          </div>
-        </div>
 
         {/* Location Filter */}
-        <div className="relative w-full md:w-auto min-w-[150px]">
-          <select
-            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-            value={filterLocation}
-            onChange={(e) => setFilterLocation(e.target.value)}
-          >
-            {uniqueLocations.map((location) => (
-              <option key={location} value={location}>
-                {location === 'all' ? 'All Locations' : location}
-              </option>
-            ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg
-              className="fill-current h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-            </svg>
-          </div>
-        </div>
 
         {/* Recruiter Filter */}
-        <div className="relative w-full md:w-auto min-w-[150px]">
+        <div className='relative w-full md:w-auto min-w-[150px]'>
           <select
-            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            className='block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
             value={filterRecruiter}
-            onChange={(e) => setFilterRecruiter(e.target.value)}
-          >
+            onChange={(e) => setFilterRecruiter(e.target.value)}>
             {uniqueRecruiters.map((recruiter) => (
               <option key={recruiter} value={recruiter}>
                 {recruiter === 'all' ? 'All Recruiters' : recruiter}
               </option>
             ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
             <svg
-              className="fill-current h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              className='fill-current h-4 w-4'
+              xmlns='http://www.w3.org/2000/svg'
+              viewBox='0 0 20 20'>
+              <path d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z' />
             </svg>
           </div>
         </div>
@@ -380,125 +342,116 @@ const AdminCandidateApprovals = () => {
         {/* Export Button - Moved to this section for better grouping */}
         <button
           onClick={handleExport}
-          className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 w-full md:w-auto mt-4 md:mt-0"
-          title="Export to CSV"
-        >
-          <Download className="h-5 w-5 mr-2" /> Export
+          className='flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 w-full md:w-auto mt-4 md:mt-0'
+          title='Export to CSV'>
+          <Download className='h-5 w-5 mr-2' /> Export
         </button>
       </div>
 
       {/* Responsive Table Container */}
-      <div className="overflow-x-auto bg-white shadow-xl rounded-xl">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+      <div className='overflow-x-auto bg-white shadow-xl rounded-xl'>
+        <table className='min-w-full divide-y divide-gray-200'>
+          <thead className='bg-gradient-to-r from-blue-500 to-indigo-600 text-white'>
             <tr>
               <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-              >
+                scope='col'
+                className='px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider'>
                 Name
               </th>
               <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-              >
+                scope='col'
+                className='px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider'>
                 Role
               </th>
               <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-              >
+                scope='col'
+                className='px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider'>
                 Location
               </th>
               <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-              >
+                scope='col'
+                className='px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider'>
                 Skills
               </th>
               <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-              >
+                scope='col'
+                className='px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider'>
                 Recruiter
               </th>
               <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-              >
+                scope='col'
+                className='px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider'>
                 Status
               </th>
               <th
-                scope="col"
-                className="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider"
-              >
+                scope='col'
+                className='px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider'>
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className='bg-white divide-y divide-gray-200'>
             {filteredCandidates.length > 0 ? (
               filteredCandidates.map((candidate) => (
-                <tr key={candidate._id} className="hover:bg-gray-100 transition-colors duration-150 ease-in-out">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <tr
+                  key={candidate._id}
+                  className='hover:bg-gray-100 transition-colors duration-150 ease-in-out'>
+                  <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
                     {candidate.name}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-700'>
                     {candidate.role}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-700'>
                     {candidate.location}
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-2">
-                      {candidate.skills && candidate.skills.split(',').map((skill, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-full shadow-sm"
-                        >
-                          {skill.trim()}
-                        </span>
-                      ))}
+                  <td className='px-6 py-4'>
+                    <div className='flex flex-wrap gap-2'>
+                      {candidate.skills &&
+                        candidate.skills.split(',').map((skill, index) => (
+                          <span
+                            key={index}
+                            className='px-3 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-full shadow-sm'>
+                            {skill.trim()}
+                          </span>
+                        ))}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-700'>
                     {candidate.userName || 'N/A'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className='px-6 py-4 whitespace-nowrap text-sm'>
                     <span
                       className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full shadow-sm ${getStatusClasses(
                         candidate.status,
-                      )}`}
-                    >
+                      )}`}>
                       {candidate.status.charAt(0).toUpperCase() +
                         candidate.status.slice(1)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-
-                      <div className="flex justify-center space-x-3">
-                        <button
-                          onClick={() => handleApprove(candidate._id)}
-                          className="p-2 rounded-full text-green-600 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-transform transform hover:scale-110 duration-200"
-                          title="Approve"
-                        >
-                          <CheckCircle className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleReject(candidate._id)}
-                          className="p-2 rounded-full text-red-600 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-transform transform hover:scale-110 duration-200"
-                          title="Reject"
-                        >
-                          <XCircle className="h-5 w-5" />
-                        </button>
-                      </div>
-
+                  <td className='px-6 py-4 whitespace-nowrap text-center text-sm font-medium'>
+                    <div className='flex justify-center space-x-3'>
+                      <button
+                        onClick={() => handleApprove(candidate._id)}
+                        className='p-2 rounded-full text-green-600 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-transform transform hover:scale-110 duration-200'
+                        title='Approve'>
+                        <CheckCircle className='h-5 w-5' />
+                      </button>
+                      <button
+                        onClick={() => handleReject(candidate._id)}
+                        className='p-2 rounded-full text-red-600 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-transform transform hover:scale-110 duration-200'
+                        title='Reject'>
+                        <XCircle className='h-5 w-5' />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="px-6 py-10 text-center text-gray-500 text-lg">
+                <td
+                  colSpan='7'
+                  className='px-6 py-10 text-center text-gray-500 text-lg'>
                   No candidates found for the current search/filter.
                 </td>
               </tr>
@@ -507,7 +460,7 @@ const AdminCandidateApprovals = () => {
         </table>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AdminCandidateApprovals;
+export default AdminCandidateApprovals

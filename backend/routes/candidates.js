@@ -58,6 +58,7 @@ router.get('/', async (req, res) => {
           userName: '$userDetails.name',
         },
       },
+      { $sort: { createdAt: -1 } },
     ])
     res.json(candidates)
   } catch (err) {
@@ -109,6 +110,7 @@ router.get('/pendings', async (req, res) => {
           userName: '$userDetails.name',
         },
       },
+      { $sort: { createdAt: -1 } },
     ])
     res.json(candidates)
   } catch (err) {
@@ -159,6 +161,7 @@ router.get('/all', async (req, res) => {
           userName: '$userDetails.name',
         },
       },
+      { $sort: { createdAt: -1 } },
     ])
     res.json(candidates)
   } catch (err) {

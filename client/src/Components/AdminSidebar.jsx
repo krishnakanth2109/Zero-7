@@ -175,7 +175,11 @@ export default function AdminSidebar({ isOpen }) {
       <div>
         <div className='admin-sidebar-header'>
           <div className='logo-img'>
-            <img src='/Logo6.jpg' alt='logo' className='h-[30px] w-[40px]' />
+            {isOpen ? (
+              <img src='/Logo6.jpg' alt='logo' className='h-[30px] w-[40px]' />
+            ) : (
+              <img src='/L1.png' alt='logo1' className='h-[32px]! w-[32px]!' />
+            )}
           </div>
           <div className='logo-side-name'></div>
         </div>

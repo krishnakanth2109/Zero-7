@@ -259,19 +259,19 @@ export default function AdminManageCandidates() {
     <div className='min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8 font-sans'>
       <div className='max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-8'>
         {/* Header Section */}
-        <div className='mb-8 p-4 bg-gradient-to-r from-teal-600 to-teal-800 text-white rounded-lg shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+        <div className='mb-8 p-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
           <div className='flex items-center gap-4'>
-            <div className='p-3 bg-teal-500 rounded-full'>
+            <div className='p-3  rounded-full'>
               <Users className='w-8 h-8 sm:w-10 sm:h-10' /> {/* Changed icon to Users */}
             </div>
             <div>
-              <h1 className='text-2xl sm:text-3xl font-bold'>Manage Candidates</h1>
+              <h3 className='text-2xl sm:text-3xl font-bold'>Manage Candidates</h3>
               <p className='text-teal-200 text-sm sm:text-base'>
                 Add, update, or remove bench candidates
               </p>
             </div>
           </div>
-          <div className='bg-teal-700/50 backdrop-blur-sm px-5 py-2 rounded-lg text-center shadow-inner'>
+          <div className='rounded-lg text-center shadow-inner'>
             <div className='text-3xl sm:text-4xl font-extrabold'>{candidates.length}</div>
             <div className='text-teal-200 text-sm'>Available Candidates</div> {/* Changed text */}
           </div>

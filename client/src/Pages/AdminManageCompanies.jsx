@@ -1,239 +1,242 @@
-import { useState, useEffect } from 'react'
-import api from '../api/axios'
+import { useState, useEffect } from 'react';
+import api from '../api/axios';
+import { FiBriefcase, FiPlus, FiEdit, FiTrash2, FiX, FiRefreshCcw } from 'react-icons/fi'; // Importing icons
+import { Building2 } from 'lucide-react';
 
 const AdminManageCompanies = () => {
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [editPopup, setEditPopup] = useState(false)
-  const [companyData, setCompanyData] = useState([])
-  const [editCompanyFormState, setEditCompanyFormState] = useState([])
-  const [needsRefresh, setNeedsRefresh] = useState(true) // To trigger data fetching
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editPopup, setEditPopup] = useState(false);
+  const [companyData, setCompanyData] = useState([]);
+  const [editCompanyFormState, setEditCompanyFormState] = useState(null); // Changed to null initially
+  const [needsRefresh, setNeedsRefresh] = useState(true); // To trigger data fetching
   const [newCompany, setNewCompany] = useState({
     _id: '',
     name: '',
     email: '',
     industry: '',
     address: '',
-  })
+  });
 
   useEffect(() => {
     const fetchCompanyData = async () => {
       try {
-        const { data } = await api.get('/company/')
-        setCompanyData(data)
+        const { data } = await api.get('/company/');
+        setCompanyData(data);
       } catch (err) {
-        console.error('Failed to fetch companies:', err)
+        console.error('Failed to fetch companies:', err);
       }
-    }
+    };
     // Only fetch data when needsRefresh is true
     if (needsRefresh) {
-      fetchCompanyData()
-      setNeedsRefresh(false) // Reset after fetching
+      fetchCompanyData();
+      setNeedsRefresh(false); // Reset after fetching
     }
-  }, [needsRefresh])
+  }, [needsRefresh]);
 
   const handleAddInputChange = (e) => {
-    const { name, value } = e.target
-    setNewCompany((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setNewCompany((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleEditInputChange = (e) => {
-    const { name, value } = e.target
-    setEditCompanyFormState((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setEditCompanyFormState((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      await api.post('/company/register', newCompany)
-      setNewCompany({ _id: '', name: '', email: '', industry: '', address: '' })
-      setShowAddForm(false)
-      setNeedsRefresh(true) // Trigger a data refresh
+      await api.post('/company/register', newCompany);
+      setNewCompany({ _id: '', name: '', email: '', industry: '', address: '' });
+      setShowAddForm(false);
+      setNeedsRefresh(true); // Trigger a data refresh
+      alert('Company added successfully!'); // Smooth alert would go here
     } catch (error) {
-      console.error('Error adding company:', error)
-      alert(
-        'Failed to add company: ' +
-          (error.response?.data?.message || 'Server error'),
-      )
+      console.error('Error adding company:', error);
+      alert('Failed to add company: ' + (error.response?.data?.message || 'Server error')); // Smooth alert would go here
     }
-  }
+  };
 
   const handleDelete = async (companyId, companyName) => {
-    // Add a confirmation dialog for better UX
     if (window.confirm(`Are you sure you want to delete ${companyName}?`)) {
       try {
-        await api.delete(`/company/${companyId}`)
-        setNeedsRefresh(true) // Trigger a data refresh
+        await api.delete(`/company/${companyId}`);
+        setNeedsRefresh(true); // Trigger a data refresh
+        alert('Company deleted successfully!'); // Smooth alert would go here
       } catch (error) {
-        console.error('Error deleting company:', error)
-        alert('Failed to delete company.')
+        console.error('Error deleting company:', error);
+        alert('Failed to delete company.'); // Smooth alert would go here
       }
     }
-  }
+  };
 
   const handlePopup = (company) => {
-    setEditCompanyFormState(company)
-    setEditPopup(true)
-  }
+    setEditCompanyFormState(company);
+    setEditPopup(true);
+  };
 
   const handleUpdateCompany = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      const response = await api.patch(
-        `/company/${editCompanyFormState._id}`,
-        editCompanyFormState,
-      )
-      console.log(response.data)
-      setEditPopup(false)
-      setNeedsRefresh(true)
+      await api.patch(`/company/${editCompanyFormState._id}`, editCompanyFormState);
+      setEditPopup(false);
+      setNeedsRefresh(true);
+      alert('Company updated successfully!'); // Smooth alert would go here
     } catch (err) {
-      console.log(err)
+      console.error('Error updating company:', err);
+      alert('Failed to update company.'); // Smooth alert would go here
     }
-  }
+  };
 
   return (
-    <div className='container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen'>
-      <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-3xl font-bold text-gray-800'>Manage Companies</h2>
+    <div className='min-h-screen bg-gray-100 p-6 font-sans'>
+      {/* Header Section */}
+      <div className='bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between'>
+        <div className='flex items-center space-x-4'>
+          <div className='bg-white bg-opacity-20 p-3 rounded-full'>
+       <Building2 />
+          </div>
+          <div>
+            <h3 className='text-3xl font-bold text-white'>Manage Companies</h3>
+            <p className='text-teal-100 text-sm'>Add, update, or remove company accounts from the system</p>
+          </div>
+        </div>
+        <div className='text-right'>
+          <p className='text-5xl font-extrabold text-white'>{companyData.length}</p>
+          <p className='text-teal-100 text-sm'>Available Companies</p> {/* Changed text */}
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className='flex justify-end space-x-4 mb-6'>
         <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className='px-5 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-transform transform hover:scale-105'>
-          {showAddForm ? 'Close Form' : 'Add Company'}
+          onClick={() => setShowAddForm(true)}
+          className='flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors duration-200'
+        >
+          <FiPlus className='mr-2' /> Add New Company
         </button>
       </div>
 
+      {/* Add New Company Form (Popup/Modal) */}
       {showAddForm && (
-        <div className='mb-8 p-6 bg-white shadow-xl rounded-lg border border-gray-200'>
-          <h3 className='text-2xl font-semibold mb-6 text-gray-700'>
-            Add New Company
-          </h3>
-          <form
-            onSubmit={handleSubmit}
-            className='grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4'>
-            <div>
-              <label
-                htmlFor='companyId'
-                className='block text-sm font-medium text-gray-600'>
-                Company ID
-              </label>
-              <input
-                type='text'
-                id='companyId'
-                name='_id'
-                value={newCompany._id}
-                onChange={handleAddInputChange}
-                className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor='name'
-                className='block text-sm font-medium text-gray-600'>
-                Company Name
-              </label>
-              <input
-                type='text'
-                id='name'
-                name='name'
-                value={newCompany.name}
-                onChange={handleAddInputChange}
-                className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor='email'
-                className='block text-sm font-medium text-gray-600'>
-                Email
-              </label>
-              <input
-                type='email'
-                id='email'
-                name='email'
-                value={newCompany.email}
-                onChange={handleAddInputChange}
-                className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor='industry'
-                className='block text-sm font-medium text-gray-600'>
-                Industry
-              </label>
-              <input
-                type='text'
-                id='industry'
-                name='industry'
-                value={newCompany.industry}
-                onChange={handleAddInputChange}
-                className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
-                required
-              />
-            </div>
-            <div className='md:col-span-2'>
-              <label
-                htmlFor='address'
-                className='block text-sm font-medium text-gray-600'>
-                Address
-              </label>
-              <textarea
-                id='address'
-                name='address'
-                value={newCompany.address}
-                onChange={handleAddInputChange}
-                rows='3'
-                className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
-              />
-            </div>
-            <div className='md:col-span-2'>
+        <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
+          <div className='relative p-8 bg-white rounded-lg shadow-xl max-w-md w-full'>
+            <button
+              className='absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-200'
+              onClick={() => setShowAddForm(false)}
+            >
+              <FiX className='h-6 w-6' />
+            </button>
+            <h2 className='text-2xl font-bold text-gray-800 mb-6'>Add New Company</h2>
+            <form onSubmit={handleSubmit} className='space-y-4'>
+              <div>
+                <label htmlFor='companyId' className='block text-sm font-medium text-gray-700'>
+                  Company ID
+                </label>
+                <input
+                  type='text'
+                  id='companyId'
+                  name='_id'
+                  value={newCompany._id}
+                  onChange={handleAddInputChange}
+                  className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm'
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor='name' className='block text-sm font-medium text-gray-700'>
+                  Company Name
+                </label>
+                <input
+                  type='text'
+                  id='name'
+                  name='name'
+                  value={newCompany.name}
+                  onChange={handleAddInputChange}
+                  className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm'
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor='email' className='block text-sm font-medium text-gray-700'>
+                  Email
+                </label>
+                <input
+                  type='email'
+                  id='email'
+                  name='email'
+                  value={newCompany.email}
+                  onChange={handleAddInputChange}
+                  className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm'
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor='industry' className='block text-sm font-medium text-gray-700'>
+                  Industry
+                </label>
+                <input
+                  type='text'
+                  id='industry'
+                  name='industry'
+                  value={newCompany.industry}
+                  onChange={handleAddInputChange}
+                  className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm'
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor='address' className='block text-sm font-medium text-gray-700'>
+                  Address
+                </label>
+                <textarea
+                  id='address'
+                  name='address'
+                  value={newCompany.address}
+                  onChange={handleAddInputChange}
+                  rows='3'
+                  className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm'
+                />
+              </div>
               <button
                 type='submit'
-                className='w-full px-4 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
-                Add Company
+                className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors duration-200'
+              >
+                <FiPlus className='mr-2' /> Add Company
               </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       )}
 
-      {editPopup && (
-        <div class='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
-          <div class='relative p-8 border w-11/12 max-w-2xl shadow-xl rounded-lg bg-white'>
+      {/* Edit Company Popup */}
+      {editPopup && editCompanyFormState && (
+        <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
+          <div className='relative p-8 bg-white rounded-lg shadow-xl max-w-md w-full'>
             <button
-              class='absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-semibold'
-              onClick={() => setEditPopup(false)} // Assuming you have a state to control this popup
+              className='absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-200'
+              onClick={() => setEditPopup(false)}
             >
-              &times;
+              <FiX className='h-6 w-6' />
             </button>
-            <h3 class='text-3xl font-bold text-gray-800 mb-8 text-center'>
-              Edit Company Details
-            </h3>
-            <form
-              onSubmit={handleUpdateCompany} // Assuming you have a handler for updating
-              class='grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5'>
+            <h2 className='text-2xl font-bold text-gray-800 mb-6'>Edit Company Details</h2>
+            <form onSubmit={handleUpdateCompany} className='space-y-4'>
               <div>
-                <label
-                  htmlFor='editCompanyId'
-                  class='block text-sm font-medium text-gray-700 mb-1'>
+                <label htmlFor='editCompanyId' className='block text-sm font-medium text-gray-700'>
                   Company ID
                 </label>
                 <input
                   type='text'
                   id='editCompanyId'
                   name='_id'
-                  value={editCompanyFormState._id} // Assuming a state for edit form
-                  onChange={handleEditInputChange} // Assuming a handler for edit input
-                  class='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 cursor-not-allowed'
-                  readOnly // Company ID often shouldn't be editable
+                  value={editCompanyFormState._id}
+                  className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-gray-100 cursor-not-allowed sm:text-sm'
+                  readOnly
                   disabled
                 />
               </div>
               <div>
-                <label
-                  htmlFor='editName'
-                  class='block text-sm font-medium text-gray-700 mb-1'>
+                <label htmlFor='editName' className='block text-sm font-medium text-gray-700'>
                   Company Name
                 </label>
                 <input
@@ -242,14 +245,12 @@ const AdminManageCompanies = () => {
                   name='name'
                   value={editCompanyFormState.name}
                   onChange={handleEditInputChange}
-                  class='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
+                  className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm'
                   required
                 />
               </div>
               <div>
-                <label
-                  htmlFor='editEmail'
-                  class='block text-sm font-medium text-gray-700 mb-1'>
+                <label htmlFor='editEmail' className='block text-sm font-medium text-gray-700'>
                   Email
                 </label>
                 <input
@@ -258,14 +259,12 @@ const AdminManageCompanies = () => {
                   name='email'
                   value={editCompanyFormState.email}
                   onChange={handleEditInputChange}
-                  class='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
+                  className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm'
                   required
                 />
               </div>
               <div>
-                <label
-                  htmlFor='editIndustry'
-                  class='block text-sm font-medium text-gray-700 mb-1'>
+                <label htmlFor='editIndustry' className='block text-sm font-medium text-gray-700'>
                   Industry
                 </label>
                 <input
@@ -274,14 +273,12 @@ const AdminManageCompanies = () => {
                   name='industry'
                   value={editCompanyFormState.industry}
                   onChange={handleEditInputChange}
-                  class='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
+                  className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm'
                   required
                 />
               </div>
-              <div class='md:col-span-2'>
-                <label
-                  htmlFor='editAddress'
-                  class='block text-sm font-medium text-gray-700 mb-1'>
+              <div>
+                <label htmlFor='editAddress' className='block text-sm font-medium text-gray-700'>
                   Address
                 </label>
                 <textarea
@@ -290,13 +287,22 @@ const AdminManageCompanies = () => {
                   value={editCompanyFormState.address}
                   onChange={handleEditInputChange}
                   rows='3'
-                  class='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'></textarea>
+                  className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm'
+                ></textarea>
               </div>
-              <div class='md:col-span-2 mt-6'>
+              <div className='flex justify-end space-x-3'>
+                <button
+                  type='button'
+                  onClick={() => setEditPopup(false)}
+                  className='flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors duration-200'
+                >
+                  <FiX className='mr-2' /> Cancel
+                </button>
                 <button
                   type='submit'
-                  class='w-full px-4 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
-                  Save Changes
+                  className='flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors duration-200'
+                >
+                  <FiRefreshCcw className='mr-2' /> Save Changes
                 </button>
               </div>
             </form>
@@ -304,9 +310,10 @@ const AdminManageCompanies = () => {
         </div>
       )}
 
+      {/* Companies Table */}
       <div className='overflow-x-auto bg-white shadow-xl rounded-lg border border-gray-200'>
         <table className='min-w-full divide-y divide-gray-200'>
-          <thead className='bg-indigo-500'>
+          <thead className='bg-teal-500'>
             <tr>
               {['ID', 'Name', 'Email', 'Industry', 'Address', 'Actions'].map(
                 (header) => (
@@ -323,7 +330,7 @@ const AdminManageCompanies = () => {
             {companyData.map((company) => (
               <tr
                 key={company._id}
-                className='hover:bg-gray-100 transition-colors duration-200'>
+                className='hover:bg-gray-50 transition-colors duration-200'>
                 <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800'>
                   {company._id}
                 </td>
@@ -339,16 +346,20 @@ const AdminManageCompanies = () => {
                 <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
                   {company.address}
                 </td>
-                <td className='px-6 py-4 whitespace-nowrap text-left text-sm font-medium flex items-center gap-5'>
+                <td className='px-6 py-4 whitespace-nowrap text-left text-sm font-medium flex items-center space-x-4'>
                   <button
                     onClick={() => handlePopup(company)}
-                    className='text-indigo-600 hover:text-indigo-900 font-semibold transition-colors duration-200 flex items-center'>
-                    Edit
+                    className='text-indigo-600 hover:text-indigo-900 font-semibold transition-colors duration-200 flex items-center'
+                    title='Edit Company'
+                  >
+                    <FiEdit className='mr-1 h-4 w-4' /> Edit
                   </button>
                   <button
                     onClick={() => handleDelete(company._id, company.name)}
-                    className='text-red-600 hover:text-red-900 font-semibold'>
-                    Delete
+                    className='text-red-600 hover:text-red-900 font-semibold transition-colors duration-200 flex items-center'
+                    title='Delete Company'
+                  >
+                    <FiTrash2 className='mr-1 h-4 w-4' /> Delete
                   </button>
                 </td>
               </tr>
@@ -357,7 +368,7 @@ const AdminManageCompanies = () => {
         </table>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminManageCompanies
+export default AdminManageCompanies;

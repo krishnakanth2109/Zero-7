@@ -109,7 +109,7 @@ export default function AdminManageManagers() {
                             <Shield className="w-8 h-8 sm:w-10 sm:h-10" />
                         </div>
                         <div>
-                            <h1 className="text-2xl sm:text-3xl font-bold">Manage Managers</h1>
+                            <h3 className="text-2xl sm:text-3xl font-bold">Manage Managers</h3>
                             <p className="text-blue-200 text-sm sm:text-base">
                                 Add, update, or remove manager accounts from the system
                             </p>

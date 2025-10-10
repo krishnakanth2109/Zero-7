@@ -359,7 +359,7 @@ export default function AdminManageRecruiters() {
                             <Shield className="w-8 h-8 sm:w-10 sm:h-10" />
                         </div>
                         <div>
-                            <h1 className="text-2xl sm:text-3xl font-bold">Manage Recruiters</h1>
+                            <h3 className="text-2xl sm:text-3xl font-bold">Manage Recruiters</h3>
                             <p className="text-blue-200 text-sm sm:text-base">
                                 Add, update, or remove recruiter accounts from the system
                             </p>

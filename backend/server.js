@@ -30,8 +30,7 @@ import interviewRoutes from './routes/interview.js'
 import managerRoutes from './routes/manager.js'
 import recruiterRoutes from './routes/recruiter.js'
 
-import notificationsRoutes from './routes/notifications.js'; // <-- ADD THIS
-
+import notificationsRoutes from './routes/notifications.js' // <-- ADD THIS
 
 const app = express()
 const server = http.createServer(app)
@@ -62,7 +61,7 @@ app.set('io', io)
 // This allows your frontend on localhost:3000 to talk to your backend on localhost:5000
 const allowedOrigins =
   process.env.NODE_ENV === 'production'
-    ? ['https://zeroseven7.netlify.app']
+    ? ['https://zeroseven7.netlify.app', 'https://zero7technologies.com/']
     : ['http://localhost:3000']
 app.use(
   cors({
@@ -99,7 +98,7 @@ app.use('/api/company', companyRoutes)
 app.use('/api/interview', interviewRoutes)
 app.use('/api/managers', managerRoutes)
 app.use('/api/recruiters', recruiterRoutes)
-app.use('/api/notifications', notificationsRoutes); 
+app.use('/api/notifications', notificationsRoutes)
 // ✅ MongoDB connection
 const PORT = process.env.PORT || 5000
 

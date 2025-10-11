@@ -44,7 +44,8 @@ const io = new Server(server, {
   cors: {
     origin: [
       'https://zero-7-ayjp.onrender.com', // backend host
-      'https://zeroseven7.netlify.app', // frontend host
+      'https://zeroseven7.netlify.app',
+      'https://zero7technologies.com', // frontend host
       'http://localhost:3000', // local dev
     ],
     methods: ['GET', 'POST'],
@@ -61,7 +62,7 @@ app.set('io', io)
 // This allows your frontend on localhost:3000 to talk to your backend on localhost:5000
 const allowedOrigins =
   process.env.NODE_ENV === 'production'
-    ? ['https://zeroseven7.netlify.app', 'https://zero7technologies.com/']
+    ? ['https://zeroseven7.netlify.app', 'https://zero7technologies.com']
     : ['http://localhost:3000']
 app.use(
   cors({

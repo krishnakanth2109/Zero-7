@@ -195,66 +195,7 @@ const BenchList = () => {
       </section>
 
       {/* Candidate Enrollment Form */}
-      <section className='form-section'>
-        <h2>Candidate Enrollment Form</h2>
-        <form onSubmit={handleEnrollmentSubmit} className='enrollment-form'>
-          <input
-            type='text'
-            name='name'
-            placeholder='Your Name'
-            value={enrollmentFormData.name}
-            onChange={handleEnrollmentChange}
-            required
-            pattern='^[A-Za-z\s]{3,}$'
-            title='Name must be at least 3 letters'
-          />
-          <input
-            type='tel'
-            name='contact'
-            placeholder='Contact Number'
-            value={enrollmentFormData.contact}
-            onChange={handleEnrollmentChange}
-            required
-            pattern='^\d{10}$'
-            title='Enter a valid 10-digit phone number'
-          />
-          <input
-            type='email'
-            name='email'
-            placeholder='Email Address'
-            value={enrollmentFormData.email}
-            onChange={handleEnrollmentChange}
-            required
-            pattern='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-            title='Enter a valid email address'
-          />
-          <input
-            type='text'
-            name='location'
-            placeholder='Your Location'
-            value={enrollmentFormData.location}
-            onChange={handleEnrollmentChange}
-            required
-          />
-          <input
-            type='text'
-            name='resume'
-            placeholder='Your Resume Link (Google Drive, etc.)'
-            value={enrollmentFormData.resume}
-            onChange={handleEnrollmentChange}
-            required
-            pattern='https?://.+'
-            title='Enter a valid URL'
-          />
-          <button
-            className='bg-blue-500 py-3 px-2 text-white rounded-lg'
-            type='submit'
-            disabled={isEnrolling}>
-            {isEnrolling ? 'Submitting...' : 'Submit'}
-          </button>
-        </form>
-      </section>
-
+     
       {/* Stats */}
       <section className='stats-section'>
         <div className='bg-[linear-gradient(45deg,#0f8afe,#00bfff)] rounded-xl flex-1 p-6 shadow-xl min-w-[200px]'>
@@ -483,6 +424,65 @@ const BenchList = () => {
             </div>
           </div>
         </div>
+      </section>
+ <section className='form-section'>
+        <h2>Candidate Enrollment Form</h2>
+        <form onSubmit={handleEnrollmentSubmit} className='enrollment-form'>
+          <input
+            type='text'
+            name='name'
+            placeholder='Your Name'
+            value={enrollmentFormData.name}
+            onChange={handleEnrollmentChange}
+            required
+            pattern='^[A-Za-z\s]{3,}$'
+            title='Name must be at least 3 letters'
+          />
+          <input
+            type='tel'
+            name='contact'
+            placeholder='Contact Number'
+            value={enrollmentFormData.contact}
+            onChange={handleEnrollmentChange}
+            required
+            pattern='^\d{10}$'
+            title='Enter a valid 10-digit phone number'
+          />
+          <input
+            type='email'
+            name='email'
+            placeholder='Email Address'
+            value={enrollmentFormData.email}
+            onChange={handleEnrollmentChange}
+            required
+            pattern='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            title='Enter a valid email address'
+          />
+          <input
+            type='text'
+            name='location'
+            placeholder='Your Location'
+            value={enrollmentFormData.location}
+            onChange={handleEnrollmentChange}
+            required
+          />
+          <input
+            type='text'
+            name='resume'
+            placeholder='Your Resume Link (Google Drive, etc.)'
+            value={enrollmentFormData.resume}
+            onChange={handleEnrollmentChange}
+            required
+            pattern='https?://.+'
+            title='Enter a valid URL'
+          />
+          <button
+            className='bg-blue-500 py-3 px-2 text-white rounded-lg'
+            type='submit'
+            disabled={isEnrolling}>
+            {isEnrolling ? 'Submitting...' : 'Submit'}
+          </button>
+        </form>
       </section>
 
       {/* Process */}

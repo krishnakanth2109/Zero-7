@@ -1,45 +1,38 @@
 // File: backend/routes/notifications.js
 
-import express from 'express'
-import Notification from '../models/notifications.js'
+import express from 'express';
+import Notification from '../models/notifications.js'; // Ensure this file exists
 
-const router = express.Router()
+const router = express.Router();
 
 /**
  * @route   GET /api/notifications
- * @desc    Fetch all notifications, sorted from newest to oldest
- * @access  Private (for admin)
+ * @desc    Fetch all notifications relevant to the logged-in user's role
+ * @access  Public (no middleware)
  */
 router.get('/', async (req, res) => {
   try {
-    // Fetch the 50 most recent notifications
-    const notifications = await Notification.find()
-      .sort({ createdAt: -1 })
-      .limit(50)
-    res.json(notifications)
+    const notifications = await Notification.find().sort({ createdAt: -1 }).limit(50);
+    res.status(200).json(notifications);
   } catch (err) {
-    console.error('Error fetching notifications:', err)
-    res
-      .status(500)
-      .json({ message: 'Server error while fetching notifications.' })
+    console.error("Error fetching notifications:", err);
+    res.status(500).json({ message: "Server error while fetching notifications." });
   }
-})
+});
 
 /**
  * @route   PUT /api/notifications/mark-all-read
  * @desc    Mark all unread notifications as read
- * @access  Private (for admin)
+ * @access  Public (no middleware)
  */
 router.put('/mark-all-read', async (req, res) => {
   try {
-    await Notification.updateMany({ unread: true }, { $set: { unread: false } })
-    res.status(200).json({ message: 'All notifications marked as read.' })
+    await Notification.updateMany({ unread: true }, { $set: { unread: false } });
+    res.status(200).json({ message: "All notifications marked as read." });
   } catch (err) {
-    console.error('Error marking notifications as read:', err)
-    res
-      .status(500)
-      .json({ message: 'Server error while updating notifications.' })
+    console.error("Error marking notifications as read:", err);
+    res.status(500).json({ message: "Server error while updating notifications." });
   }
-})
+});
 
-export default router
+export default router;

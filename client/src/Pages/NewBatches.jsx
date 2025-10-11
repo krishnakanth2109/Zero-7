@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import './NewBatches.css'
 
-const API_URL = 'http://localhost:5000'
+const API_URL = 'https://zero-7-ayjp.onrender.com'
 
 const NewBatches = () => {
   const [showRegistration, setShowRegistration] = useState(false)

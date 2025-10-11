@@ -1,8 +1,9 @@
-// File: src/Components/AdminSidebar.jsx (Complete and Corrected)
+// File: src/Components/AdminSidebar.jsx
 
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
+  AlignHorizontalJustifyStart,
   AudioLines,
   Building,
   CardSim,
@@ -11,6 +12,8 @@ import {
   FileUser,
   GraduationCap,
   HardDrive,
+  Hourglass,
+  Layers,
   LayoutDashboard,
   LogOut,
   Shield,
@@ -19,8 +22,6 @@ import {
   UserRound,
   UserSearch,
 } from 'lucide-react'
-import api from '../api/axios'
-import { io } from 'socket.io-client'
 import Cookie from 'js-cookie'
 import './AdminSidebar.css'
 
@@ -31,46 +32,12 @@ export default function AdminSidebar({ isOpen }) {
   const [newCount, setNewCount] = useState(0)
   const [newRequestCount, setNewRequestCount] = useState(0)
 
-  useEffect(() => {
-    if (
-      location.pathname.startsWith('/admin/it-programs') ||
-      location.pathname.startsWith('/admin/non-it-programs')
-    ) {
-      setOpenServices(true)
-    }
-  }, [location.pathname])
+  // Get user info and role from cookie
+  const user = Cookie.get('user') ? JSON.parse(Cookie.get('user')) : null
+  const role = user?.role
 
   const isActive = (path) => location.pathname === path
   const isSubmenuActive = location.pathname.includes('programs')
-
-  useEffect(() => {
-    const fetchCounts = async () => {
-      try {
-        const res = await api.get('/forms/count-new')
-        setNewCount(res.data.count ?? 0)
-      } catch (err) {
-        console.error('Failed to fetch counts:', err)
-      }
-    }
-    fetchCounts()
-  }, [])
-
-  useEffect(() => {
-    if (location.pathname === '/admin/forms') setNewCount(0)
-    if (location.pathname === '/admin/view-requests') setNewRequestCount(0)
-  }, [location.pathname])
-
-  useEffect(() => {
-    const socket_url = (
-      process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
-    ).replace('/api', '')
-    const socket = io(socket_url)
-
-    socket.on('newFormSubmission', () => setNewCount((prev) => prev + 1))
-    socket.on('newInfoRequest', () => setNewRequestCount((prev) => prev + 1))
-
-    return () => socket.disconnect()
-  }, [])
 
   const handleLogout = () => {
     Cookie.remove('token')
@@ -78,230 +45,211 @@ export default function AdminSidebar({ isOpen }) {
     navigate('/admin')
   }
 
+  // Common links
+  const commonLinks = [
+    { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  ]
+
+  // All possible links for admin
+  const allLinks = [
+    ...commonLinks,
+    { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
+    {
+      path: '/admin/interviews/approvals',
+      label: 'Interviews Approvals',
+      icon: Hourglass,
+    },
+    {
+      path: '/admin/manage-candidates',
+      label: 'Manage Candidates',
+      icon: AlignHorizontalJustifyStart,
+    },
+    {
+      path: '/admin/candidateList',
+      label: 'Candidates Approvals',
+      icon: Hourglass,
+    },
+    { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
+    { path: '/admin/companies', label: 'Manage Companies', icon: Building },
+    {
+      path: '/admin/studentenrollment',
+      label: 'Student Enrollment',
+      icon: Store,
+    },
+    { path: '/admin/applications', label: 'View Applications', icon: Layers },
+    {
+      path: '/admin/view-requests',
+      label: 'View Requests',
+      icon: AudioLines,
+      isNotification: true,
+    },
+    {
+      path: '/admin/manage-recruiters',
+      label: 'Add Recruiter',
+      icon: UserSearch,
+    },
+    { path: '/admin/manage-managers', label: 'Add Managers', icon: UserCog },
+    { path: '/admin/manage-blogs', label: 'Manage Blogs', icon: Shield },
+    {
+      path: '/admin/new-batch-dashboard',
+      label: 'New Batches',
+      icon: FileUser,
+    },
+    { path: '/admin/forms', label: 'Form', icon: Layers },
+    {
+      path: '/admin/it-programs',
+      label: 'IT Programs',
+      icon: HardDrive,
+      isDropdown: true,
+    },
+  ]
+
+  // Sidebar config for manager and recruiter
+  const sidebarConfig = {
+    manager: [
+      ...commonLinks,
+      { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
+      {
+        path: 'interviews/approvals',
+        label: 'Interviews Approvals',
+        icon: Hourglass,
+      },
+      {
+        path: '/admin/manage-candidates',
+        label: 'Manage Candidates',
+        icon: AlignHorizontalJustifyStart,
+      },
+      {
+        path: '/admin/candidateList',
+        label: 'Candidates Approvals',
+        icon: Hourglass,
+      },
+      { path: '/admin/companies', label: 'Manage Companies', icon: Building },
+      { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
+      {
+        path: '/admin/studentenrollment',
+        label: 'Student Enrollment',
+        icon: Store,
+      },
+      { path: '/admin/applications', label: 'View Applications', icon: Layers },
+      {
+        path: '/admin/view-requests',
+        label: 'View Requests',
+        icon: AudioLines,
+        isNotification: true,
+      },
+      {
+        path: '/admin/manage-recruiters',
+        label: 'Add Recruiter',
+        icon: UserSearch,
+      },
+      {
+        path: '/admin/it-programs',
+        label: 'IT Programs',
+        icon: HardDrive,
+        isDropdown: true,
+      },
+    ],
+    recruiter: [
+      ...commonLinks,
+      { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
+      {
+        path: '/admin/manage-candidates',
+        label: 'Manage Candidates',
+        icon: UserRound,
+      },
+      { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
+    ],
+  }
+
+  // Decide which links to render
+  let linksToRender = []
+  if (role === 'Admin') linksToRender = allLinks
+  else if (role === 'manager') linksToRender = sidebarConfig.manager
+  else if (role === 'recruiter') linksToRender = sidebarConfig.recruiter
+  else linksToRender = commonLinks
+
   return (
     <aside
       className={`admin-sidebar overflow-scroll ${!isOpen ? 'collapsed' : ''}`}>
       <div>
         <div className='admin-sidebar-header'>
           <div className='logo-img'>
-            <img src='/Logo6.jpg' alt='logo' className='h-[30px] w-[40px]' />
+            {isOpen ? (
+              <img src='/Logo6.jpg' alt='logo' className='h-[30px] w-[40px]' />
+            ) : (
+              <img src='/L1.png' alt='logo1' className='h-[32px]! w-[32px]!' />
+            )}
           </div>
-          <div className='logo-side-name'>
-            <div className='head-name'>Zero7</div>
-            <div className='head-panel'>Admin Panel</div>
-          </div>
+          <div className='logo-side-name'></div>
         </div>
 
         <nav>
-          <Link
-            to='/admin/dashboard'
-            className={`sidebar-link ${
-              isActive('/admin/dashboard') ? 'active' : ''
-            }`}
-            data-tooltip='Dashboard'>
-            <div className='dashboard-icon'>
-              <LayoutDashboard style={{ width: '18px', flexShrink: 0 }} />{' '}
-              <span className='link-text'>Dashboard</span>
-            </div>
-          </Link>
+          {linksToRender.map((link) => {
+            // Handle dropdown submenu for IT/Non-IT programs
+            if (link.isDropdown) {
+              return (
+                <div className='dropdown-container' key={link.path}>
+                  <div
+                    onClick={() => setOpenServices(!openServices)}
+                    className={`sidebar-link services-header ${
+                      isSubmenuActive ? 'active' : ''
+                    }`}
+                    data-tooltip='Services'>
+                    <div className='dashboard-icon'>
+                      <HardDrive style={{ width: '18px', flexShrink: 0 }} />{' '}
+                      <span className='link-text'>Services</span>
+                    </div>
+                    <ChevronDown
+                      size={18}
+                      className={`dropdown-arrow ${
+                        openServices ? 'rotate' : ''
+                      }`}
+                    />
+                  </div>
+                  {openServices && (
+                    <div className='submenu'>
+                      <Link
+                        to='/admin/it-programs'
+                        className={`sidebar-link ${
+                          isActive('/admin/it-programs') ? 'active' : ''
+                        }`}
+                        data-tooltip='IT Services'>
+                        IT Services
+                      </Link>
+                      <Link
+                        to='/admin/non-it-programs'
+                        className={`sidebar-link ${
+                          isActive('/admin/non-it-programs') ? 'active' : ''
+                        }`}
+                        data-tooltip='Non-IT Services'>
+                        Non IT Services
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )
+            }
 
-          <div className='dropdown-container'>
-            <div
-              onClick={() => setOpenServices(!openServices)}
-              className={`sidebar-link services-header ${
-                isSubmenuActive ? 'active' : ''
-              }`}
-              data-tooltip='Services'>
-              <div className='dashboard-icon'>
-                <HardDrive style={{ width: '18px', flexShrink: 0 }} />{' '}
-                <span className='link-text'>Services</span>
-              </div>
-              <ChevronDown
-                size={18}
-                className={`dropdown-arrow ${openServices ? 'rotate' : ''}`}
-              />
-            </div>
-            {openServices && (
-              <div className='submenu'>
-                <Link
-                  to='/admin/it-programs'
-                  className={`sidebar-link ${
-                    isActive('/admin/it-programs') ? 'active' : ''
-                  }`}
-                  data-tooltip='IT Services'>
-                  IT Services
-                </Link>
-                <Link
-                  to='/admin/non-it-programs'
-                  className={`sidebar-link ${
-                    isActive('/admin/non-it-programs') ? 'active' : ''
-                  }`}
-                  data-tooltip='Non-IT Services'>
-                  Non IT Services
-                </Link>
-              </div>
-            )}
-          </div>
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`sidebar-link ${
+                  isActive(link.path) ? 'active' : ''
+                }`}
+                data-tooltip={link.label}>
+                <div className='dashboard-icon'>
+                  <link.icon style={{ width: '18px', flexShrink: 0 }} />{' '}
+                  <span className='link-text'>{link.label}</span>
+                </div>
+                {link.isNotification && newRequestCount > 0 && (
+                  <span className='notification-badge'>{newRequestCount}</span>
+                )}
+              </Link>
+            )
+          })}
 
-          <Link
-            to='/admin/forms'
-            className={`sidebar-link ${
-              isActive('/admin/forms') ? 'active' : ''
-            }`}
-            data-tooltip='Form Submissions'>
-            <div className='dashboard-cont'>
-              <div className='dashboard-icon'>
-                <CardSim style={{ width: '18px', flexShrink: 0 }} />
-                <span className='link-text'>Form Submissions</span>
-              </div>
-              {newCount > 0 && (
-                <span className='notification-badge'>{newCount}</span>
-              )}
-            </div>
-          </Link>
-          <Link
-            to='/admin/interviews'
-            className={`sidebar-link ${
-              isActive('/admin/interviews') ? 'active' : ''
-            }`}
-            data-tooltip='Form Submissions'>
-            <div className='dashboard-cont'>
-              <div className='dashboard-icon'>
-                <FileUser style={{ width: '18px', flexShrink: 0 }} />
-                <span className='link-text'>Interviews</span>
-              </div>
-              {newCount > 0 && (
-                <span className='notification-badge'>{newCount}</span>
-              )}
-            </div>
-          </Link>
-          <Link
-            to='/admin/companies'
-            className={`sidebar-link ${
-              isActive('/admin/companies') ? 'active' : ''
-            }`}
-            data-tooltip='Form Submissions'>
-            <div className='dashboard-cont'>
-              <div className='dashboard-icon'>
-                <Building style={{ width: '18px', flexShrink: 0 }} />
-                <span className='link-text'>Manage Companies</span>
-              </div>
-              {newCount > 0 && (
-                <span className='notification-badge'>{newCount}</span>
-              )}
-            </div>
-          </Link>
-
-          <Link
-            to='/admin/manage-jobs'
-            className={`sidebar-link ${
-              isActive('/admin/manage-jobs') ? 'active' : ''
-            }`}
-            data-tooltip='Manage Jobs'>
-            <div className='dashboard-icon'>
-              <CircleUser style={{ width: '18px', flexShrink: 0 }} />{' '}
-              <span className='link-text'>Manage Jobs</span>
-            </div>
-          </Link>
-
-          <Link
-            to='/admin/applications'
-            className={`sidebar-link ${
-              isActive('/admin/applications') ? 'active' : ''
-            }`}
-            data-tooltip='View Applications'>
-            <div className='dashboard-icon'>
-              <Store style={{ width: '18px', flexShrink: 0 }} />{' '}
-              <span className='link-text'>View Applications</span>
-            </div>
-          </Link>
-          <Link
-            to='/admin/studentenrollment'
-            className={`sidebar-link ${
-              isActive('/admin/studentenrollment') ? 'active' : ''
-            }`}>
-            <div className='dashboard-icon'>
-              <Store style={{ width: '18px' }} />
-              <span className='link-text'>Student Enrollments</span>
-            </div>
-          </Link>
-
-          <Link
-            to='/admin/new-batch-dashboard'
-            className={`sidebar-link ${
-              isActive('/admin/new-batch-dashboard') ? 'active' : ''
-            }`}
-            data-tooltip='New Batches'>
-            <div className='dashboard-icon'>
-              <GraduationCap style={{ width: '18px', flexShrink: 0 }} />{' '}
-              <span className='link-text'>New Batches</span>
-            </div>
-          </Link>
-
-          <Link
-            to='/admin/manage-blogs'
-            className={`sidebar-link ${
-              isActive('/admin/manage-blogs') ? 'active' : ''
-            }`}
-            data-tooltip='Manage Blogs'>
-            <div className='dashboard-icon'>
-              <Shield style={{ width: '18px', flexShrink: 0 }} />{' '}
-              <span className='link-text'>Manage Blogs</span>
-            </div>
-          </Link>
-
-          <Link
-            to='/admin/manage-candidates'
-            className={`sidebar-link ${
-              isActive('/admin/manage-candidates') ? 'active' : ''
-            }`}
-            data-tooltip='Manage Candidates'>
-            <div className='dashboard-icon'>
-              <UserRound style={{ width: '18px', flexShrink: 0 }} />{' '}
-              <span className='link-text'>Manage Candidates</span>
-            </div>
-          </Link>
-
-          <Link
-            to='/admin/view-requests'
-            className={`sidebar-link ${
-              isActive('/admin/view-requests') ? 'active' : ''
-            }`}
-            data-tooltip='View Requests'>
-            <div className='dashboard-cont'>
-              <div className='dashboard-icon'>
-                <AudioLines style={{ width: '18px', flexShrink: 0 }} />{' '}
-                <span className='link-text'>View Requests</span>
-              </div>
-              {newRequestCount > 0 && (
-                <span className='notification-badge'>{newRequestCount}</span>
-              )}
-            </div>
-          </Link>
-
-          <Link
-            to='/admin/manage-managers'
-            className={`sidebar-link ${
-              isActive('/admin/manage-managers') ? 'active' : ''
-            }`}
-            data-tooltip='Add Managers'>
-            <div className='dashboard-icon'>
-              <UserCog style={{ width: '18px', flexShrink: 0 }} />{' '}
-              <span className='link-text'>Add Managers</span>
-            </div>
-          </Link>
-
-          <Link
-            to='/admin/manage-recruiters'
-            className={`sidebar-link ${
-              isActive('/admin/manage-recruiters') ? 'active' : ''
-            }`}
-            data-tooltip='Add Recruiters'>
-            <div className='dashboard-icon'>
-              <UserSearch style={{ width: '18px', flexShrink: 0 }} />{' '}
-              <span className='link-text'>Add Recruiters</span>
-            </div>
-          </Link>
           <button
             className='logout-btn'
             onClick={handleLogout}

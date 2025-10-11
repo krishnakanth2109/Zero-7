@@ -212,8 +212,7 @@ body {
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
 }
 
-.jobs-table th,
-.jobs-table td {
+.jobs-table th td {
   padding: 15px 20px;
   text-align: left;
   border-bottom: 1px solid #e0e0e0;

@@ -41,7 +41,6 @@ const AdminViewApplications = () => {
 
       // Send a DELETE request to the backend API
       await api.delete(`/applications/${id}`);
-      
       // Immediately remove the application from the local state to update the UI
       setApplications((prev) => prev.filter((app) => app._id !== id));
       alert('Application rejected and removed successfully.');
@@ -98,20 +97,38 @@ const AdminViewApplications = () => {
                   <td>{app.jobId?.role || 'Job Not Found'}</td>
                   <td>
                     {app.resume ? (
-                      // The backend should provide a full, accessible URL
-                      <a href={app.resume} target='_blank' rel='noopener noreferrer'>
+                      <a
+                        href={app.resume}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          color: "#007bff",
+                          fontWeight: "700",
+                          cursor: "pointer",
+                        }}
+                        onMouseOver={(e) => (e.target.style.textDecoration = "underline")}
+                        onMouseOut={(e) => (e.target.style.textDecoration = "none")}
+                      >
                         View Resume
                       </a>
                     ) : (
-                      'N/A'
+                      <span style={{ color: "gray", fontStyle: "italic" }}>N/A</span>
                     )}
                   </td>
+
                   <td>
                     <button
+                      style={{
+                        color: "red",
+                        backgroundColor: "transparent",
+                        cursor: "pointer",
+                      }}
                       className="reject-button"
-                      onClick={() => handleReject(app._id)}>
-                      Reject
+                      onClick={() => handleReject(app._id)}
+                    >
+                      Remove Application
                     </button>
+
                   </td>
                 </tr>
               ))

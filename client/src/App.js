@@ -46,9 +46,10 @@ import Nonittraining from './Pages/Nonittraining.jsx'
 import ViewEnrollments from './Pages/AdminStudentEnrollment.jsx'
 import InterviewTracker from './Pages/AdminInterviews.jsx'
 import AdminManageCompanies from './Pages/AdminManageCompanies.jsx'
+import AdminCandidateApprovals from './Pages/AdminCandidateApprovals.jsx'
 // --- 1. IMPORT THE PROVIDER ---
-import { NotificationProvider } from './context/NotificationContext';
-
+import { NotificationProvider } from './context/NotificationContext'
+import AdminInterviewApprovals from './Pages/AdminInterviewApprovals.jsx'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -58,7 +59,7 @@ const LoginPage = () => {
       navigate('/admin/dashboard', { replace: true })
     }
   }, [navigate])
-  
+
   const handleLoginSuccess = () => {
     navigate('/admin/dashboard')
   }
@@ -100,11 +101,23 @@ function App() {
             <Route path='/college-connect' element={<CollegeConnect />} />
             <Route path='/current-hirings' element={<CurrentHirings />} />
             <Route path='/digital-courses' element={<DigitalCourses />} />
-            <Route path='/services/payroll-services' element={<PayrollServices />} />
-            <Route path='/services/resume-marketing' element={<Resumemarketing />} />
-            <Route path='/services/college-connect' element={<CollegeConnect />} />
+            <Route
+              path='/services/payroll-services'
+              element={<PayrollServices />}
+            />
+            <Route
+              path='/services/resume-marketing'
+              element={<Resumemarketing />}
+            />
+            <Route
+              path='/services/college-connect'
+              element={<CollegeConnect />}
+            />
             <Route path='/services/it-training' element={<Ittraining />} />
-            <Route path='/services/non-it-training' element={<Nonittraining />} />
+            <Route
+              path='/services/non-it-training'
+              element={<Nonittraining />}
+            />
 
             {/* --- Admin Login Route --- */}
             <Route path='/admin' element={<LoginPage />} />
@@ -123,15 +136,32 @@ function App() {
               <Route path='forms' element={<AdminForms />} />
               <Route path='manage-jobs' element={<AdminManageJobs />} />
               <Route path='applications' element={<AdminViewApplications />} />
-              <Route path='new-batch-dashboard' element={<NewBatchDashboard />} />
+              <Route
+                path='new-batch-dashboard'
+                element={<NewBatchDashboard />}
+              />
               <Route path='manage-blogs' element={<ManageBlogs />} />
               <Route path='studentenrollment' element={<ViewEnrollments />} />
               <Route path='interviews' element={<InterviewTracker />} />
+              <Route
+                path='interviews/approvals'
+                element={<AdminInterviewApprovals />}
+              />
               <Route path='companies' element={<AdminManageCompanies />} />
-              <Route path='manage-candidates' element={<AdminManageCandidates />} />
+              <Route
+                path='manage-candidates'
+                element={<AdminManageCandidates />}
+              />
+              <Route
+                path='candidateList'
+                element={<AdminCandidateApprovals />}
+              />
               <Route path='view-requests' element={<AdminViewRequests />} />
               <Route path='manage-managers' element={<AdminManageManagers />} />
-              <Route path='manage-recruiters' element={<AdminManageRecruiters />} />
+              <Route
+                path='manage-recruiters'
+                element={<AdminManageRecruiters />}
+              />
             </Route>
           </Routes>
         </div>

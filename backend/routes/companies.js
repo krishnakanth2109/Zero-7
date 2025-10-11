@@ -1,6 +1,6 @@
 import express from 'express'
 import Company from '../models/Companies.js'
-import Notification from '../models/notifications.js'; 
+import Notification from '../models/notifications.js'
 const router = express.Router()
 
 // GET all companies
@@ -21,13 +21,17 @@ router.post('/register', async (request, response) => {
 
   // Basic validation
   if (!_id || !name || !email || !industry) {
-    return response.status(400).json({ message: 'All required fields must be provided.' })
+    return response
+      .status(400)
+      .json({ message: 'All required fields must be provided.' })
   }
 
   try {
     const companyExists = await Company.findOne({ _id: _id })
     if (companyExists) {
-      return response.status(409).json({ message: 'Company with this ID already exists.' })
+      return response
+        .status(409)
+        .json({ message: 'Company with this ID already exists.' })
     }
 
     const newCompany = new Company({
@@ -39,7 +43,9 @@ router.post('/register', async (request, response) => {
     })
 
     const savedCompany = await newCompany.save()
-    response.status(201).json({ message: 'Company added successfully!', company: savedCompany })
+    response
+      .status(201)
+      .json({ message: 'Company added successfully!', company: savedCompany })
   } catch (err) {
     console.error('Error registering company:', err)
     response.status(500).json({ message: 'Server error' })
@@ -60,6 +66,20 @@ router.delete('/:id', async (request, response) => {
   } catch (err) {
     console.error('Error deleting company:', err)
     response.status(500).json({ message: 'Server error' })
+  }
+})
+
+//edit company details
+router.patch('/:id', async (request, response) => {
+  try {
+    const companyUpdate = await Company.findByIdAndUpdate(
+      { _id: request.params.id },
+      { $set: request.body },
+      { new: true },
+    )
+    response.send(companyUpdate)
+  } catch (err) {
+    response.send(err)
   }
 })
 

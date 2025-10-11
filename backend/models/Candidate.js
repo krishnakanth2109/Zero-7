@@ -11,6 +11,11 @@ const CandidateSchema = new Schema(
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true },
     skills: { type: String, required: true },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'placed', 'rejected'],
+      default: 'pending',
+    },
   },
   { timestamps: true },
 )

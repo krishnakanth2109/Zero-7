@@ -34,24 +34,24 @@ router.post('/', async (req, res) => {
     
     // --- Email Sending Logic ---
     // 1. Send an alert email to the admin
-    const adminTemplate = prepareCandidateEnrollForAdmin(newEnrollment);
-    const adminHtml = renderEmailTemplate('enrollmentAlert', adminTemplate);
-    await transporter.sendMail({
-      from: process.env.AUTH_MAIL,
-      to: process.env.AUTH_MAIL,
-      subject: 'Candidate Enrollment Form Alert',
-      html: adminHtml,
-    });
+    // const adminTemplate = prepareCandidateEnrollForAdmin(newEnrollment);
+    // const adminHtml = renderEmailTemplate('enrollmentAlert', adminTemplate);
+    // await transporter.sendMail({
+    //   from: process.env.AUTH_MAIL,
+    //   to: process.env.AUTH_MAIL,
+    //   subject: 'Candidate Enrollment Form Alert',
+    //   html: adminHtml,
+    // });
     
     // 2. Send an acknowledgment email to the student
-    const studentTemplate = prepareStudentAcknowledgment(name);
-    const studentHtml = renderEmailTemplate('enrollmentStudentConfirmation', studentTemplate);
-    await transporter.sendMail({
-      from: process.env.AUTH_MAIL,
-      to: email,
-      subject: 'Thank You for Your Response',
-      html: studentHtml,
-    });
+    // const studentTemplate = prepareStudentAcknowledgment(name);
+    // const studentHtml = renderEmailTemplate('enrollmentStudentConfirmation', studentTemplate);
+    // await transporter.sendMail({
+    //   from: process.env.AUTH_MAIL,
+    //   to: email,
+    //   subject: 'Thank You for Your Response',
+    //   html: studentHtml,
+    // });
     // --- End Email Logic ---
 
     // --- Notification Logic ---

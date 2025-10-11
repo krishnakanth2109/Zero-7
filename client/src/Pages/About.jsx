@@ -52,22 +52,16 @@ const About = () => {
             <div className='text-content'>
               <h2>Who We Are</h2>
               <p>
-                At <strong>Zero7 Technologies</strong>, we are more than just a
-                workforce solutions provider—we are career builders and
-                innovation enablers. Established in 2025, our mission is to
-                empower job seekers, career changers, and professionals with
-                gaps to re-enter the job market with confidence.
+                At <strong>Zero7 Technologies</strong>, we believe every career
+                deserves a second chance and every talent deserves the right
+                platform. Established in 2025, we specialize in IT & Non-IT
+                Training, Payroll Process Outsourcing, Resume Marketing, and
+                Campus Drives.
               </p>
               <p>
-                We specialize in <b>IT & Non-IT Training</b>,{' '}
-                <b>Resume Marketing</b>,<b> Payroll Process Outsourcing</b>, and{' '}
-                <b>Campus Drives</b>. Our unique approach blends human-centric
-                mentoring with modern tools that make careers future-proof.
-              </p>
-              <p>
-                With our dedicated team, strong industry partnerships, and
-                community-driven approach, we ensure that talent and opportunity
-                find their perfect match.
+                Our mission is to empower individuals with skills, confidence,
+                and opportunities while supporting organizations with trained
+                and reliable talent.
               </p>
             </div>
             <div className='image-container'>

@@ -186,7 +186,8 @@ const AdminManageJobs = () => {
 
       {showPopup && (
         <div className='popup-overlay'>
-          <div className='popup-content'>
+       <div className='popup-content w-[90%] sm:w-[70%] md:w-[50%] lg:w-[40%] bg-white p-6 rounded-xl shadow-xl max-h-[80vh] overflow-y-auto'>
+
             <button
               className='close-popup-button'
               onClick={() => setShowPopup(false)}>

@@ -204,7 +204,7 @@ const AdminHomeForm = () => {
 
   return (
     <div className='p-4 sm:p-6 lg:p-8'>
-      <h2 className='text-2xl font-bold mb-4 text-gray-800'>Admin Forms</h2>
+      <h2 className='text-2xl font-bold mb-4 text-gray-800'>Carrer Consultation Form</h2>
 
       <div className='mt-8 flow-root'>
         <div className='-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8'>

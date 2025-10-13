@@ -102,7 +102,7 @@ export default function AdminSidebar({ isOpen }) {
       label: 'New Batches',
       icon: FileUser,
     },
-    { path: '/admin/forms', label: 'Form', icon: Layers },
+    { path: '/admin/forms', label: 'Carrer Consultation Form', icon: Layers },
     {
       path: '/admin/it-programs',
       label: 'IT Programs',
@@ -156,6 +156,7 @@ export default function AdminSidebar({ isOpen }) {
         label: 'Add Recruiter',
         icon: UserSearch,
       },
+      { path: '/admin/forms', label: 'Carrer Consultation Form', icon: Layers },
       {
         path: '/admin/it-programs',
         label: 'IT Programs',

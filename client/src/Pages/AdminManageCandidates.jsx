@@ -291,7 +291,7 @@ export default function AdminManageCandidates() {
     <div className='min-h-screen font-sans'>
       <div className='max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-8'>
         {/* Header Section */}
-        <div className='mb-8 p-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+        <div className='mb-8 p-4 bg-[#267edc] text-white rounded-lg shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
           <div className='flex items-center gap-4'>
             <div className='p-3  rounded-full'>
               <Users className='w-8 h-8 sm:w-10 sm:h-10' />{' '}

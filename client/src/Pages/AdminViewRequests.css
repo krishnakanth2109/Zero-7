@@ -17,7 +17,7 @@
   align-items: center;
   margin-bottom: 24px;
   padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #203995 100%);
+  background: #267edc;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   color: white;
@@ -107,7 +107,7 @@
 
 /* Table Header Styling - FIXED VISIBILITY */
 .requests-table thead {
-  background: linear-gradient(135deg, #667eea 0%, #203995 100%);
+  background: #267edc;
   position: sticky;
   top: 0;
   z-index: 10;

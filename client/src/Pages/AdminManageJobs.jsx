@@ -143,7 +143,7 @@ const AdminManageJobs = () => {
 
   return (
     <div className='admin-manage-jobs'>
-      <div className='bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between'>
+      <div className='bg-[#267edc] rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between'>
         <div className='flex items-center space-x-4'>
           <div className='bg-white bg-opacity-20 p-3 rounded-full'>
             <FileText />
@@ -449,7 +449,7 @@ const AdminManageJobs = () => {
                         <button
                           onClick={() => handleDeleteJob(job._id)}
                           className='delete-btn'>
-                         <Trash />
+                          <Trash />
                         </button>
                       </td>
                     </tr>

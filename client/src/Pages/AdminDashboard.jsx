@@ -167,14 +167,14 @@ export default function AdminDashboard() {
     <a href={path}>
       <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1'>
         <div className='flex items-center justify-between'>
-          <div className='bg-red-200 p-2 rounded-lg'>{icon}</div>
+          <div className='bg-[#7eade0] p-2 rounded-lg'>{icon}</div>
           {percentage && <p className='text-[#16a34a]'>{percentage}</p>}
         </div>
         <div>
           <h1 className='text-3xl font-bold mt-3'>
             {loadingStats ? '...' : value}
           </h1>
-          <p className='text-lg font-semibold text-[#64748b]'>{title}</p>
+          <p className='text-lg font-semibold text-[#267edc]'>{title}</p>
           <p className='text-sm text-[#64748b]'>{subtext}</p>
         </div>
       </div>
@@ -198,7 +198,7 @@ export default function AdminDashboard() {
           title='Total Candidates'
           value={stats.totalCandidates}
           subtext='on bench'
-          icon={<UsersRound className='stroke-red-500 stroke-2' />}
+          icon={<UsersRound className='stroke-[#0b325b] stroke-2' />}
           percentage='+12%'
           path='manage-candidates'
         />
@@ -206,7 +206,7 @@ export default function AdminDashboard() {
           title='Active Jobs'
           value={stats.activeJobs}
           subtext='new this week'
-          icon={<Briefcase className='stroke-red-500 stroke-2' />}
+          icon={<Briefcase className='stroke-[#0b325b] stroke-2' />}
           percentage='+3%'
           path='manage-jobs'
         />
@@ -215,7 +215,7 @@ export default function AdminDashboard() {
             title='Bench Requests'
             value={stats.benchRequests}
             subtext='awaiting approval'
-            icon={<UserCheck className='stroke-red-500 stroke-2' />}
+            icon={<UserCheck className='stroke-[#0b325b] stroke-2' />}
             percentage={`+${stats.benchRequests}`}
             path='candidateList'
           />
@@ -225,7 +225,7 @@ export default function AdminDashboard() {
             title='Partner Companies'
             value={stats.partnerCompanies}
             subtext='actively hiring'
-            icon={<Building2 className='stroke-red-500 stroke-2' />}
+            icon={<Building2 className='stroke-[#0b325b] stroke-2' />}
             percentage='+12%'
             path='companies'
           />
@@ -234,21 +234,22 @@ export default function AdminDashboard() {
           title='Colleges'
           value={stats.colleges}
           subtext='Colleges under us'
-          icon={<School className='stroke-red-500 stroke-2' />}
+          icon={<School className='stroke-[#0b325b] stroke-2' />}
           percentage='+12%'
         />
         <StatCard
           title='Placements'
           value={stats.placements}
           subtext='Candidates Placed'
-          icon={<Award className='stroke-red-500 stroke-2' />}
+          icon={<Award className='stroke-[#0b325b] stroke-2' />}
           percentage='+12%'
+          path='placedcandidates'
         />
         <StatCard
           title='Interviews'
           value={stats.interviews}
           subtext='Interviews scheduled'
-          icon={<BookUser className='stroke-red-500 stroke-2' />}
+          icon={<BookUser className='stroke-[#0b325b] stroke-2' />}
           percentage='+12%'
           path='interviews'
         />
@@ -259,7 +260,7 @@ export default function AdminDashboard() {
         {/* Area Chart */}
         <div className='bg-white rounded-xl w-full md:w-1/2 p-4'>
           <div className='flex gap-2 text-xl font-bold mb-4'>
-            <TrendingUp className='stroke-2 stroke-red-500' />
+            <TrendingUp className='stroke-2 stroke-[#0b325b]' />
             Application Trends
           </div>
           <ResponsiveContainer height={300} width='100%'>
@@ -316,7 +317,7 @@ export default function AdminDashboard() {
         {/* Pie Chart */}
         <div className='bg-white rounded-xl w-full md:w-1/2 p-4'>
           <div className='flex gap-2 text-xl font-bold mb-4'>
-            <Briefcase className='stroke-2 stroke-red-500' />
+            <Briefcase className='stroke-2 stroke-[#0b325b]' />
             Hiring Overview
           </div>
           <ResponsiveContainer height={300} width='100%'>
@@ -346,7 +347,7 @@ export default function AdminDashboard() {
       {/* Recent Applications Table */}
       <div className='bg-white w-full p-4 rounded-xl mt-4'>
         <div className='flex justify-center gap-1 mb-4'>
-          <UsersRound className='stroke-2 stroke-red-500' />
+          <UsersRound className='stroke-2 stroke-[#0b325b]' />
           <span className='text-xl font-bold'>Recent Applications</span>
         </div>
         <div className='overflow-x-auto'>

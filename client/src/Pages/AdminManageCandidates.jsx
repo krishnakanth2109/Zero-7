@@ -291,7 +291,7 @@ export default function AdminManageCandidates() {
     <div className='min-h-screen font-sans'>
       <div className='max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-8'>
         {/* Header Section */}
-        <div className='mb-8 p-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+        <div className='mb-8 p-4 bg-[#267edc] text-white rounded-lg shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
           <div className='flex items-center gap-4'>
             <div className='p-3  rounded-full'>
               <Users className='w-8 h-8 sm:w-10 sm:h-10' />{' '}
@@ -299,7 +299,7 @@ export default function AdminManageCandidates() {
             </div>
             <div>
               <h3 className='text-2xl sm:text-3xl font-bold'>
-                Manage Candidates
+                Manage Bench List
               </h3>
               <p className='text-teal-200 text-sm sm:text-base'>
                 Add, update, or remove bench candidates
@@ -386,14 +386,41 @@ export default function AdminManageCandidates() {
             <table className='min-w-full divide-y divide-gray-200'>
               <thead className='bg-gray-50'>
                 <tr>
-              
-                  <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Name</th>
-                  <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Role</th>
-                  <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Skills</th>
-                  <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Experience</th>
-                  <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Location</th>
-                  <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Recruiter</th>
-                  <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>Actions</th>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Name
+                  </th>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Role
+                  </th>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Skills
+                  </th>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Experience
+                  </th>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Location
+                  </th>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Recruiter
+                  </th>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>
@@ -412,14 +439,27 @@ export default function AdminManageCandidates() {
                   </tr>
                 ) : (
                   candidates.map((c) => (
-                    <tr key={c._id} className='hover:bg-gray-50 transition duration-150 ease-in-out'>
-                      
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>{c.name}</td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>{c.role}</td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>{c.skills || 'N/A'}</td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>{c.exp} years</td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>{c.location}</td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>{c.userName || 'N/A'}</td>
+                    <tr
+                      key={c._id}
+                      className='hover:bg-gray-50 transition duration-150 ease-in-out'>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+                        {c.name}
+                      </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
+                        {c.role}
+                      </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
+                        {c.skills || 'N/A'}
+                      </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
+                        {c.exp} years
+                      </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
+                        {c.location}
+                      </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
+                        {c.userName || 'N/A'}
+                      </td>
                       <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
                         <div className='flex items-center space-x-3'>
                           <button

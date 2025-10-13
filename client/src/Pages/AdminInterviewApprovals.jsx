@@ -287,7 +287,6 @@ const AdminInterviewApprovals = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          
         </div>
 
         {/* Checkbox Filters for Approval Status */}
@@ -336,7 +335,7 @@ const AdminInterviewApprovals = () => {
       {/* Responsive Table Container */}
       <div className='overflow-x-auto bg-white shadow-xl rounded-xl'>
         <table className='min-w-full divide-y divide-gray-200'>
-          <thead className='bg-gradient-to-r from-purple-600 to-indigo-700 text-white'>
+          <thead className='bg-[#267edc] text-white'>
             <tr>
               <th
                 scope='col'

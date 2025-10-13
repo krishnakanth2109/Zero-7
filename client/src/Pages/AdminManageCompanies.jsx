@@ -104,7 +104,7 @@ const AdminManageCompanies = () => {
   return (
     <div className='min-h-screen bg-gray-100 p-6 font-sans'>
       {/* Header Section */}
-      <div className='bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between'>
+      <div className='bg-[#267edc] rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between'>
         <div className='flex items-center space-x-4'>
           <div className='bg-white bg-opacity-20 p-3 rounded-full'>
             <Building2 />
@@ -348,7 +348,7 @@ const AdminManageCompanies = () => {
       {/* Companies Table */}
       <div className='overflow-x-auto bg-white shadow-xl rounded-lg border border-gray-200'>
         <table className='min-w-full divide-y divide-gray-200'>
-          <thead className='bg-indigo-600'>
+          <thead className='bg-[#267edc]'>
             <tr>
               {['ID', 'Name', 'Email', 'Industry', 'Address', 'Actions'].map(
                 (header) => (

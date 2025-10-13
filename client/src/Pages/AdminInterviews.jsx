@@ -258,31 +258,33 @@ const InterviewTracker = () => {
 
         {/* Stats Cards */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
-          {['Scheduled', 'Completed', 'Pending Feedback', 'Offer Extended','placed'].map(
-            (status) => (
-              <div
-                key={status}
-                className='bg-white rounded-2xl shadow-lg p-6 border-l-4 border-indigo-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-gray-600'>
-                      {status}
-                    </p>
-                    <p className='text-2xl font-bold text-gray-900 mt-1'>
-                      {
-                        interviewData.filter((item) => item.status === status)
-                          .length
-                      }
-                    </p>
-                  </div>
-                  <div
-                    className={`w-3 h-3 rounded-full ${getStatusDot(
-                      status,
-                    )}`}></div>
+          {[
+            'Scheduled',
+            'Completed',
+            'Pending Feedback',
+            'Offer Extended',
+            'placed',
+          ].map((status) => (
+            <div
+              key={status}
+              className='bg-white rounded-2xl shadow-lg p-6 border-l-4 border-indigo-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='text-sm font-medium text-gray-600'>{status}</p>
+                  <p className='text-2xl font-bold text-gray-900 mt-1'>
+                    {
+                      interviewData.filter((item) => item.status === status)
+                        .length
+                    }
+                  </p>
                 </div>
+                <div
+                  className={`w-3 h-3 rounded-full ${getStatusDot(
+                    status,
+                  )}`}></div>
               </div>
-            ),
-          )}
+            </div>
+          ))}
         </div>
 
         {/* Add Interview Button */}
@@ -410,7 +412,7 @@ const InterviewTracker = () => {
                   Interview Date
                 </label>
                 <input
-                  type='date'
+                  type='datetime-local'
                   id='date'
                   name='date'
                   value={newInterview.date}
@@ -583,6 +585,9 @@ const InterviewTracker = () => {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true,
                       })}
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>

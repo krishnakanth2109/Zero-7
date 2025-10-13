@@ -195,7 +195,7 @@ const BenchList = () => {
       </section>
 
       {/* Candidate Enrollment Form */}
-     
+
       {/* Stats */}
       <section className='stats-section'>
         <div className='bg-[linear-gradient(45deg,#0f8afe,#00bfff)] rounded-xl flex-1 p-6 shadow-xl min-w-[200px]'>
@@ -237,7 +237,7 @@ const BenchList = () => {
                   <td>{c.location}</td>
                   <td>
                     <button
-                      className='btn-gradient'
+                      className='bg-gradient-to-tr from-[#0f62fe] to-[#00bfff] text-white p-2 text-sm rounded-xl'
                       onClick={() => setSelectedCandidate(c)}>
                       Request Info
                     </button>
@@ -425,7 +425,7 @@ const BenchList = () => {
           </div>
         </div>
       </section>
- <section className='form-section'>
+      <section className='form-section'>
         <h2>Candidate Enrollment Form</h2>
         <form onSubmit={handleEnrollmentSubmit} className='enrollment-form'>
           <input

@@ -123,12 +123,12 @@ export default function AdminSidebar({ isOpen }) {
       },
       {
         path: '/admin/manage-candidates',
-        label: 'Manage Candidates',
+        label: 'Manage Bench List',
         icon: AlignHorizontalJustifyStart,
       },
       {
         path: '/admin/candidateList',
-        label: 'Candidates Approvals',
+        label: 'Bench Approvals',
         icon: Hourglass,
       },
               {

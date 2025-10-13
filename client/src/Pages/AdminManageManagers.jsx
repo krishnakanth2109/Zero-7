@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Edit, Trash2, UserPlus, XCircle, Loader2, Shield, Mail, IdCard, Key } from 'lucide-react'; // Added icons for consistency
+import React, { useState, useEffect, useRef } from 'react';
+import { Edit, Trash2, UserPlus, XCircle, Loader2, Shield, Mail, IdCard, Key, User, X } from 'lucide-react'; // Added User, X icons
 import api from '../api/axios'; // Using the central axios instance
 
 export default function AdminManageManagers() {
@@ -12,10 +12,14 @@ export default function AdminManageManagers() {
     });
     const [editingId, setEditingId] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [submitting, setSubmitting] = useState(false); // New state for form submission loading
-    const [deletingId, setDeletingId] = useState(null); // New state for delete loading
-    const [error, setError] = useState(''); // Unified error state
-    const [success, setSuccess] = useState(''); // Unified success state
+    const [submitting, setSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    // NEW STATE: To control the visibility of the edit modal
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+    const modalRef = useRef(null); // Ref for the modal to handle clicks outside
 
     const fetchManagers = async () => {
         try {
@@ -35,6 +39,24 @@ export default function AdminManageManagers() {
         fetchManagers();
     }, []);
 
+    // Close modal when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            // Close modal if click is outside
+            if (modalRef.current && !modalRef.current.contains(event.target) && isEditModalOpen) {
+                // Ensure the click isn't inside any children of the form itself
+                if (!event.target.closest('#edit-manager-form')) {
+                    closeEditModal();
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isEditModalOpen]); // Depend on isEditModalOpen to re-attach listener if modal state changes
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -46,7 +68,12 @@ export default function AdminManageManagers() {
         setSubmitting(true);
         try {
             if (editingId) {
-                await api.put(`/managers/${editingId}`, formData);
+                // Ensure password is only sent if it's provided
+                const dataToUpdate = { ...formData };
+                if (!dataToUpdate.password) {
+                    delete dataToUpdate.password;
+                }
+                await api.put(`/managers/${editingId}`, dataToUpdate);
                 setSuccess('Manager updated successfully!');
             } else {
                 await api.post('/managers/register', formData);
@@ -55,6 +82,7 @@ export default function AdminManageManagers() {
             resetForm();
             fetchManagers();
             setTimeout(() => setSuccess(''), 3000); // Clear success message after 3 seconds
+            closeEditModal(); // NEW: Close modal on successful submission
         } catch (error) {
             console.error("Failed to submit manager:", error);
             setError(error.response?.data?.error || 'Failed to save manager.');
@@ -68,10 +96,18 @@ export default function AdminManageManagers() {
             name: manager.name,
             email: manager.email,
             employeeID: manager.employeeId,
-            password: '' 
+            password: '' // Clear password field for security, user can enter new one
         });
         setEditingId(manager._id);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setIsEditModalOpen(true); // NEW: Open the edit modal
+        // No need to scroll here as the form is now in a modal
+    };
+
+    const closeEditModal = () => {
+        setIsEditModalOpen(false);
+        resetForm(); // NEW: Reset form when modal is closed
+        setError(''); // Clear errors when modal closes
+        setSuccess(''); // Clear success when modal closes
     };
 
     const handleDelete = async (id) => {
@@ -99,7 +135,6 @@ export default function AdminManageManagers() {
     };
     
     return (
-        // Corrected: Wrapped the entire content in a single parent div
         <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8 font-sans">
             <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-8">
                 {/* Header Section */}
@@ -122,110 +157,102 @@ export default function AdminManageManagers() {
                 </div>
 
                 {/* Alert Messages */}
-                {error && (
+                {error && !isEditModalOpen && ( // Only show global error if modal is not open
                     <div className="mb-6 p-4 flex items-center bg-red-100 border border-red-400 text-red-700 rounded-lg shadow-sm animate-fade-in" role="alert">
                         <XCircle className="w-5 h-5 mr-3 flex-shrink-0" />
                         <span className="text-sm font-medium">{error}</span>
                     </div>
                 )}
 
-                {success && (
+                {success && !isEditModalOpen && ( // Only show global success if modal is not open
                     <div className="mb-6 p-4 flex items-center bg-green-100 border border-green-400 text-green-700 rounded-lg shadow-sm animate-fade-in" role="alert">
                         <div className="w-5 h-5 mr-3 flex-shrink-0 text-lg font-bold">✓</div>
                         <span className="text-sm font-medium">{success}</span>
                     </div>
                 )}
 
-                {/* Add/Edit Form */}
-                <form onSubmit={handleSubmit} className="mb-10 p-6 bg-gray-50 rounded-lg shadow-md border border-gray-200">
-                    <div className="mb-6 pb-4 border-b border-gray-200 flex items-center justify-between">
-                        <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
-                            {editingId ? 'Edit Manager' : 'Add New Manager'}
-                        </h2>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div className="relative">
-                           
-                            <input 
-                                name="name" 
-                                value={formData.name} 
-                                onChange={handleChange} 
-                                placeholder="Full Name" 
-                                required 
-                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
-                            />
+                {/* Add New Manager Form - only visible when not editing (and not in modal) */}
+                {!editingId && (
+                    <form onSubmit={handleSubmit} className="mb-10 p-6 bg-gray-50 rounded-lg shadow-md border border-gray-200">
+                        <div className="mb-6 pb-4 border-b border-gray-200 flex items-center justify-between">
+                            <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                                Add New Manager
+                            </h2>
                         </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="relative">
+                                
+                                <input 
+                                    name="name" 
+                                    value={formData.name} 
+                                    onChange={handleChange} 
+                                    placeholder="Full Name" 
+                                    required 
+                                    className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
+                                />
+                            </div>
 
-                        <div className="relative">
-                          
-                            <input 
-                                name="email" 
-                                type="email" 
-                                value={formData.email} 
-                                onChange={handleChange} 
-                                placeholder="Email Address" 
-                                required 
-                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
-                            />
-                        </div>
+                            <div className="relative">
+                               
+                                <input 
+                                    name="email" 
+                                    type="email" 
+                                    value={formData.email} 
+                                    onChange={handleChange} 
+                                    placeholder="Email Address" 
+                                    required 
+                                    className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
+                                />
+                            </div>
 
-                        <div className="relative">
-                            
-                            <input 
-                                name="employeeID" 
-                                value={formData.employeeID} 
-                                onChange={handleChange} 
-                                placeholder="Employee ID" 
-                                required 
-                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
-                            />
-                        </div>
+                            <div className="relative">
+                             
+                                <input 
+                                    name="employeeID" 
+                                    value={formData.employeeID} 
+                                    onChange={handleChange} 
+                                    placeholder="Employee ID" 
+                                    required 
+                                    className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
+                                />
+                            </div>
 
-                        <div className="relative">
-                           
-                            <input 
-                                name="password" 
-                                type="password" 
-                                value={formData.password} 
-                                onChange={handleChange} 
-                                placeholder={editingId ? "New Password (Optional)" : "Password"} 
-                                required={!editingId} 
-                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
-                            />
+                            <div className="relative">
+             
+                                <input 
+                                    name="password" 
+                                    type="password" 
+                                    value={formData.password} 
+                                    onChange={handleChange} 
+                                    placeholder="Password" 
+                                    required 
+                                    className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div className="flex justify-end space-x-4">
-                        {editingId && (
+                        
+                        <div className="flex justify-end space-x-4">
                             <button 
-                                type="button" 
-                                onClick={resetForm} 
-                                className="flex items-center px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 transition duration-200 text-sm font-medium"
+                                type="submit" 
+                                disabled={submitting} 
+                                className="flex items-center px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                             >
-                                <XCircle className="w-4 h-4 mr-2" />
-                                Cancel Edit
+                                {submitting ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        Adding...
+                                    </>
+                                ) : (
+                                    <>
+                                        <UserPlus className="w-4 h-4 mr-2" />
+                                        Add Manager
+                                    </>
+                                )}
                             </button>
-                        )}
-                        <button 
-                            type="submit" 
-                            disabled={submitting} 
-                            className="flex items-center px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                        >
-                            {submitting ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    {editingId ? 'Updating...' : 'Adding...'}
-                                </>
-                            ) : (
-                                <>
-                                    <UserPlus className="w-4 h-4 mr-2" />
-                                    {editingId ? 'Update Manager' : 'Add Manager'}
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </form>
+                        </div>
+                    </form>
+                )}
                 <br />
 
                 {/* Managers Table Section */}
@@ -314,6 +341,126 @@ export default function AdminManageManagers() {
                     </div>
                 </div>
             </div>
+
+            {/* NEW: Edit Manager Modal */}
+            {isEditModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900 bg-opacity-50 animate-fade-in-scale">
+                    <div ref={modalRef} className="relative bg-white rounded-lg shadow-xl w-full max-w-lg p-6 sm:p-8 transform transition-all duration-300 scale-100 opacity-100" id="edit-manager-form">
+                        <button
+                            onClick={closeEditModal}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                            title="Close"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">Edit Manager Details</h2>
+
+                        {/* Modal-specific Alert Messages */}
+                        {error && (
+                            <div className="mb-4 p-3 flex items-center bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm" role="alert">
+                                <XCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+                                <span>{error}</span>
+                            </div>
+                        )}
+                        {success && (
+                            <div className="mb-4 p-3 flex items-center bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm" role="alert">
+                                <div className="w-4 h-4 mr-2 flex-shrink-0 text-lg font-bold">✓</div>
+                                <span>{success}</span>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-1 gap-y-5 gap-x-4 mb-6">
+                                <div className="relative">
+                                  
+                                    <label htmlFor="edit-manager-name" className="sr-only">Full Name</label>
+                                    <input
+                                        id="edit-manager-name"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        placeholder="Full Name"
+                                        required
+                                        className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700 text-sm"
+                                    />
+                                </div>
+
+                                <div className="relative">
+             
+                                    <label htmlFor="edit-manager-email" className="sr-only">Email Address</label>
+                                    <input
+                                        id="edit-manager-email"
+                                        name="email"
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        placeholder="Email Address"
+                                        required
+                                        className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700 text-sm"
+                                    />
+                                </div>
+
+                                <div className="relative">
+
+                                    <label htmlFor="edit-manager-employeeID" className="sr-only">Employee ID</label>
+                                    <input
+                                        id="edit-manager-employeeID"
+                                        name="employeeID"
+                                        value={formData.employeeID}
+                                        onChange={handleChange}
+                                        placeholder="Employee ID"
+                                        required
+                                        className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700 text-sm"
+                                    />
+                                </div>
+
+                                <div className="relative">
+      
+                                    <label htmlFor="edit-manager-password" className="sr-only">New Password (Optional)</label>
+                                    <input
+                                        id="edit-manager-password"
+                                        name="password"
+                                        type="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        placeholder="New Password (Optional)"
+                                        className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700 text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end space-x-3 mt-6">
+                                <button
+                                    type="button"
+                                    onClick={closeEditModal} // Use closeEditModal to reset state
+                                    className="flex items-center px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 transition duration-200 text-sm font-medium"
+                                >
+                                    <XCircle className="w-4 h-4 mr-2" />
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={submitting}
+                                    className="flex items-center px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                >
+                                    {submitting ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                            Updating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <UserPlus className="w-4 h-4 mr-2" />
+                                            Update Manager
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

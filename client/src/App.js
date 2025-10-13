@@ -50,6 +50,7 @@ import AdminCandidateApprovals from './Pages/AdminCandidateApprovals.jsx'
 // --- 1. IMPORT THE PROVIDER ---
 import { NotificationProvider } from './context/NotificationContext'
 import AdminInterviewApprovals from './Pages/AdminInterviewApprovals.jsx'
+import PlacedCandidates from './Pages/Adminplacedcandidates.jsx'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -147,6 +148,11 @@ function App() {
                 path='interviews/approvals'
                 element={<AdminInterviewApprovals />}
               />
+              <Route
+                path='placedcandidates'
+                element={<PlacedCandidates />}
+              />
+
               <Route path='companies' element={<AdminManageCompanies />} />
               <Route
                 path='manage-candidates'

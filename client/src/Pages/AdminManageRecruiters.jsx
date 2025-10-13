@@ -9,18 +9,19 @@ import {
     Download,
     Upload,
     Shield,
-    Mail,
-    IdCard,
-    Key,
+    Mail, // Added for input icons
+    IdCard, // Added for input icons
+    Key, // Added for input icons
     FileText,
     Table,
-    ChevronDown, // Added for dropdown indicator
-    ChevronUp // Added for dropdown indicator
+    ChevronDown,
+    ChevronUp,
+    User, // Added for input icons
+    X // Added for modal close button
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../api/axios';
-// No need to import './AdminManageRecruiters.css' anymore
 
 export default function AdminManageRecruiters() {
     const [recruiters, setRecruiters] = useState([]);
@@ -41,9 +42,12 @@ export default function AdminManageRecruiters() {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
     const [importing, setImporting] = useState(false);
     const [showExportMenu, setShowExportMenu] = useState(false);
+    // NEW STATE: To control the visibility of the edit modal
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const fileInputRef = useRef(null);
     const exportMenuRef = useRef(null);
+    const modalRef = useRef(null); // Ref for the modal to handle clicks outside
 
     const fetchRecruiters = useCallback(async () => {
         try {
@@ -64,11 +68,18 @@ export default function AdminManageRecruiters() {
         fetchRecruiters();
     }, [fetchRecruiters]);
 
-    // Close export menu when clicking outside
+    // Close export menu and modal when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (exportMenuRef.current && !exportMenuRef.current.contains(event.target)) {
                 setShowExportMenu(false);
+            }
+            // Close modal if click is outside
+            if (modalRef.current && !modalRef.current.contains(event.target) && isEditModalOpen) {
+                // Only close if the event target is not within the form itself
+                if (!event.target.closest('#edit-recruiter-form')) {
+                    closeEditModal();
+                }
             }
         };
 
@@ -76,7 +87,7 @@ export default function AdminManageRecruiters() {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, []);
+    }, [isEditModalOpen]); // Depend on isEditModalOpen to re-attach listener if modal state changes
 
     // Filter recruiters based on search term
     useEffect(() => {
@@ -120,7 +131,12 @@ export default function AdminManageRecruiters() {
 
         try {
             if (editingId) {
-                await api.put(`/recruiters/${editingId}`, formData);
+                // Ensure password is only sent if it's provided
+                const dataToUpdate = { ...formData };
+                if (!dataToUpdate.password) {
+                    delete dataToUpdate.password;
+                }
+                await api.put(`/recruiters/${editingId}`, dataToUpdate);
                 setSuccess('Recruiter updated successfully!');
             } else {
                 await api.post('/recruiters/register', formData);
@@ -130,6 +146,7 @@ export default function AdminManageRecruiters() {
             await fetchRecruiters();
 
             setTimeout(() => setSuccess(''), 3000);
+            closeEditModal(); // NEW: Close modal on successful submission
         } catch (error) {
             console.error("Failed to submit recruiter:", error);
             setError(error.response?.data?.error || 'Failed to save recruiter.');
@@ -143,13 +160,18 @@ export default function AdminManageRecruiters() {
             name: recruiter.name,
             email: recruiter.email,
             employeeID: recruiter.employeeId,
-            password: ''
+            password: '' // Clear password field for security, user can enter new one
         });
         setEditingId(recruiter._id);
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+        setIsEditModalOpen(true); // NEW: Open the edit modal
+        // No need to scroll here, as the form is now in a modal
+    };
+
+    const closeEditModal = () => {
+        setIsEditModalOpen(false);
+        resetForm(); // NEW: Reset form when modal is closed
+        setError(''); // Clear errors when modal closes
+        setSuccess(''); // Clear success when modal closes
     };
 
     const handleDelete = async (id) => {
@@ -372,110 +394,102 @@ export default function AdminManageRecruiters() {
                 </div>
 
                 {/* Alert Messages */}
-                {error && (
+                {error && !isEditModalOpen && ( // Only show global error if modal is not open
                     <div className="mb-6 p-4 flex items-center bg-red-100 border border-red-400 text-red-700 rounded-lg shadow-sm animate-fade-in" role="alert">
                         <XCircle className="w-5 h-5 mr-3 flex-shrink-0" />
                         <span className="text-sm font-medium">{error}</span>
                     </div>
                 )}
 
-                {success && (
+                {success && !isEditModalOpen && ( // Only show global success if modal is not open
                     <div className="mb-6 p-4 flex items-center bg-green-100 border border-green-400 text-green-700 rounded-lg shadow-sm animate-fade-in" role="alert">
                         <div className="w-5 h-5 mr-3 flex-shrink-0 text-lg font-bold">✓</div>
                         <span className="text-sm font-medium">{success}</span>
                     </div>
                 )}
 
-                {/* Add/Edit Form */}
-                <form onSubmit={handleSubmit} className="mb-10 p-6 bg-gray-50 rounded-lg shadow-md border border-gray-200">
-                    <div className="mb-6 pb-4 border-b border-gray-200 flex items-center justify-between">
-                        <h2 id='scroll-container' className="text-xl sm:text-2xl font-semibold text-gray-800">
-                            {editingId ? 'Edit Recruiter' : 'Add New Recruiter'}
-                        </h2>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div className="relative">
-
-                            <input
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                placeholder="Full Name"
-                                required
-                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
-                            />
+                {/* Original Add New Recruiter Form - only visible when not editing (and not in modal) */}
+                {!editingId && (
+                    <form onSubmit={handleSubmit} className="mb-10 p-6 bg-gray-50 rounded-lg shadow-md border border-gray-200">
+                        <div className="mb-6 pb-4 border-b border-gray-200 flex items-center justify-between">
+                            <h2 id='scroll-container' className="text-xl sm:text-2xl font-semibold text-gray-800">
+                                Add New Recruiter
+                            </h2>
                         </div>
 
-                        <div className="relative">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="relative">
 
-                            <input
-                                name="email"
-                                type="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder="Email Address"
-                                required
-                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
-                            />
+                                <input
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    placeholder="Full Name"
+                                    required
+                                    className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
+                                />
+                            </div>
+
+                            <div className="relative">
+
+                                <input
+                                    name="email"
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    placeholder="Email Address"
+                                    required
+                                    className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
+                                />
+                            </div>
+
+                            <div className="relative">
+
+                                <input
+                                    name="employeeID"
+                                    value={formData.employeeID}
+                                    onChange={handleChange}
+                                    placeholder="Employee ID"
+                                    required
+                                    className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
+                                />
+                            </div>
+
+                            <div className="relative">
+
+                                <input
+                                    name="password"
+                                    type="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    placeholder="Password"
+                                    required
+                                    className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
+                                />
+                            </div>
                         </div>
 
-                        <div className="relative">
-
-                            <input
-                                name="employeeID"
-                                value={formData.employeeID}
-                                onChange={handleChange}
-                                placeholder="Employee ID"
-                                required
-                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
-                            />
-                        </div>
-
-                        <div className="relative">
-
-                            <input
-                                name="password"
-                                type="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                placeholder={editingId ? "New Password (Optional)" : "Password"}
-                                required={!editingId}
-                                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex justify-end space-x-4">
-                        {editingId && (
+                        <div className="flex justify-end space-x-4">
                             <button
-                                type="button"
-                                onClick={resetForm}
-                                className="flex items-center px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 transition duration-200 text-sm font-medium"
+                                type="submit"
+                                disabled={submitting}
+                                className="flex items-center px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                             >
-                                <XCircle className="w-4 h-4 mr-2" />
-                                Cancel Edit
+                                {submitting ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        Adding...
+                                    </>
+                                ) : (
+                                    <>
+                                        <UserPlus className="w-4 h-4 mr-2" />
+                                        Add Recruiter
+                                    </>
+                                )}
                             </button>
-                        )}
-                        <button
-                            type="submit"
-                            disabled={submitting}
-                            className="flex items-center px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                        >
-                            {submitting ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    {editingId ? 'Updating...' : 'Adding...'}
-                                </>
-                            ) : (
-                                <>
-                                    <UserPlus className="w-4 h-4 mr-2" />
-                                    {editingId ? 'Update Recruiter' : 'Add Recruiter'}
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </form>
+                        </div>
+                    </form>
+                )}
                 <br />
                 {/* Recruiters Table Section */}
                 <div className="bg-white rounded-lg shadow-md border border-gray-200">
@@ -484,7 +498,6 @@ export default function AdminManageRecruiters() {
                             <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">All Recruiters</h2>
                             <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                                 <div className="relative w-full sm:w-auto">
-                                    {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} /> */}
                                     <input
                                         type="text"
                                         placeholder="Search recruiters..."
@@ -658,10 +671,8 @@ export default function AdminManageRecruiters() {
                                                     <button
                                                         onClick={() => {
                                                             handleEdit(recruiter);
-                                                            const container = document.getElementById('scroll-container');
-                                                            if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+                                                            // Removed original scroll logic as modal handles focus
                                                         }}
-
                                                         className="flex items-center text-blue-600 hover:text-blue-900 transition duration-150 ease-in-out hover:scale-105"
                                                         title="Edit Recruiter"
                                                     >
@@ -691,23 +702,137 @@ export default function AdminManageRecruiters() {
                         </table>
                     </div>
 
-                    {/* Table Footer */}
-                    <div className="p-5 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between text-sm text-gray-600">
-                        <div className="mb-2 sm:mb-0">
-                            Showing <strong className="font-semibold">{filteredRecruiters.length}</strong> of{' '}
-                            <strong className="font-semibold">{recruiters.length}</strong> recruiters
-                            {searchTerm && (
-                                <span className="ml-1">
-                                    {' '}for "<strong className="font-semibold">{searchTerm}</strong>"
-                                </span>
-                            )}
-                        </div>
+                    <div className="mb-2 sm:mb-0">
+                        Showing <strong className="font-semibold">{filteredRecruiters.length}</strong> of{' '}
+                        <strong className="font-semibold">{recruiters.length}</strong> recruiters
+                        {searchTerm && (
+                            <span className="ml-1">
+                                {' '}for "<strong className="font-semibold">{searchTerm}</strong>"
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>
+
+            {/* NEW: Edit Recruiter Modal */}
+            {isEditModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900 bg-opacity-50 animate-fade-in-scale">
+                    <div ref={modalRef} className="relative bg-white rounded-lg shadow-xl w-full max-w-lg p-6 sm:p-8 transform transition-all duration-300 scale-100 opacity-100" id="edit-recruiter-form">
+                        <button
+                            onClick={closeEditModal}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                            title="Close"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">Edit Recruiter Details</h2>
+
+                        {/* Modal-specific Alert Messages */}
+                        {error && (
+                            <div className="mb-4 p-3 flex items-center bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm" role="alert">
+                                <XCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+                                <span>{error}</span>
+                            </div>
+                        )}
+                        {success && (
+                            <div className="mb-4 p-3 flex items-center bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm" role="alert">
+                                <div className="w-4 h-4 mr-2 flex-shrink-0 text-lg font-bold">✓</div>
+                                <span>{success}</span>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-1 gap-y-5 gap-x-4 mb-6">
+                                <div className="relative">
+
+                                    <label htmlFor="edit-name" className="sr-only">Full Name</label>
+                                    <input
+                                        id="edit-name"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        placeholder="Full Name"
+                                        required
+                                        className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700 text-sm"
+                                    />
+                                </div>
+
+                                <div className="relative">
+
+                                    <label htmlFor="edit-email" className="sr-only">Email Address</label>
+                                    <input
+                                        id="edit-email"
+                                        name="email"
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        placeholder="Email Address"
+                                        required
+                                        className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700 text-sm"
+                                    />
+                                </div>
+
+                                <div className="relative">
+
+                                    <label htmlFor="edit-employeeID" className="sr-only">Employee ID</label>
+                                    <input
+                                        id="edit-employeeID"
+                                        name="employeeID"
+                                        value={formData.employeeID}
+                                        onChange={handleChange}
+                                        placeholder="Employee ID"
+                                        required
+                                        className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700 text-sm"
+                                    />
+                                </div>
+
+                                <div className="relative">
+
+                                    <label htmlFor="edit-password" className="sr-only">New Password (Optional)</label>
+                                    <input
+                                        id="edit-password"
+                                        name="password"
+                                        type="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        placeholder="New Password (Optional)"
+                                        className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700 text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end space-x-3 mt-6">
+                                <button
+                                    type="button"
+                                    onClick={closeEditModal} // Use closeEditModal to reset state
+                                    className="flex items-center px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 transition duration-200 text-sm font-medium"
+                                >
+                                    <XCircle className="w-4 h-4 mr-2" />
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={submitting}
+                                    className="flex items-center px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                >
+                                    {submitting ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                            Updating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <UserPlus className="w-4 h-4 mr-2" />
+                                            Update Recruiter
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
-
-// Export the component as before
-export { AdminManageRecruiters };

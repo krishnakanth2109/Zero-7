@@ -243,6 +243,7 @@ export default function AdminDashboard() {
           subtext='Candidates Placed'
           icon={<Award className='stroke-red-500 stroke-2' />}
           percentage='+12%'
+          path='placedcandidates'
         />
         <StatCard
           title='Interviews'

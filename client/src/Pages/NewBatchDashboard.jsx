@@ -6,6 +6,7 @@ import * as XLSX from 'xlsx' // Import the xlsx library
 import { FiEdit } from 'react-icons/fi'
 import { Loader2, PlusCircle, X } from 'lucide-react'
 import api from '../api/axios'
+import { duration } from 'moment'
 // Removed: import './NewBatchDashboard.css' // No longer needed with Tailwind CSS
 
 const API_URL = process.env.REACT_APP_API_URL // Ensure this matches your server port
@@ -19,6 +20,7 @@ export default function NewBatchDashboard() {
     course: '',
     date: '',
     timing: '',
+    duration: '',
     trainer: '',
     demo: 'No',
   })
@@ -28,6 +30,7 @@ export default function NewBatchDashboard() {
     try {
       const response = await axios.get(`${API_URL}/batches`)
       setBatches(response.data)
+      console.log(response.data)
     } catch (error) {
       console.error('Failed to fetch batches:', error)
       alert('Could not fetch batches.')
@@ -85,10 +88,11 @@ export default function NewBatchDashboard() {
   const handleExport = () => {
     // We don't want to export database-specific fields like _id, __v, timestamps
     const dataToExport = batches.map(
-      ({ course, date, timing, trainer, demo }) => ({
+      ({ course, date, timing, duration, trainer, demo }) => ({
         Course: course,
         Date: date,
         Timing: timing,
+        Duration: duration,
         Trainer: trainer,
         'Demo Available': demo,
       }),
@@ -118,6 +122,7 @@ export default function NewBatchDashboard() {
         course: row.Course,
         date: row.Date,
         timing: row.Timing,
+        duration: row.duration,
         trainer: row.Trainer,
         demo: row['Demo Available'] || 'No',
       }))
@@ -193,6 +198,15 @@ export default function NewBatchDashboard() {
               name='timing'
               placeholder='Batch Timing'
               value={newBatch.timing}
+              onChange={handleChange}
+              required
+              className='p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none transition-all duration-200'
+            />
+            <input
+              type='text'
+              name='duration'
+              placeholder='Batch Duration'
+              value={newBatch.duration}
               onChange={handleChange}
               required
               className='p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none transition-all duration-200'
@@ -278,6 +292,16 @@ export default function NewBatchDashboard() {
               </div>
               <div className='relative'>
                 <input
+                  name='role'
+                  value={batch.duration}
+                  onChange={handleEditChange}
+                  placeholder='Batch duration'
+                  required
+                  className='pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700'
+                />
+              </div>
+              <div className='relative'>
+                <input
                   name='trainer'
                   value={batch.trainer}
                   onChange={handleEditChange}
@@ -325,8 +349,9 @@ export default function NewBatchDashboard() {
             <span className='text-indigo-500 mr-3 text-3xl'>📋</span> All
             Batches
           </h3>
-          <div className='flex flex-wrap gap-3'>
+          <div className='flex flex-wrap gap-3 items-center justify-center'>
             <label
+              type='button'
               htmlFor='import-excel'
               className='bg-green-500 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition-all duration-200 text-sm font-medium'>
               Import from Excel
@@ -338,11 +363,11 @@ export default function NewBatchDashboard() {
               onChange={handleImport}
               className='hidden'
             />
-            <button
+            <label
               className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-all duration-200 text-sm font-medium'
               onClick={handleExport}>
               Export to Excel
-            </button>
+            </label>
           </div>
         </div>
 
@@ -363,6 +388,9 @@ export default function NewBatchDashboard() {
                   </th>
                   <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                     Timing
+                  </th>
+                  <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Duration
                   </th>
                   <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                     Trainer
@@ -389,6 +417,9 @@ export default function NewBatchDashboard() {
                       </td>
                       <td className='px-4 py-3 whitespace-nowrap text-sm text-gray-700'>
                         {batch.timing}
+                      </td>
+                      <td className='px-4 py-3 whitespace-nowrap text-sm text-gray-700'>
+                        {batch.duration}
                       </td>
                       <td className='px-4 py-3 whitespace-nowrap text-sm text-gray-700'>
                         {batch.trainer}

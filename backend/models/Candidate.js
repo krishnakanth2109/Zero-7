@@ -8,6 +8,7 @@ const CandidateSchema = new Schema(
     role: { type: String, required: true },
     exp: { type: String, required: true }, // e.g., "5+ Years"
     location: { type: String, required: true },
+    industry: { type: String },
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true },
     skills: { type: String, required: true },

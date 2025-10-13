@@ -61,11 +61,11 @@ export default function AdminSidebar({ isOpen }) {
     },
     {
       path: '/admin/manage-candidates',
-      label: 'Manage Candidates',
+      label: 'Manage Bench List',
       icon: AlignHorizontalJustifyStart,
     },
 
-        {
+    {
       path: '/admin/placedcandidates',
       label: 'Placed Candidates',
       icon: CircleUser,
@@ -73,7 +73,7 @@ export default function AdminSidebar({ isOpen }) {
 
     {
       path: '/admin/candidateList',
-      label: 'Candidates Approvals',
+      label: 'Bench Approvals',
       icon: Hourglass,
     },
     { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
@@ -131,11 +131,11 @@ export default function AdminSidebar({ isOpen }) {
         label: 'Bench Approvals',
         icon: Hourglass,
       },
-              {
-      path: '/admin/placedcandidates',
-      label: 'Placed Candidates',
-      icon: CircleUser,
-    },
+      {
+        path: '/admin/placedcandidates',
+        label: 'Placed Candidates',
+        icon: CircleUser,
+      },
 
       { path: '/admin/companies', label: 'Manage Companies', icon: Building },
       { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
@@ -167,11 +167,11 @@ export default function AdminSidebar({ isOpen }) {
     recruiter: [
       ...commonLinks,
       { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
-              {
-      path: '/admin/placedcandidates',
-      label: 'Placed Candidates',
-      icon: CircleUser,
-    },
+      {
+        path: '/admin/placedcandidates',
+        label: 'Placed Candidates',
+        icon: CircleUser,
+      },
 
       {
         path: '/admin/manage-candidates',

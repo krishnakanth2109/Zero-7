@@ -149,23 +149,31 @@ export default function AdminViewRequests() {
     <div className='requests-container'>
       {/* Header Section */}
       <div className='requests-header'>
-        <h2>Candidate Information Requests</h2>
+        <h3 className='text-xl font-bold'>Candidate Information Requests</h3>
         <div className='header-stats'>
           <div className='stat-card'>
-            <span className='stat-number'>{statusCounts.total}</span>
-            <span className='stat-label'>Total</span>
+            <span className='text-white font-bold text-xl'>
+              {statusCounts.total}
+            </span>
+            <span className='text-white'>Total</span>
           </div>
           <div className='stat-card pending'>
-            <span className='stat-number'>{statusCounts.pending}</span>
-            <span className='stat-label'>Pending</span>
+            <span className='text-white font-bold text-xl'>
+              {statusCounts.pending}
+            </span>
+            <span className='text-white'>Pending</span>
           </div>
           <div className='stat-card approved'>
-            <span className='stat-number'>{statusCounts.approved}</span>
-            <span className='stat-label'>Approved</span>
+            <span className='text-white font-bold text-xl'>
+              {statusCounts.approved}
+            </span>
+            <span className='text-white'>Approved</span>
           </div>
           <div className='stat-card rejected'>
-            <span className='stat-number'>{statusCounts.rejected}</span>
-            <span className='stat-label'>Rejected</span>
+            <span className='text-white font-bold text-xl'>
+              {statusCounts.rejected}
+            </span>
+            <span className='text-white'>Rejected</span>
           </div>
         </div>
       </div>

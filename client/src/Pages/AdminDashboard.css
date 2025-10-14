@@ -1,9 +1,5 @@
 .admin-main {
-  background-image: linear-gradient(
-    135deg,
-    rgba(220, 38, 38, 0.1) 0%,
-    rgba(13, 162, 231, 0.05) 100%
-  );
+  background-image: linear-gradient(135deg, #c4d8e91a 0%, #267edc 100%);
 }
 
 .button-container {

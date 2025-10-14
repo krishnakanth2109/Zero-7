@@ -100,7 +100,7 @@ const AdminItPrograms = () => {
         <h2>{editingId ? "✏️ Edit Program" : "➕ Add Program"}</h2>
         <div className="form-grid">
           <input name="title" placeholder="Title" value={form.title} onChange={handleChange} required />
-          <input name="icon" placeholder="Icon (emoji)" value={form.icon} onChange={handleChange} />
+          <input name="icon" placeholder="Icon[Window click Windows Key + .][Control + Command + Space in MAC]" value={form.icon} onChange={handleChange} />
           <input name="price" placeholder="Price" value={form.price} onChange={handleChange} required />
           <input name="description" placeholder="Short Description" value={form.description} onChange={handleChange} />
           <textarea name="details" placeholder="Details" value={form.details} onChange={handleChange}></textarea>

@@ -52,6 +52,7 @@ router.get('/', async (req, res) => {
           name: 1,
           role: 1,
           location: 1,
+          industry: 1,
           email: 1,
           skills: 1,
           industry: 1, // <-- ADDED
@@ -157,6 +158,7 @@ router.get('/all', async (req, res) => {
           name: 1,
           role: 1,
           location: 1,
+          industry: 1,
           email: 1,
           skills: 1,
           industry: 1, // <-- ADDED

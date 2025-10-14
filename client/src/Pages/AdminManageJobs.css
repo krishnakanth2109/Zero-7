@@ -83,10 +83,10 @@ body {
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
   width: 90%;
   max-width: 600px;
-  position: relative;
+  /* position: relative; */
   transform: translateY(-20px);
   animation: slideIn 0.3s ease-out forwards;
-  margin-top: 145px;
+ 
 }
 
 @keyframes fadeIn {
@@ -295,18 +295,34 @@ body {
   margin-top: -10px; /* Pulls it closer to the button above */
   margin-bottom: 40px; /* Pushes the "Current Job Listings" card down */
 }
-
 .excel-action-link {
-  background: none;
+  display: inline-block;
+  background: linear-gradient(90deg, #3bc9f5, #228be6);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 8px 18px;
   border: none;
-  color: #555; /* A neutral text color */
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 5px;
-  transition: color 0.2s ease;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(56, 189, 248, 0.25);
+  transition: all 0.3s ease-in-out;
+  margin-right: 12px;
 }
 
 .excel-action-link:hover {
-  color: #007bff; /* Highlight color on hover */
+  background: linear-gradient(90deg, #4dd0ff, #1e7fe6);
+  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
+  transform: translateY(-2px);
+}
+
+.excel-action-link:active {
+  transform: scale(0.96);
+  box-shadow: 0 3px 8px rgba(56, 189, 248, 0.35);
+}
+
+.excel-action-link:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.4);
 }

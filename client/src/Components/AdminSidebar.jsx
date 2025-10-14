@@ -61,12 +61,19 @@ export default function AdminSidebar({ isOpen }) {
     },
     {
       path: '/admin/manage-candidates',
-      label: 'Manage Candidates',
+      label: 'Manage Bench List',
       icon: AlignHorizontalJustifyStart,
     },
+
+    {
+      path: '/admin/placedcandidates',
+      label: 'Placed Candidates',
+      icon: CircleUser,
+    },
+
     {
       path: '/admin/candidateList',
-      label: 'Candidates Approvals',
+      label: 'Bench Approvals',
       icon: Hourglass,
     },
     { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
@@ -95,7 +102,7 @@ export default function AdminSidebar({ isOpen }) {
       label: 'New Batches',
       icon: FileUser,
     },
-    { path: '/admin/forms', label: 'Form', icon: Layers },
+    { path: '/admin/forms', label: 'Carrer Consultation Form', icon: Layers },
     {
       path: '/admin/it-programs',
       label: 'IT Programs',
@@ -116,14 +123,20 @@ export default function AdminSidebar({ isOpen }) {
       },
       {
         path: '/admin/manage-candidates',
-        label: 'Manage Candidates',
+        label: 'Manage Bench List',
         icon: AlignHorizontalJustifyStart,
       },
       {
         path: '/admin/candidateList',
-        label: 'Candidates Approvals',
+        label: 'Bench Approvals',
         icon: Hourglass,
       },
+      {
+        path: '/admin/placedcandidates',
+        label: 'Placed Candidates',
+        icon: CircleUser,
+      },
+
       { path: '/admin/companies', label: 'Manage Companies', icon: Building },
       { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
       {
@@ -143,6 +156,7 @@ export default function AdminSidebar({ isOpen }) {
         label: 'Add Recruiter',
         icon: UserSearch,
       },
+      { path: '/admin/forms', label: 'Carrer Consultation Form', icon: Layers },
       {
         path: '/admin/it-programs',
         label: 'IT Programs',
@@ -153,6 +167,12 @@ export default function AdminSidebar({ isOpen }) {
     recruiter: [
       ...commonLinks,
       { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
+      {
+        path: '/admin/placedcandidates',
+        label: 'Placed Candidates',
+        icon: CircleUser,
+      },
+
       {
         path: '/admin/manage-candidates',
         label: 'Manage Candidates',

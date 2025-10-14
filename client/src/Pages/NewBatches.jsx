@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import './NewBatches.css'
 
-const API_URL = 'https://zero-7-ayjp.onrender.com'
+const API_URL = process.env.REACT_APP_API_URL
 
 const NewBatches = () => {
   const [showRegistration, setShowRegistration] = useState(false)
@@ -14,7 +14,7 @@ const NewBatches = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/batches`)
+        const response = await axios.get(`${API_URL}/batches`)
         setCoursesData(response.data)
       } catch (error) {
         console.error('Failed to fetch new batches:', error)
@@ -241,9 +241,7 @@ const NewBatches = () => {
                 <tr>
                   <th>Course</th>
                   <th>Date</th>
-                  <th>Timings</th>
                   <th>Duration</th>
-                  <th>Trainer</th>
                   <th>Register for Demo</th>
                 </tr>
               </thead>
@@ -253,10 +251,10 @@ const NewBatches = () => {
                     <tr key={course._id}>
                       {/* ✅ FIX: Render all fields from the course object */}
                       <td>{course.course}</td>
-                      <td>{course.date}</td>
-                      <td>{course.timing}</td>
+                      <td>
+                        {new Date(course.date).toLocaleDateString('En-IN')}
+                      </td>
                       <td>{course.duration || 'N/A'}</td>
-                      <td>{course.trainer}</td>
                       <td>
                         <button
                           className='register-btn'

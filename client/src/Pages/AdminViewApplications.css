@@ -28,7 +28,7 @@ h2 {
 }
 
 .applications-table thead {
-  background-color: #4caf50; /* A pleasant green */
+  background-color: #4dabea; /* A pleasant green */
   color: white;
 }
 
@@ -54,7 +54,7 @@ h2 {
 }
 
 .applications-table tbody tr:hover {
-  background-color: #e8f5e9; /* Lighter green on hover */
+  background-color: #cad4e2;
   transform: translateY(-2px); /* Slightly lift the row */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow on hover */
 }

@@ -9,6 +9,7 @@ const JobSchema = new Schema(
     skills: { type: String, required: true },
     salary: { type: String, required: true },
     location: { type: String, required: true },
+    status: { type: String, enum: ['active', 'in active'], default: 'active' },
   },
   { timestamps: true },
 )

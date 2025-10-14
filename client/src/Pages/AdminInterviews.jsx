@@ -21,6 +21,9 @@ const InterviewTracker = () => {
   const [showEditModal, setShowEditModal] = useState(false)
   const [currentEditInterview, setCurrentEditInterview] = useState(null)
 
+  const [showCandidateDetailsModal, setShowCandidateDetailsModal] = useState(false)
+  const [selectedCandidateDetails, setSelectedCandidateDetails] = useState(null)
+
   const fetchInterviews = async () => {
     try {
       setLoading(true)
@@ -28,12 +31,21 @@ const InterviewTracker = () => {
       setInterviewData(response.data)
 
       // Transform interview data for the calendar
+      // Now using candidateInfo.email if your backend provides it
+      console.log(response.data)
       const events = response.data.map((interview) => ({
         title: `${interview.candidateName} @ ${interview.companyName}`,
         start: new Date(interview.date),
         end: new Date(interview.date),
         allDay: true,
-        resource: interview,
+        resource: {
+          ...interview, // Keep all interview details
+          // ASSUMPTION: Your backend's /interview endpoint response looks like this for candidate email:
+          // { ..., candidateInfo: { email: "some@email.com", ... }, ... }
+          // If the email is directly on the interview object, e.g., interview.candidateEmail,
+          // then change this line to: candidateEmail: interview.candidateEmail,
+          candidateEmail: interview.candidateEmail || 'no-email-provided@example.com', // Dynamically fetch candidate email
+        },
       }))
       setCalendarEvents(events)
     } catch (error) {
@@ -49,7 +61,6 @@ const InterviewTracker = () => {
       setCandidateOptions(response.data.candidates)
       setCompanyOptions(response.data.companies)
     } catch (error) {
-      // <-- Corrected: Added curly braces
       console.error('Error fetching options:', error)
     }
   }
@@ -231,6 +242,12 @@ const InterviewTracker = () => {
     }
   }
 
+  const handleEventClick = (event) => {
+    setSelectedCandidateDetails(event.resource) // event.resource contains the full interview object
+    setShowCandidateDetailsModal(true)
+  }
+
+
   if (loading) {
     return (
       <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center'>
@@ -258,31 +275,33 @@ const InterviewTracker = () => {
 
         {/* Stats Cards */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
-          {['Scheduled', 'Completed', 'Pending Feedback', 'Offer Extended','placed'].map(
-            (status) => (
-              <div
-                key={status}
-                className='bg-white rounded-2xl shadow-lg p-6 border-l-4 border-indigo-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-gray-600'>
-                      {status}
-                    </p>
-                    <p className='text-2xl font-bold text-gray-900 mt-1'>
-                      {
-                        interviewData.filter((item) => item.status === status)
-                          .length
-                      }
-                    </p>
-                  </div>
-                  <div
-                    className={`w-3 h-3 rounded-full ${getStatusDot(
-                      status,
-                    )}`}></div>
+          {[
+            'Scheduled',
+            'Completed',
+            'Pending Feedback',
+            'Offer Extended',
+            'placed',
+          ].map((status) => (
+            <div
+              key={status}
+              className='bg-white rounded-2xl shadow-lg p-6 border-l-4 border-indigo-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='text-sm font-medium text-gray-600'>{status}</p>
+                  <p className='text-2xl font-bold text-gray-900 mt-1'>
+                    {
+                      interviewData.filter((item) => item.status === status)
+                        .length
+                    }
+                  </p>
                 </div>
+                <div
+                  className={`w-3 h-3 rounded-full ${getStatusDot(
+                    status,
+                  )}`}></div>
               </div>
-            ),
-          )}
+            </div>
+          ))}
         </div>
 
         {/* Add Interview Button */}
@@ -410,7 +429,7 @@ const InterviewTracker = () => {
                   Interview Date
                 </label>
                 <input
-                  type='date'
+                  type='datetime-local'
                   id='date'
                   name='date'
                   value={newInterview.date}
@@ -583,6 +602,9 @@ const InterviewTracker = () => {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true,
                       })}
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
@@ -630,13 +652,14 @@ const InterviewTracker = () => {
                 eventPropGetter={eventStyleGetter}
                 views={['month', 'week', 'day']}
                 popup
+                onSelectEvent={handleEventClick} // NEW: Add onSelectEvent handler
               />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Edit Status Modal */}
+      {/* Edit Status Modal (Existing) */}
       {showEditModal && currentEditInterview && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4'>
           <div className='relative w-full max-w-md mx-auto'>
@@ -708,7 +731,6 @@ const InterviewTracker = () => {
                     <option value='L3'>L3</option>
                     <option value='L4'>L4</option>
                     <option value='L5'>L5</option>
-                    <option value='placed'>PLACED</option>
                     <option value='HR'>HR Round</option>
                   </select>
                 </div>
@@ -727,6 +749,107 @@ const InterviewTracker = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* NEW: Candidate Details Pop-up Modal */}
+      {showCandidateDetailsModal && selectedCandidateDetails && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-700 bg-opacity-60 backdrop-blur-sm p-4'>
+          <div className='relative w-full max-w-md mx-auto'>
+            <div className='relative bg-white rounded-2xl shadow-2xl transform transition-all duration-300 scale-100'>
+              <div className='p-6 border-b border-gray-200'>
+                <div className='flex items-center justify-between'>
+                  <h3 className='text-xl font-bold text-gray-800'>
+                    Candidate Details
+                  </h3>
+                  <button
+                    className='p-2 hover:bg-gray-100 rounded-full transition-colors duration-200'
+                    onClick={() => setShowCandidateDetailsModal(false)}>
+                    <svg
+                      className='w-5 h-5 text-gray-500'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M6 18L18 6M6 6l12 12'
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div className='p-6 space-y-4 text-gray-700'>
+                <p>
+                  <span className='font-semibold'>Candidate Name:</span>{' '}
+                  {selectedCandidateDetails.candidateName}
+                </p>
+                <p>
+                  <span className='font-semibold'>Email:</span>{' '}
+                  {/* Display the dynamically fetched email */}
+                  <a
+                    href={`mailto:${selectedCandidateDetails.candidateEmail}`}
+                    className='text-indigo-600 hover:underline'>
+                    {selectedCandidateDetails.candidateEmail}
+                  </a>
+                </p>
+                <p>
+                  <span className='font-semibold'>Company:</span>{' '}
+                  {selectedCandidateDetails.companyName}
+                </p>
+                <p>
+                  <span className='font-semibold'>Job Role:</span>{' '}
+                  {selectedCandidateDetails.jobRole}
+                </p>
+                <p>
+                  <span className='font-semibold'>Interview Level:</span>{' '}
+                  {selectedCandidateDetails.interviewLevel}
+                </p>
+                <p>
+                  <span className='font-semibold'>Status:</span>{' '}
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+                      selectedCandidateDetails.status,
+                    )}`}>
+                    <span
+                      className={`w-2 h-2 rounded-full mr-2 ${getStatusDot(
+                        selectedCandidateDetails.status,
+                      )}`}></span>
+                    {selectedCandidateDetails.status}
+                  </span>
+                </p>
+                <p>
+                  <span className='font-semibold'>Date & Time:</span>{' '}
+                  {new Date(selectedCandidateDetails.date).toLocaleString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true,
+                  })}
+                </p>
+                {/* Add more details as needed from selectedCandidateDetails.resource */}
+              </div>
+             {/* <div className='p-6 border-t border-gray-200 flex justify-end'>
+                <a
+                  href={generateMailtoLink(
+                    selectedCandidateDetails.candidateEmail,
+                    selectedCandidateDetails.candidateName,
+                    selectedCandidateDetails.date,
+                    selectedCandidateDetails.jobRole, // Pass jobRole for email body
+                    selectedCandidateDetails.companyName // Pass companyName for email body
+                  )}
+                  // Remove target='_blank' and rel='noopener noreferrer'
+                  // target='_blank'
+                  // rel='noopener noreferrer'
+                  className='px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
+                  Send Confirmation Mail
+                </a>
+              </div> */}
             </div>
           </div>
         </div>

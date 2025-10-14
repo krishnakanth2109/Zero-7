@@ -16,6 +16,7 @@ const AdminManageJobs = () => {
     skills: '',
     salary: '',
     location: '',
+    status: 'active',
   })
   const [showPopup, setShowPopup] = useState(false) // State for controlling the pop-up
   const [editPopup, setEditPopup] = useState(false)
@@ -143,7 +144,7 @@ const AdminManageJobs = () => {
 
   return (
     <div className='admin-manage-jobs'>
-      <div className='bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between'>
+      <div className='bg-[#267edc] rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between'>
         <div className='flex items-center space-x-4'>
           <div className='bg-white bg-opacity-20 p-3 rounded-full'>
             <FileText />
@@ -186,7 +187,7 @@ const AdminManageJobs = () => {
 
       {showPopup && (
         <div className='popup-overlay'>
-          <div className='popup-content'>
+          <div className='popup-content w-[90%] sm:w-[70%] md:w-[50%] lg:w-[40%] bg-white p-6 rounded-xl shadow-xl max-h-[80vh] overflow-y-auto'>
             <button
               className='close-popup-button'
               onClick={() => setShowPopup(false)}>
@@ -268,6 +269,19 @@ const AdminManageJobs = () => {
                   required
                 />
               </div>
+              <div className='form-group'>
+                <label htmlFor='jobStatus'>Job Status</label>
+                <select
+                  name='status'
+                  onChange={handleInputChange}
+                  value={formState.status}
+                  id='jobStatus'>
+                  <option value='active' default>
+                    Active
+                  </option>
+                  <option value='in active'>In Active</option>
+                </select>
+              </div>
               <button type='submit' className='post-job-button'>
                 Post Job
               </button>
@@ -277,7 +291,7 @@ const AdminManageJobs = () => {
       )}
       {editPopup && (
         <div class='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
-          <div class='relative p-8 border w-11/12 max-w-lg shadow-lg rounded-md bg-white'>
+          <div class='relative p-8 border w-11/12 max-w-lg shadow-lg rounded-md bg-white h-[90vh] overflow-scroll'>
             <button
               class='absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-semibold'
               onClick={() => setEditPopup(false)}>
@@ -399,6 +413,19 @@ const AdminManageJobs = () => {
                   class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
                 />
               </div>
+              <div>
+                <label htmlFor='jobStatus'>Job Status</label>
+                <select
+                  name='status'
+                  onChange={handleInputChange}
+                  value={formState.status}
+                  id='jobStatus'>
+                  <option value='active' defaultChecked>
+                    Active
+                  </option>
+                  <option value='in active'>In Active</option>
+                </select>
+              </div>
 
               <button
                 type='submit'
@@ -426,6 +453,7 @@ const AdminManageJobs = () => {
                   <th>Skills</th>
                   <th>Salary</th>
                   <th>Location</th>
+                  <th>Job Status</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -440,16 +468,17 @@ const AdminManageJobs = () => {
                       <td>{job.skills}</td>
                       <td>{job.salary}</td>
                       <td>{job.location}</td>
+                      <td>{job.status || 'N/A'}</td>
                       <td className='flex align-center justify-center gap-3 p-5 '>
                         <button
                           onClick={() => handleEditPopup(job)}
-                          className='text-indigo-600 hover:text-indigo-900 font-semibold transition-colors duration-200 flex items-center'>
+                          className='text-indigo-600 hover:text-indigo-900 text-sm'>
                           <FilePenLine />
                         </button>
                         <button
                           onClick={() => handleDeleteJob(job._id)}
-                          className='delete-btn'>
-                         <Trash />
+                          className='text-rose-600 hover:text-rose-900 text-sm'>
+                          <Trash />
                         </button>
                       </td>
                     </tr>

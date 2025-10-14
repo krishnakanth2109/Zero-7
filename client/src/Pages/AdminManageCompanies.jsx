@@ -104,7 +104,7 @@ const AdminManageCompanies = () => {
   return (
     <div className='min-h-screen bg-gray-100 p-6 font-sans'>
       {/* Header Section */}
-      <div className='bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between'>
+      <div className='bg-[#267edc] rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between'>
         <div className='flex items-center space-x-4'>
           <div className='bg-white bg-opacity-20 p-3 rounded-full'>
             <Building2 />
@@ -137,7 +137,7 @@ const AdminManageCompanies = () => {
       {/* Add New Company Form (Popup/Modal) */}
       {showAddForm && (
         <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
-          <div className='relative p-8 bg-white rounded-lg shadow-xl max-w-md w-full'>
+          <div className='relative p-8 bg-white rounded-lg shadow-xl max-w-md w-full h-[80vh] overflow-scroll'>
             <button
               className='absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-200'
               onClick={() => setShowAddForm(false)}>
@@ -239,7 +239,7 @@ const AdminManageCompanies = () => {
       {/* Edit Company Popup */}
       {editPopup && editCompanyFormState && (
         <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
-          <div className='relative p-8 bg-white rounded-lg shadow-xl max-w-md w-full'>
+          <div className='relative p-8 bg-white rounded-lg shadow-xl max-w-md w-full h-[80vh] overflow-scroll'>
             <button
               className='absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-200'
               onClick={() => setEditPopup(false)}>
@@ -348,7 +348,7 @@ const AdminManageCompanies = () => {
       {/* Companies Table */}
       <div className='overflow-x-auto bg-white shadow-xl rounded-lg border border-gray-200'>
         <table className='min-w-full divide-y divide-gray-200'>
-          <thead className='bg-indigo-600'>
+          <thead className='bg-[#267edc]'>
             <tr>
               {['ID', 'Name', 'Email', 'Industry', 'Address', 'Actions'].map(
                 (header) => (

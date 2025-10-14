@@ -122,7 +122,7 @@ const checkUpcomingInterviews = () => {
       interview.status === 'Scheduled' &&
       !alertedInterviews.has(interview._id) &&
       new Date(interview.date) - now > 0 &&
-      new Date(interview.date) - now <= 5 * 60 * 1000
+      new Date(interview.date) - now <= 10 * 60 * 1000
   );
 
   if (upcoming.length === 0) return;
@@ -858,6 +858,7 @@ const [editinterviewtiming, seteditinterviewtiming] = useState()
                     <option value='L4'>L4</option>
                     <option value='L5'>L5</option>
                     <option value='HR'>HR Round</option>
+                     <option value='PLACED'>PLACED</option>
                   </select>
 
                 <label

@@ -21,7 +21,8 @@ const InterviewTracker = () => {
   const [showEditModal, setShowEditModal] = useState(false)
   const [currentEditInterview, setCurrentEditInterview] = useState(null)
 
-  const [showCandidateDetailsModal, setShowCandidateDetailsModal] = useState(false)
+  const [showCandidateDetailsModal, setShowCandidateDetailsModal] =
+    useState(false)
   const [selectedCandidateDetails, setSelectedCandidateDetails] = useState(null)
 
   const fetchInterviews = async () => {
@@ -44,7 +45,40 @@ const InterviewTracker = () => {
           // { ..., candidateInfo: { email: "some@email.com", ... }, ... }
           // If the email is directly on the interview object, e.g., interview.candidateEmail,
           // then change this line to: candidateEmail: interview.candidateEmail,
-          candidateEmail: interview.candidateEmail || 'no-email-provided@example.com', // Dynamically fetch candidate email
+          candidateEmail:
+            interview.candidateEmail || 'no-email-provided@example.com', // Dynamically fetch candidate email
+        },
+      }))
+      setCalendarEvents(events)
+    } catch (error) {
+      console.error('Error fetching interviews:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchUserInterviews = async (id) => {
+    try {
+      setLoading(true)
+      const response = await api.get(`/interview/user/${id}`)
+      setInterviewData(response.data)
+
+      // Transform interview data for the calendar
+      // Now using candidateInfo.email if your backend provides it
+      console.log(response.data)
+      const events = response.data.map((interview) => ({
+        title: `${interview.candidateName} @ ${interview.companyName}`,
+        start: new Date(interview.date),
+        end: new Date(interview.date),
+        allDay: true,
+        resource: {
+          ...interview, // Keep all interview details
+          // ASSUMPTION: Your backend's /interview endpoint response looks like this for candidate email:
+          // { ..., candidateInfo: { email: "some@email.com", ... }, ... }
+          // If the email is directly on the interview object, e.g., interview.candidateEmail,
+          // then change this line to: candidateEmail: interview.candidateEmail,
+          candidateEmail:
+            interview.candidateEmail || 'no-email-provided@example.com', // Dynamically fetch candidate email
         },
       }))
       setCalendarEvents(events)
@@ -58,6 +92,7 @@ const InterviewTracker = () => {
   const fetchOptions = async () => {
     try {
       const response = await api.get('/interview/search')
+      console.log(response.data)
       setCandidateOptions(response.data.candidates)
       setCompanyOptions(response.data.companies)
     } catch (error) {
@@ -66,12 +101,12 @@ const InterviewTracker = () => {
   }
 
   useEffect(() => {
-    fetchInterviews()
     fetchOptions()
     const data = Cookie.get('user')
     const res = JSON.parse(data)
+    res.role === 'Admin' ? fetchInterviews() : fetchUserInterviews(res.id)
     setUser(res.id)
-  }, [])
+  }, [showAddForm])
 
   const [newInterview, setNewInterview] = useState({
     candidateName: '',
@@ -157,7 +192,6 @@ const InterviewTracker = () => {
         interviewLevel: '',
         date: '',
       })
-      fetchInterviews() // Re-fetch interviews to update the list and calendar
     } catch (error) {
       console.error('Error adding interview:', error)
       alert(
@@ -246,7 +280,6 @@ const InterviewTracker = () => {
     setSelectedCandidateDetails(event.resource) // event.resource contains the full interview object
     setShowCandidateDetailsModal(true)
   }
-
 
   if (loading) {
     return (
@@ -822,19 +855,22 @@ const InterviewTracker = () => {
                 </p>
                 <p>
                   <span className='font-semibold'>Date & Time:</span>{' '}
-                  {new Date(selectedCandidateDetails.date).toLocaleString('en-US', {
-                    weekday: 'short',
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true,
-                  })}
+                  {new Date(selectedCandidateDetails.date).toLocaleString(
+                    'en-US',
+                    {
+                      weekday: 'short',
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true,
+                    },
+                  )}
                 </p>
                 {/* Add more details as needed from selectedCandidateDetails.resource */}
               </div>
-             {/* <div className='p-6 border-t border-gray-200 flex justify-end'>
+              {/* <div className='p-6 border-t border-gray-200 flex justify-end'>
                 <a
                   href={generateMailtoLink(
                     selectedCandidateDetails.candidateEmail,

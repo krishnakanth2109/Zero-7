@@ -117,7 +117,7 @@ export default function AdminManageCandidates() {
         showAlert('success', 'Candidate updated successfully!')
       } else {
         await api.post('/candidates', formData)
-        showAlert('success', 'Candidate added successfully!')
+        showAlert('success', 'Candidate added, Awaiting in Approval!')
       }
       handleCloseModal()
       fetchCandidates()

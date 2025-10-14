@@ -3,6 +3,7 @@ import api from '../api/axios'
 import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
 import Cookie from 'js-cookie'
+import Swal from 'sweetalert2'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
 // Setup the localizer by providing the moment Object
@@ -24,6 +25,8 @@ const InterviewTracker = () => {
   const [showCandidateDetailsModal, setShowCandidateDetailsModal] =
     useState(false)
   const [selectedCandidateDetails, setSelectedCandidateDetails] = useState(null)
+  // New state for alerts
+const [alertedInterviews, setAlertedInterviews] = useState(new Set())
 
   const fetchInterviews = async () => {
     try {
@@ -108,6 +111,87 @@ const InterviewTracker = () => {
     setUser(res.id)
   }, [showAddForm])
 
+// Check for upcoming interviews every minute
+// Check for upcoming interviews every minute
+// Check for upcoming interviews every minute
+useEffect(() => {
+const checkUpcomingInterviews = () => {
+  const now = new Date();
+  const upcoming = interviewData.filter(
+    (interview) =>
+      interview.status === 'Scheduled' &&
+      !alertedInterviews.has(interview._id) &&
+      new Date(interview.date) - now > 0 &&
+      new Date(interview.date) - now <= 5 * 60 * 1000
+  );
+
+  if (upcoming.length === 0) return;
+
+  // Play sound once
+  const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+  audio.play().catch(err => console.log('Audio play failed:', err));
+
+  // Build card-style HTML
+  const html = upcoming
+    .map(
+      (interview) => `
+        <div style="
+          border: 1px solid #ddd;
+          border-radius: 12px;
+          padding: 12px 16px;
+          margin-bottom: 12px;
+          background: #f9f9f9;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        ">
+          <p style="margin:4px 0;"><strong>📋 Candidate:</strong> ${interview.candidateName}</p>
+          <p style="margin:4px 0;"><strong>💼 Role:</strong> ${interview.jobRole}</p>
+          <p style="margin:4px 0;"><strong>🏢 Company:</strong> ${interview.companyName}</p>
+          <p style="margin:4px 0;"><strong>🕐 Time:</strong> ${new Date(interview.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+          <p style="margin-top:8px; font-weight:bold; color:#e74c3c;">
+            ⚡ Starting in ${Math.ceil((new Date(interview.date) - now)/60000)} min!
+          </p>
+        </div>
+      `
+    )
+    .join('');
+
+  Swal.fire({
+    title: '⏰ Upcoming Interviews!',
+    html: `<div style="display:flex; flex-direction:column; gap:10px;">${html}</div>`,
+    icon: 'warning',
+    iconColor: '#f39c12',
+    confirmButtonText: 'Got it!',
+    confirmButtonColor: '#6366f1',
+    background: '#fff',
+    timerProgressBar: true,
+    allowOutsideClick: false,
+    customClass: {
+      popup: 'rounded-2xl shadow-2xl',
+      title: 'text-2xl font-bold',
+      confirmButton: 'px-6 py-3 rounded-xl shadow-lg'
+    }
+  });
+
+  // Mark all as alerted
+  setAlertedInterviews((prev) => {
+    const updated = new Set(prev);
+    upcoming.forEach(i => updated.add(i._id));
+    return updated;
+  });
+};
+
+
+
+  // Check immediately on mount
+  checkUpcomingInterviews()
+
+  // Then check every minute
+  const intervalId = setInterval(checkUpcomingInterviews, 60000)
+
+  // Cleanup interval on unmount
+  return () => clearInterval(intervalId)
+}, [interviewData, alertedInterviews])
+
   const [newInterview, setNewInterview] = useState({
     candidateName: '',
     companyName: '',
@@ -119,6 +203,9 @@ const InterviewTracker = () => {
 
   const [editStatus, setEditStatus] = useState('')
   const [editInterviewLevel, setEditInterviewLevel] = useState('')
+const [editinterviewtiming, seteditinterviewtiming] = useState()
+
+  
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -217,6 +304,11 @@ const InterviewTracker = () => {
     setEditInterviewLevel(e.target.value)
   }
 
+    const handleEditInteviewtimingChange = (e) => {
+    seteditinterviewtiming(e.target.value)
+  }
+
+
   const handleEditSubmit = async (e) => {
     e.preventDefault()
     if (!currentEditInterview) return
@@ -226,6 +318,7 @@ const InterviewTracker = () => {
       await api.patch(`/interview/${currentEditInterview._id}`, {
         status: editStatus,
         interviewLevel: editInterviewLevel,
+        date:editinterviewtiming,
         approvalStatus: 'pending',
       })
       setShowEditModal(false)
@@ -766,6 +859,23 @@ const InterviewTracker = () => {
                     <option value='L5'>L5</option>
                     <option value='HR'>HR Round</option>
                   </select>
+
+                <label
+                  htmlFor='date'
+                  className='block text-sm font-semibold text-gray-700'>
+                  Interview Date
+                </label>
+                <input
+                  type='datetime-local'
+                  id='date'
+                  name='date'
+                  value={editinterviewtiming}
+                  onChange={handleEditInteviewtimingChange}
+                  className='w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white shadow-sm'
+                  required
+                />
+
+
                 </div>
                 <div className='flex space-x-4'>
                   <button

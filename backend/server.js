@@ -1,6 +1,5 @@
 // File: backend/server.js
 
-// server.js
 import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
@@ -10,18 +9,20 @@ import { Server } from 'socket.io'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-// Routes - Now using import
+// --- This MUST be at the very top to load environment variables ---
+dotenv.config()
+
+// Route Imports
 import itProgramsRoutes from './routes/itPrograms.js'
 import nonItProgramsRoutes from './routes/nonItPrograms.js'
 import formRoutes from './routes/formRoutes.js'
 import batchRoutes from './routes/batches.js'
 import blogRoutes from './routes/blog.js'
-import candidateRoutes from './routes/candidates.js' // <-- ADD THIS
-import requestInfoRoutes from './routes/requestInfo.js' // <-- ADD THIS
-dotenv.config()
-import jobsRoutes from './routes/jobs.js' // <-- Changed
-import enrollmentsRoutes from './routes/enrollments.js' // <-- Changed
-import applicationsRoutes from './routes/applications.js' // <-- Changed
+import candidateRoutes from './routes/candidates.js'
+import requestInfoRoutes from './routes/requestInfo.js'
+import jobsRoutes from './routes/jobs.js'
+import enrollmentsRoutes from './routes/enrollments.js'
+import applicationsRoutes from './routes/applications.js'
 import collegeConnectRoutes from './routes/collegeConnect.js'
 import registerDemoRoutes from './routes/registerDemo.js'
 import loginRoutes from './routes/login.js'
@@ -29,17 +30,13 @@ import companyRoutes from './routes/companies.js'
 import interviewRoutes from './routes/interview.js'
 import managerRoutes from './routes/manager.js'
 import recruiterRoutes from './routes/recruiter.js'
-
-import notificationsRoutes from './routes/notifications.js' // <-- ADD THIS
+import notificationsRoutes from './routes/notifications.js'
 
 const app = express()
 const server = http.createServer(app)
-
-// Helper for __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// ✅ Socket.io setup
 const io = new Server(server, {
   cors: {
     origin: [
@@ -53,7 +50,6 @@ const io = new Server(server, {
   },
 })
 
-// ✅ Make io accessible in routes
 app.set('io', io)
 
 // ✅ Middleware
@@ -70,13 +66,16 @@ app.use(
     credentials: true,
   }),
 )
-// -----------------------
+// --- CORRECTED: JSON and URL-Encoded Middleware with Increased Limit ---
+// This replaces the old app.use(express.json())
+app.use(express.json({ limit: '50mb' }))
+app.use(express.urlencoded({ limit: '50mb', extended: true }))
+// --- END OF CORRECTION ---
 
-// Use path.join to create an absolute path for serving static files
+// Static Files Middleware
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-app.use(express.json()) // <-- important for req.body
 
-// ✅ Root route
+// Root Route
 app.get('/', (req, res) => {
   res.send('🚀 Zero7 API is running!')
 })
@@ -103,22 +102,37 @@ app.use('/api/notifications', notificationsRoutes)
 // ✅ MongoDB connection
 const PORT = process.env.PORT || 5000
 
+// Socket.io Connection Logic
+io.on('connection', (socket) => {
+  console.log(`⚡ Client connected: ${socket.id}`)
+  socket.on('join', (userData) => {
+    if (userData && userData.role) {
+      socket.join(userData.role)
+      console.log(
+        `User ${userData.name || socket.id} joined the "${
+          userData.role
+        }" room.`,
+      )
+      if (userData.role === 'admin') {
+        socket.join('manager')
+        console.log(
+          `Admin ${userData.name || socket.id} also joined the "manager" room.`,
+        )
+      }
+    }
+  })
+  socket.on('disconnect', () => {
+    console.log(`❌ Client disconnected: ${socket.id}`)
+  })
+})
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB Connected')
-
-    server.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`)
-    })
+    server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`))
   })
-  .catch((err) => console.error('❌ MongoDB error:', err))
-
-// ✅ Socket.io connection logs
-io.on('connection', (socket) => {
-  console.log('⚡ Client connected:', socket.id)
-
-  socket.on('disconnect', () => {
-    console.log('❌ Client disconnected:', socket.id)
+  .catch((err) => {
+    console.error('❌ MongoDB connection error:', err)
+    process.exit(1)
   })
-})

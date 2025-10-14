@@ -15,10 +15,10 @@ import {
   MapPin,
   Hash, // For ID field
   XCircle,
+  Building, // Icon for Industry
 } from 'lucide-react'
 import api from '../api/axios'
 import Cookie from 'js-cookie'
-// import './AdminManageCandidates.css' // Removed custom CSS
 import * as XLSX from 'xlsx' // Import for Excel functionality
 
 export default function AdminManageCandidates() {
@@ -29,6 +29,7 @@ export default function AdminManageCandidates() {
     name: '',
     role: '',
     skills: '',
+    industry: '', // <-- ADDED
     exp: '',
     industry: '',
     location: '',
@@ -53,7 +54,7 @@ export default function AdminManageCandidates() {
   const fetchCandidates = async () => {
     try {
       setLoading(true)
-      const { data } = await api.get('/candidates')
+      const { data } = await api.get('/candidates/all') // Using /all to see all statuses
       setCandidates(data)
     } catch (error) {
       console.error('Failed to fetch candidates:', error)
@@ -88,6 +89,7 @@ export default function AdminManageCandidates() {
       name: '',
       role: '',
       skills: '',
+      industry: 'Information Technology', // <-- ADDED with default
       exp: '',
       industry: '',
       location: '',
@@ -164,6 +166,7 @@ export default function AdminManageCandidates() {
           Name: name,
           Role: role,
           Skills: skills,
+          Industry: industry, // <-- ADDED
           'Experience (Years)': exp,
           Location: location,
           Industry: industry,
@@ -213,9 +216,12 @@ export default function AdminManageCandidates() {
 
           const formattedData = data.map((item, index) => {
             // Basic validation for required fields
-            if (!item.Name || !item.Role || !item.Email) {
+            if (!item.Name || !item.Role || !item.Email || !item.Industry) {
+              // <-- ADDED Industry check
               throw new Error(
-                `Row ${index + 2}: Missing required fields (Name, Role, Email)`,
+                `Row ${
+                  index + 2
+                }: Missing required fields (Name, Role, Email, Industry)`,
               )
             }
             return {
@@ -223,6 +229,7 @@ export default function AdminManageCandidates() {
               name: item.Name ? String(item.Name).trim() : '',
               role: item.Role ? String(item.Role).trim() : '',
               skills: item.Skills ? String(item.Skills).trim() : '',
+              industry: item.Industry ? String(item.Industry).trim() : '', // <-- ADDED
               exp: item['Experience (Years)']
                 ? Number(item['Experience (Years)'])
                 : 0,
@@ -531,6 +538,10 @@ export default function AdminManageCandidates() {
             </div>
             <form onSubmit={handleSubmit} className='flex flex-col gap-2 h-fit'>
               <div className='relative'>
+                <Hash
+                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
+                  size={18}
+                />
                 <input
                   name='userId'
                   id='user-id'
@@ -540,6 +551,10 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
+                <Users
+                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
+                  size={18}
+                />
                 <input
                   name='name'
                   value={formData.name}
@@ -550,6 +565,10 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
+                <Briefcase
+                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
+                  size={18}
+                />
                 <input
                   name='role'
                   value={formData.role}
@@ -559,7 +578,27 @@ export default function AdminManageCandidates() {
                   className='pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700'
                 />
               </div>
+              {/* --- NEW FIELD ADDED --- */}
               <div className='relative'>
+                <Building
+                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
+                  size={18}
+                />
+                <input
+                  name='industry'
+                  value={formData.industry}
+                  onChange={handleChange}
+                  placeholder='Industry (e.g., IT, Finance, Healthcare)'
+                  required
+                  className='pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700'
+                />
+              </div>
+              {/* --- END OF NEW FIELD --- */}
+              <div className='relative'>
+                <Lightbulb
+                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
+                  size={18}
+                />
                 <input
                   name='skills'
                   value={formData.skills}
@@ -570,6 +609,10 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
+                <Briefcase
+                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
+                  size={18}
+                />
                 <input
                   name='exp'
                   type='number'
@@ -581,6 +624,10 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
+                <MapPin
+                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
+                  size={18}
+                />
                 <input
                   name='industry'
                   type='text'
@@ -602,6 +649,10 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
+                <Mail
+                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
+                  size={18}
+                />
                 <input
                   name='email'
                   type='email'
@@ -613,6 +664,10 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
+                <Phone
+                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
+                  size={18}
+                />
                 <input
                   name='phone'
                   type='tel'

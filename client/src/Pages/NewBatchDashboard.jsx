@@ -185,7 +185,7 @@ export default function NewBatchDashboard() {
               className='p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none transition-all duration-200'
             />
             <input
-              type='text'
+              type='date'
               name='date'
               placeholder='Date (e.g., 20 Aug 2025)'
               value={newBatch.date}

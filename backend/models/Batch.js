@@ -6,7 +6,7 @@ const { Schema } = mongoose
 const BatchSchema = new Schema(
   {
     course: { type: String, required: true },
-    date: { type: String, required: true },
+    date: { type: Date, required: true },
     timing: { type: String, required: true },
     duration: { type: String, required: true },
     trainer: { type: String, required: true },

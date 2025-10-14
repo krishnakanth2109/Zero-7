@@ -30,6 +30,7 @@ export default function AdminManageCandidates() {
     role: '',
     skills: '',
     exp: '',
+    industry: '',
     location: '',
     email: '',
     phone: '',
@@ -88,6 +89,7 @@ export default function AdminManageCandidates() {
       role: '',
       skills: '',
       exp: '',
+      industry: '',
       location: '',
       email: '',
       phone: '',
@@ -409,6 +411,11 @@ export default function AdminManageCandidates() {
                   <th
                     scope='col'
                     className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Industry
+                  </th>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                     Location
                   </th>
                   <th
@@ -453,6 +460,9 @@ export default function AdminManageCandidates() {
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
                         {c.exp} years
+                      </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
+                        {c.industry}
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
                         {c.location}
@@ -506,7 +516,7 @@ export default function AdminManageCandidates() {
 
       {showModal && (
         <div className='fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50 animate-fade-in'>
-          <div className='bg-white rounded-lg shadow-xl w-full max-w-lg p-6 relative'>
+          <div className='bg-white rounded-lg shadow-xl w-full max-w-lg p-6 relative overflow-scroll h-[90vh]'>
             <div className='pb-4 border-b border-gray-200 mb-6 flex items-center justify-between'>
               <h2 className='text-2xl font-semibold text-gray-800'>
                 {editingId ? 'Edit Candidate' : 'Add New Candidate'}
@@ -517,7 +527,7 @@ export default function AdminManageCandidates() {
                 <X size={24} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className='grid grid-cols-1 gap-4'>
+            <form onSubmit={handleSubmit} className='flex flex-col gap-2 h-fit'>
               <div className='relative'>
                 <input
                   name='userId'
@@ -564,6 +574,17 @@ export default function AdminManageCandidates() {
                   value={formData.exp}
                   onChange={handleChange}
                   placeholder='Experience (Years)'
+                  required
+                  className='pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700'
+                />
+              </div>
+              <div className='relative'>
+                <input
+                  name='industry'
+                  type='text'
+                  value={formData.industry}
+                  onChange={handleChange}
+                  placeholder='Industry'
                   required
                   className='pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700'
                 />

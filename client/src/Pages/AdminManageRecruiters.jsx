@@ -754,7 +754,7 @@ export default function AdminManageRecruiters() {
             </table>
           </div>
 
-          <div className='mb-2 sm:mb-0'>
+          <div className='mb-2 sm:mb-0 px-4 py-2'>
             Showing{' '}
             <strong className='font-semibold'>
               {filteredRecruiters.length}

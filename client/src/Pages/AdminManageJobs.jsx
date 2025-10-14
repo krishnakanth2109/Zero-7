@@ -16,6 +16,7 @@ const AdminManageJobs = () => {
     skills: '',
     salary: '',
     location: '',
+    status: 'active',
   })
   const [showPopup, setShowPopup] = useState(false) // State for controlling the pop-up
   const [editPopup, setEditPopup] = useState(false)
@@ -186,8 +187,7 @@ const AdminManageJobs = () => {
 
       {showPopup && (
         <div className='popup-overlay'>
-       <div className='popup-content w-[90%] sm:w-[70%] md:w-[50%] lg:w-[40%] bg-white p-6 rounded-xl shadow-xl max-h-[80vh] overflow-y-auto'>
-
+          <div className='popup-content w-[90%] sm:w-[70%] md:w-[50%] lg:w-[40%] bg-white p-6 rounded-xl shadow-xl max-h-[80vh] overflow-y-auto'>
             <button
               className='close-popup-button'
               onClick={() => setShowPopup(false)}>
@@ -268,6 +268,19 @@ const AdminManageJobs = () => {
                   placeholder='e.g., Hyderabad'
                   required
                 />
+              </div>
+              <div className='form-group'>
+                <label htmlFor='jobStatus'>Job Status</label>
+                <select
+                  name='status'
+                  onChange={handleInputChange}
+                  value={formState.status}
+                  id='jobStatus'>
+                  <option value='active' default>
+                    Active
+                  </option>
+                  <option value='in active'>In Active</option>
+                </select>
               </div>
               <button type='submit' className='post-job-button'>
                 Post Job
@@ -400,6 +413,19 @@ const AdminManageJobs = () => {
                   class='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
                 />
               </div>
+              <div>
+                <label htmlFor='jobStatus'>Job Status</label>
+                <select
+                  name='status'
+                  onChange={handleInputChange}
+                  value={formState.status}
+                  id='jobStatus'>
+                  <option value='active' defaultChecked>
+                    Active
+                  </option>
+                  <option value='in active'>In Active</option>
+                </select>
+              </div>
 
               <button
                 type='submit'
@@ -427,6 +453,7 @@ const AdminManageJobs = () => {
                   <th>Skills</th>
                   <th>Salary</th>
                   <th>Location</th>
+                  <th>Job Status</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -441,6 +468,7 @@ const AdminManageJobs = () => {
                       <td>{job.skills}</td>
                       <td>{job.salary}</td>
                       <td>{job.location}</td>
+                      <td>{job.status || 'N/A'}</td>
                       <td className='flex align-center justify-center gap-3 p-5 '>
                         <button
                           onClick={() => handleEditPopup(job)}

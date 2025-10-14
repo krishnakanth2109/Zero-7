@@ -10,6 +10,8 @@ export default function ManageBlogs() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [editingId, setEditingId] = useState(null) // State to track the blog being edited
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)

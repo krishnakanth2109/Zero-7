@@ -6,11 +6,12 @@ const CandidateSchema = new Schema(
     userId: { type: String, required: true },
     name: { type: String, required: true },
     role: { type: String, required: true },
+    skills: { type: String, required: true },
+    industry: { type: String, required: true, default: 'Information Technology' }, // New field
     exp: { type: String, required: true }, // e.g., "5+ Years"
     location: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true },
-    skills: { type: String, required: true },
     status: {
       type: String,
       enum: ['pending', 'approved', 'placed', 'rejected'],

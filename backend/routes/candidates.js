@@ -54,6 +54,7 @@ router.get('/', async (req, res) => {
           location: 1,
           email: 1,
           skills: 1,
+          industry: 1, // <-- ADDED
           exp: 1,
           updatedAt: 1,
           userName: '$userDetails.name',
@@ -106,6 +107,7 @@ router.get('/pendings', async (req, res) => {
           location: 1,
           email: 1,
           skills: 1,
+          industry: 1, // <-- ADDED
           exp: 1,
           status: 1,
           userName: '$userDetails.name',
@@ -157,6 +159,7 @@ router.get('/all', async (req, res) => {
           location: 1,
           email: 1,
           skills: 1,
+          industry: 1, // <-- ADDED
           exp: 1,
           status: 1,
           userName: '$userDetails.name',

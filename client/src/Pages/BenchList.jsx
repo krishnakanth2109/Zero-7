@@ -37,6 +37,8 @@ const BenchList = () => {
     contact: '',
     email: '',
     location: '',
+    role: '', // <-- ADDED
+    skills: '', // <-- ADDED
     resume: '',
   })
   const [isEnrolling, setIsEnrolling] = useState(false)
@@ -61,9 +63,12 @@ const BenchList = () => {
         contact: '',
         email: '',
         location: '',
+        role: '', // <-- ADDED
+        skills: '', // <-- ADDED
         resume: '',
       })
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error submitting enrollment:', error)
       const errorMessage =
         error.response?.data?.message ||
@@ -195,7 +200,7 @@ const BenchList = () => {
       </section>
 
       {/* Candidate Enrollment Form */}
-     
+
       {/* Stats */}
       <section className='stats-section'>
         <div className='bg-[linear-gradient(45deg,#0f8afe,#00bfff)] rounded-xl flex-1 p-6 shadow-xl min-w-[200px]'>
@@ -221,6 +226,7 @@ const BenchList = () => {
               <tr>
                 <th>Name</th>
                 <th>Role</th>
+                <th>Industry</th> {/* <-- ADDED */}
                 <th>Skills</th>
                 <th>Experience</th>
                 <th>Location</th>
@@ -232,6 +238,7 @@ const BenchList = () => {
                 <tr key={c._id}>
                   <td title={c.name}>{c.name}</td>
                   <td title={c.role}>{c.role}</td>
+                  <td title={c.industry}>{c.industry || 'N/A'}</td> {/* <-- ADDED */}
                   <td>{c.skills}</td>
                   <td>{c.exp} Years</td>
                   <td>{c.location}</td>
@@ -425,7 +432,7 @@ const BenchList = () => {
           </div>
         </div>
       </section>
- <section className='form-section'>
+      <section className='form-section'>
         <h2>Candidate Enrollment Form</h2>
         <form onSubmit={handleEnrollmentSubmit} className='enrollment-form'>
           <input
@@ -466,6 +473,26 @@ const BenchList = () => {
             onChange={handleEnrollmentChange}
             required
           />
+          {/* --- NEW FIELDS ADDED --- */}
+          <input
+            type='text'
+            name='role'
+            placeholder='Your Role (e.g., Software Engineer)'
+            value={enrollmentFormData.role}
+            onChange={handleEnrollmentChange}
+            required
+            title='Please enter your professional role.'
+          />
+          <input
+            type='text'
+            name='skills'
+            placeholder='Primary Skills (e.g., React, Node.js, Python)'
+            value={enrollmentFormData.skills}
+            onChange={handleEnrollmentChange}
+            required
+            title='Please list your key skills.'
+          />
+          {/* --- END OF NEW FIELDS --- */}
           <input
             type='text'
             name='resume'

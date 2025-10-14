@@ -251,7 +251,9 @@ const NewBatches = () => {
                     <tr key={course._id}>
                       {/* ✅ FIX: Render all fields from the course object */}
                       <td>{course.course}</td>
-                      <td>{course.date}</td>
+                      <td>
+                        {new Date(course.date).toLocaleDateString('En-IN')}
+                      </td>
                       <td>{course.duration || 'N/A'}</td>
                       <td>
                         <button

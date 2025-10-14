@@ -160,12 +160,13 @@ export default function AdminManageCandidates() {
   const exportToExcel = () => {
     try {
       const dataToExport = candidates.map(
-        ({ name, role, skills, exp, location, email, phone }) => ({
+        ({ name, role, skills, exp, location, industry, email, phone }) => ({
           Name: name,
           Role: role,
           Skills: skills,
           'Experience (Years)': exp,
           Location: location,
+          Industry: industry,
           Email: email,
           Phone: phone,
         }),
@@ -226,6 +227,7 @@ export default function AdminManageCandidates() {
                 ? Number(item['Experience (Years)'])
                 : 0,
               location: item.Location ? String(item.Location).trim() : '',
+              industry: item.Industry ? String(item.Industry).trim() : '',
               email: item.Email ? String(item.Email).trim().toLowerCase() : '',
               phone: item.Phone ? String(item.Phone).trim() : '',
             }

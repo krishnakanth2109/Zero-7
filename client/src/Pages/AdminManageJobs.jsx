@@ -291,7 +291,7 @@ const AdminManageJobs = () => {
       )}
       {editPopup && (
         <div class='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
-          <div class='relative p-8 border w-11/12 max-w-lg shadow-lg rounded-md bg-white'>
+          <div class='relative p-8 border w-11/12 max-w-lg shadow-lg rounded-md bg-white h-[90vh] overflow-scroll'>
             <button
               class='absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-semibold'
               onClick={() => setEditPopup(false)}>
@@ -472,12 +472,12 @@ const AdminManageJobs = () => {
                       <td className='flex align-center justify-center gap-3 p-5 '>
                         <button
                           onClick={() => handleEditPopup(job)}
-                          className='text-indigo-600 hover:text-indigo-900 font-semibold transition-colors duration-200 flex items-center'>
+                          className='text-indigo-600 hover:text-indigo-900 text-sm'>
                           <FilePenLine />
                         </button>
                         <button
                           onClick={() => handleDeleteJob(job._id)}
-                          className='delete-btn'>
+                          className='text-rose-600 hover:text-rose-900 text-sm'>
                           <Trash />
                         </button>
                       </td>

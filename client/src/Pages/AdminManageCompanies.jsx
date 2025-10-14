@@ -137,7 +137,7 @@ const AdminManageCompanies = () => {
       {/* Add New Company Form (Popup/Modal) */}
       {showAddForm && (
         <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
-          <div className='relative p-8 bg-white rounded-lg shadow-xl max-w-md w-full'>
+          <div className='relative p-8 bg-white rounded-lg shadow-xl max-w-md w-full h-[80vh] overflow-scroll'>
             <button
               className='absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-200'
               onClick={() => setShowAddForm(false)}>
@@ -239,7 +239,7 @@ const AdminManageCompanies = () => {
       {/* Edit Company Popup */}
       {editPopup && editCompanyFormState && (
         <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50'>
-          <div className='relative p-8 bg-white rounded-lg shadow-xl max-w-md w-full'>
+          <div className='relative p-8 bg-white rounded-lg shadow-xl max-w-md w-full h-[80vh] overflow-scroll'>
             <button
               className='absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-200'
               onClick={() => setEditPopup(false)}>

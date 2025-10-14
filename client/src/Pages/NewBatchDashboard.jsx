@@ -273,6 +273,7 @@ export default function NewBatchDashboard() {
               <div className='relative'>
                 <input
                   name='date'
+                  type='date'
                   value={batch.date}
                   onChange={handleEditChange}
                   placeholder='Date'
@@ -282,7 +283,7 @@ export default function NewBatchDashboard() {
               </div>
               <div className='relative'>
                 <input
-                  name='role'
+                  name='timing'
                   value={batch.timing}
                   onChange={handleEditChange}
                   placeholder='Batch timing'
@@ -292,7 +293,7 @@ export default function NewBatchDashboard() {
               </div>
               <div className='relative'>
                 <input
-                  name='role'
+                  name='duration'
                   value={batch.duration}
                   onChange={handleEditChange}
                   placeholder='Batch duration'

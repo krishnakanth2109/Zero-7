@@ -51,7 +51,6 @@ import AdminCandidateApprovals from './Pages/AdminCandidateApprovals.jsx'
 import { NotificationProvider } from './context/NotificationContext'
 import AdminInterviewApprovals from './Pages/AdminInterviewApprovals.jsx'
 import PlacedCandidates from './Pages/Adminplacedcandidates.jsx'
-import AdminCandidateProfile from './Pages/AdminCandidateProfile.jsx'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -155,10 +154,6 @@ function App() {
               <Route
                 path='manage-candidates'
                 element={<AdminManageCandidates />}
-              />
-              <Route
-                path='manage-candidates/:id'
-                element={<AdminCandidateProfile />}
               />
               <Route
                 path='candidateList'

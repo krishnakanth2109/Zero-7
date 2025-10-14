@@ -468,7 +468,7 @@ section {
 .form-group i {
   position: absolute;
   left: 16px;
-  top: 50%;
+  top: 38%;
   transform: translateY(-50%);
   color: #888;
   font-size: 1rem;
@@ -489,7 +489,6 @@ section {
   display: flex;
   align-items: center;
   font-size: 0.95rem;
-  margin-bottom: 20px;
   line-height: 1.4;
   cursor: pointer;
 }
@@ -513,7 +512,7 @@ section {
   font-size: 12px;
   position: absolute;
   left: 2px;
-  top: -1px;
+  top: 2px;
 }
 
 /* Buttons */

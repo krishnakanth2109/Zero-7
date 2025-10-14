@@ -14,6 +14,7 @@ import {
   FaClock,
   FaSignal,
   FaClosedCaptioning,
+  FaGlobe,
 } from 'react-icons/fa'
 
 // ================= IT Courses =================
@@ -97,7 +98,7 @@ const itCourses = [
   {
     title: 'Cybersecurity',
     desc: 'Defend against modern cyber threats',
-    icon: <FaBug />,
+    icon: <FaGlobe />,
     category: 'IT',
     rating: 4.8,
     reviews: 890,
@@ -389,6 +390,7 @@ const DigitalCourses = () => {
                       <input
                         type='text'
                         name='name'
+                        pattern='[A-Za-z]*'
                         placeholder='Enter your name'
                         value={formData.name}
                         onChange={handleInputChange}
@@ -405,7 +407,7 @@ const DigitalCourses = () => {
                       />
                       <label>Contact</label>
                       <input
-                        type='text'
+                        type='phone'
                         name='contact'
                         placeholder='Enter your contact'
                         value={formData.contact}

@@ -67,8 +67,7 @@ const BenchList = () => {
         skills: '', // <-- ADDED
         resume: '',
       })
-    } catch (error)
-    {
+    } catch (error) {
       console.error('Error submitting enrollment:', error)
       const errorMessage =
         error.response?.data?.message ||
@@ -238,7 +237,8 @@ const BenchList = () => {
                 <tr key={c._id}>
                   <td title={c.name}>{c.name}</td>
                   <td title={c.role}>{c.role}</td>
-                  <td title={c.industry}>{c.industry || 'N/A'}</td> {/* <-- ADDED */}
+                  <td title={c.industry}>{c.industry || 'N/A'}</td>{' '}
+                  {/* <-- ADDED */}
                   <td>{c.skills}</td>
                   <td>{c.exp} Years</td>
                   <td>{c.location}</td>

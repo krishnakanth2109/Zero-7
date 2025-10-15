@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import api from "../api/axios"; // Assuming you have a central axios instance
-import { MessageSquare, Loader2, ShieldX, Trash2 } from "lucide-react";
+import { MessageSquare, Loader2, ShieldX, Trash2, Contact } from "lucide-react";
 
 const AdminContactInquiries = () => {
   const [inquiries, setInquiries] = useState([]);
@@ -44,8 +44,8 @@ const AdminContactInquiries = () => {
       {/* --- UPDATED: Header color changed to a blue gradient --- */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between text-white">
         <div className="flex items-center space-x-4">
-          <div className="bg-white bg-opacity-20 p-3 rounded-full">
-            <MessageSquare size={28} />
+          <div className="b bg-opacity-10 p-3 rounded-full">
+           <Contact />
           </div>
           <div>
             <h3 className="text-2xl sm:text-3xl font-bold">Contact Us Inquiries</h3>

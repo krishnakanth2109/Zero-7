@@ -1,41 +1,41 @@
+// File: src/components/AdminHomeForm.jsx
+
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import axios from 'axios'
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
+const API_URL =
+  process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
 
 const AdminHomeForm = () => {
   const [forms, setForms] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(10) // Number of items per page
+  const [itemsPerPage] = useState(10)
   const [sortConfig, setSortConfig] = useState({
     key: 'createdAt',
     direction: 'descending',
-  }) // Initial sort
+  })
   const audioContextRef = useRef(null)
   const audioBufferRef = useRef(null)
-  const previousLengthRef = useRef(0) // Track previous submissions
+  const previousLengthRef = useRef(0)
 
-  // Load notification sound using Web Audio API
+  // Load notification sound
   useEffect(() => {
     audioContextRef.current = new (window.AudioContext ||
       window.webkitAudioContext)()
-
     const loadAudio = async () => {
       try {
-        const response = await fetch('/notification.mp3') // replace with your file
+        const response = await fetch('/notification.mp3')
         const arrayBuffer = await response.arrayBuffer()
-        audioBufferRef.current = await audioContextRef.current.decodeAudioData(
-          arrayBuffer,
-        )
+        audioBufferRef.current =
+          await audioContextRef.current.decodeAudioData(arrayBuffer)
       } catch (err) {
         console.error('Failed to load audio:', err)
       }
     }
-
     loadAudio()
   }, [])
 
-  // Function to play notification sound
+  // Function to play sound
   const playSound = () => {
     if (audioContextRef.current && audioBufferRef.current) {
       const source = audioContextRef.current.createBufferSource()
@@ -45,49 +45,42 @@ const AdminHomeForm = () => {
     }
   }
 
-  // Fetch forms and check for new submissions
+  // Fetch proposals and check for new submissions
   useEffect(() => {
-    const fetchForms = async () => {
+    const fetchProposals = async () => {
       try {
-        const res = await axios.get(`${API_URL}/forms`)
+        // UPDATED: Fetch from the new endpoint for college proposals
+        const res = await axios.get(`${API_URL}/college-proposals`)
         setForms(res.data)
 
-        // Play sound if new form is submitted
         if (res.data.length > previousLengthRef.current) {
           playSound()
         }
         previousLengthRef.current = res.data.length
       } catch (err) {
-        console.error('Failed to fetch forms:', err)
+        console.error('Failed to fetch proposals:', err)
       }
     }
 
-    fetchForms()
-    const interval = setInterval(fetchForms, 5000) // check every 5 seconds
+    fetchProposals()
+    const interval = setInterval(fetchProposals, 5000)
 
     return () => clearInterval(interval)
   }, [])
 
-  // --- Sorting Logic ---
+  // Sorting Logic
   const sortedForms = useMemo(() => {
     let sortableForms = [...forms]
     if (sortConfig.key !== null) {
       sortableForms.sort((a, b) => {
         let aValue = a[sortConfig.key]
         let bValue = b[sortConfig.key]
-
-        // Special handling for createdAt (Date objects)
         if (sortConfig.key === 'createdAt') {
           aValue = new Date(aValue)
           bValue = new Date(bValue)
         }
-
-        if (aValue < bValue) {
-          return sortConfig.direction === 'ascending' ? -1 : 1
-        }
-        if (aValue > bValue) {
-          return sortConfig.direction === 'ascending' ? 1 : -1
-        }
+        if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1
+        if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1
         return 0
       })
     }
@@ -102,14 +95,14 @@ const AdminHomeForm = () => {
     setSortConfig({ key, direction })
   }
 
-  // --- Pagination Logic ---
+  // Pagination Logic
   const totalPages = Math.ceil(sortedForms.length / itemsPerPage)
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentForms = sortedForms.slice(indexOfFirstItem, indexOfLastItem)
-
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
+  // --- RENDER FUNCTIONS (Pagination remains unchanged) ---
   const renderPaginationButtons = () => {
     const pageNumbers = []
     for (let i = 1; i <= totalPages; i++) {
@@ -135,13 +128,7 @@ const AdminHomeForm = () => {
         <div className='hidden sm:flex sm:flex-1 sm:items-center sm:justify-between'>
           <div>
             <p className='text-sm text-gray-700'>
-              Showing{' '}
-              <span className='font-medium'>{indexOfFirstItem + 1}</span> to{' '}
-              <span className='font-medium'>
-                {Math.min(indexOfLastItem, sortedForms.length)}
-              </span>{' '}
-              of <span className='font-medium'>{sortedForms.length}</span>{' '}
-              results
+              Showing <span className='font-medium'>{indexOfFirstItem + 1}</span> to <span className='font-medium'>{Math.min(indexOfLastItem, sortedForms.length)}</span> of <span className='font-medium'>{sortedForms.length}</span> results
             </p>
           </div>
           <div>
@@ -153,16 +140,8 @@ const AdminHomeForm = () => {
                 disabled={currentPage === 1}
                 className='relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50'>
                 <span className='sr-only'>Previous</span>
-                <svg
-                  className='h-5 w-5'
-                  viewBox='0 0 20 20'
-                  fill='currentColor'
-                  aria-hidden='true'>
-                  <path
-                    fillRule='evenodd'
-                    d='M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z'
-                    clipRule='evenodd'
-                  />
+                <svg className='h-5 w-5' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'>
+                  <path fillRule='evenodd' d='M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z' clipRule='evenodd' />
                 </svg>
               </button>
               {pageNumbers.map((number) => (
@@ -170,11 +149,7 @@ const AdminHomeForm = () => {
                   key={number}
                   onClick={() => paginate(number)}
                   aria-current={currentPage === number ? 'page' : undefined}
-                  className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                    currentPage === number
-                      ? 'z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
-                      : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                  }`}>
+                  className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${currentPage === number ? 'z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600' : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'}`}>
                   {number}
                 </button>
               ))}
@@ -183,16 +158,8 @@ const AdminHomeForm = () => {
                 disabled={currentPage === totalPages}
                 className='relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50'>
                 <span className='sr-only'>Next</span>
-                <svg
-                  className='h-5 w-5'
-                  viewBox='0 0 20 20'
-                  fill='currentColor'
-                  aria-hidden='true'>
-                  <path
-                    fillRule='evenodd'
-                    d='M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z'
-                    clipRule='evenodd'
-                  />
+                <svg className='h-5 w-5' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'>
+                  <path fillRule='evenodd' d='M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z' clipRule='evenodd' />
                 </svg>
               </button>
             </nav>
@@ -204,7 +171,9 @@ const AdminHomeForm = () => {
 
   return (
     <div className='p-4 sm:p-6 lg:p-8'>
-      <h2 className='text-2xl font-bold mb-4 text-gray-800'>Carrer Consultation Form</h2>
+      <h2 className='text-2xl font-bold mb-4 text-gray-800'>
+        College Proposal Submissions
+      </h2>
 
       <div className='mt-8 flow-root'>
         <div className='-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8'>
@@ -212,31 +181,15 @@ const AdminHomeForm = () => {
             <div className='overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg'>
               <table className='min-w-full divide-y divide-gray-300'>
                 <thead className='bg-gray-50'>
+                  {/* UPDATED: Table headers */}
                   <tr>
-                    <th
-                      scope='col'
-                      className='py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6'>
-                      Name
-                    </th>
-                    <th
-                      scope='col'
-                      className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'>
-                      Phone Number
-                    </th>
-                    <th
-                      scope='col'
-                      className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'>
-                      Email
-                    </th>
-                    <th
-                      scope='col'
-                      className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'>
-                      Purpose
-                    </th>
-                    <th
-                      scope='col'
-                      className='relative cursor-pointer py-3.5 pl-3 pr-4 text-left text-sm font-semibold text-gray-900 sm:pr-6'
-                      onClick={() => requestSort('createdAt')}>
+                    <th scope='col' className='py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6'>College Name</th>
+                    <th scope='col' className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'>Contact Person</th>
+                    <th scope='col' className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'>Email</th>
+                    <th scope='col' className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'>Phone</th>
+                    <th scope='col' className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'>Proposal Type</th>
+                    <th scope='col' className='px-3 py-3.5 text-left text-sm font-semibold text-gray-900'>Message</th>
+                    <th scope='col' className='relative cursor-pointer py-3.5 pl-3 pr-4 text-left text-sm font-semibold text-gray-900 sm:pr-6' onClick={() => requestSort('createdAt')}>
                       Submitted At
                       {sortConfig.key === 'createdAt' && (
                         <span>
@@ -249,19 +202,14 @@ const AdminHomeForm = () => {
                 <tbody className='divide-y divide-gray-200 bg-white'>
                   {currentForms.length > 0 ? (
                     currentForms.map((form) => (
+                      // UPDATED: Table row data
                       <tr key={form._id}>
-                        <td className='whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6'>
-                          {form.name}
-                        </td>
-                        <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
-                          {form.number}
-                        </td>
-                        <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
-                          {form.email}
-                        </td>
-                        <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
-                          {form.purpose}
-                        </td>
+                        <td className='whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6'>{form.collegeName}</td>
+                        <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>{form.contactPerson}</td>
+                        <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>{form.email}</td>
+                        <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>{form.phone}</td>
+                        <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>{form.proposalType}</td>
+                        <td className='whitespace-normal px-3 py-4 text-sm text-gray-500 max-w-xs truncate'>{form.message}</td>
                         <td className='whitespace-nowrap px-3 py-4 text-sm text-gray-500'>
                           {new Date(form.createdAt).toLocaleString(undefined, {
                             dateStyle: 'short',
@@ -272,10 +220,8 @@ const AdminHomeForm = () => {
                     ))
                   ) : (
                     <tr>
-                      <td
-                        colSpan='5'
-                        className='text-center py-4 text-sm text-gray-500'>
-                        No forms to display.
+                      <td colSpan='7' className='text-center py-4 text-sm text-gray-500'>
+                        No proposals to display.
                       </td>
                     </tr>
                   )}

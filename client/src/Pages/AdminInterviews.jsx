@@ -3,6 +3,7 @@ import api from '../api/axios'
 import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
 import Cookie from 'js-cookie'
+import Swal from 'sweetalert2'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
 // Setup the localizer by providing the moment Object
@@ -21,8 +22,11 @@ const InterviewTracker = () => {
   const [showEditModal, setShowEditModal] = useState(false)
   const [currentEditInterview, setCurrentEditInterview] = useState(null)
 
-  const [showCandidateDetailsModal, setShowCandidateDetailsModal] = useState(false)
+  const [showCandidateDetailsModal, setShowCandidateDetailsModal] =
+    useState(false)
   const [selectedCandidateDetails, setSelectedCandidateDetails] = useState(null)
+  // New state for alerts
+  const [alertedInterviews, setAlertedInterviews] = useState(new Set())
 
   const fetchInterviews = async () => {
     try {
@@ -44,7 +48,40 @@ const InterviewTracker = () => {
           // { ..., candidateInfo: { email: "some@email.com", ... }, ... }
           // If the email is directly on the interview object, e.g., interview.candidateEmail,
           // then change this line to: candidateEmail: interview.candidateEmail,
-          candidateEmail: interview.candidateEmail || 'no-email-provided@example.com', // Dynamically fetch candidate email
+          candidateEmail:
+            interview.candidateEmail || 'no-email-provided@example.com', // Dynamically fetch candidate email
+        },
+      }))
+      setCalendarEvents(events)
+    } catch (error) {
+      console.error('Error fetching interviews:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchUserInterviews = async (id) => {
+    try {
+      setLoading(true)
+      const response = await api.get(`/interview/user/${id}`)
+      setInterviewData(response.data)
+
+      // Transform interview data for the calendar
+      // Now using candidateInfo.email if your backend provides it
+      console.log(response.data)
+      const events = response.data.map((interview) => ({
+        title: `${interview.candidateName} @ ${interview.companyName}`,
+        start: new Date(interview.date),
+        end: new Date(interview.date),
+        allDay: true,
+        resource: {
+          ...interview, // Keep all interview details
+          // ASSUMPTION: Your backend's /interview endpoint response looks like this for candidate email:
+          // { ..., candidateInfo: { email: "some@email.com", ... }, ... }
+          // If the email is directly on the interview object, e.g., interview.candidateEmail,
+          // then change this line to: candidateEmail: interview.candidateEmail,
+          candidateEmail:
+            interview.candidateEmail || 'no-email-provided@example.com', // Dynamically fetch candidate email
         },
       }))
       setCalendarEvents(events)
@@ -58,6 +95,7 @@ const InterviewTracker = () => {
   const fetchOptions = async () => {
     try {
       const response = await api.get('/interview/search')
+      console.log(response.data)
       setCandidateOptions(response.data.candidates)
       setCompanyOptions(response.data.companies)
     } catch (error) {
@@ -66,12 +104,103 @@ const InterviewTracker = () => {
   }
 
   useEffect(() => {
-    fetchInterviews()
     fetchOptions()
     const data = Cookie.get('user')
     const res = JSON.parse(data)
+    res.role === 'Admin' ? fetchInterviews() : fetchUserInterviews(res.id)
     setUser(res.id)
-  }, [])
+  }, [showAddForm])
+
+// Check for upcoming interviews every minute
+// Check for upcoming interviews every minute
+// Check for upcoming interviews every minute
+useEffect(() => {
+const checkUpcomingInterviews = () => {
+  const now = new Date();
+  const upcoming = interviewData.filter(
+    (interview) =>
+      interview.status === 'Scheduled' &&
+      !alertedInterviews.has(interview._id) &&
+      new Date(interview.date) - now > 0 &&
+      new Date(interview.date) - now <= 10 * 60 * 1000
+  );
+
+      if (upcoming.length === 0) return
+
+      // Play sound once
+      const audio = new Audio(
+        'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3',
+      )
+      audio.play().catch((err) => console.log('Audio play failed:', err))
+
+      // Build card-style HTML
+      const html = upcoming
+        .map(
+          (interview) => `
+        <div style="
+          border: 1px solid #ddd;
+          border-radius: 12px;
+          padding: 12px 16px;
+          margin-bottom: 12px;
+          background: #f9f9f9;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        ">
+          <p style="margin:4px 0;"><strong>📋 Candidate:</strong> ${
+            interview.candidateName
+          }</p>
+          <p style="margin:4px 0;"><strong>💼 Role:</strong> ${
+            interview.jobRole
+          }</p>
+          <p style="margin:4px 0;"><strong>🏢 Company:</strong> ${
+            interview.companyName
+          }</p>
+          <p style="margin:4px 0;"><strong>🕐 Time:</strong> ${new Date(
+            interview.date,
+          ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+          <p style="margin-top:8px; font-weight:bold; color:#e74c3c;">
+            ⚡ Starting in ${Math.ceil(
+              (new Date(interview.date) - now) / 60000,
+            )} min!
+          </p>
+        </div>
+      `,
+        )
+        .join('')
+
+      Swal.fire({
+        title: '⏰ Upcoming Interviews!',
+        html: `<div style="display:flex; flex-direction:column; gap:10px;">${html}</div>`,
+        icon: 'warning',
+        iconColor: '#f39c12',
+        confirmButtonText: 'Got it!',
+        confirmButtonColor: '#6366f1',
+        background: '#fff',
+        timerProgressBar: true,
+        allowOutsideClick: false,
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl',
+          title: 'text-2xl font-bold',
+          confirmButton: 'px-6 py-3 rounded-xl shadow-lg',
+        },
+      })
+
+      // Mark all as alerted
+      setAlertedInterviews((prev) => {
+        const updated = new Set(prev)
+        upcoming.forEach((i) => updated.add(i._id))
+        return updated
+      })
+    }
+
+    // Check immediately on mount
+    checkUpcomingInterviews()
+
+    // Then check every minute
+    const intervalId = setInterval(checkUpcomingInterviews, 60000)
+
+    // Cleanup interval on unmount
+    return () => clearInterval(intervalId)
+  }, [interviewData, alertedInterviews])
 
   const [newInterview, setNewInterview] = useState({
     candidateName: '',
@@ -84,6 +213,7 @@ const InterviewTracker = () => {
 
   const [editStatus, setEditStatus] = useState('')
   const [editInterviewLevel, setEditInterviewLevel] = useState('')
+  const [editinterviewtiming, seteditinterviewtiming] = useState()
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -157,7 +287,6 @@ const InterviewTracker = () => {
         interviewLevel: '',
         date: '',
       })
-      fetchInterviews() // Re-fetch interviews to update the list and calendar
     } catch (error) {
       console.error('Error adding interview:', error)
       alert(
@@ -183,6 +312,10 @@ const InterviewTracker = () => {
     setEditInterviewLevel(e.target.value)
   }
 
+  const handleEditInteviewtimingChange = (e) => {
+    seteditinterviewtiming(e.target.value)
+  }
+
   const handleEditSubmit = async (e) => {
     e.preventDefault()
     if (!currentEditInterview) return
@@ -192,6 +325,7 @@ const InterviewTracker = () => {
       await api.patch(`/interview/${currentEditInterview._id}`, {
         status: editStatus,
         interviewLevel: editInterviewLevel,
+        date: editinterviewtiming,
         approvalStatus: 'pending',
       })
       setShowEditModal(false)
@@ -246,7 +380,6 @@ const InterviewTracker = () => {
     setSelectedCandidateDetails(event.resource) // event.resource contains the full interview object
     setShowCandidateDetailsModal(true)
   }
-
 
   if (loading) {
     return (
@@ -732,7 +865,23 @@ const InterviewTracker = () => {
                     <option value='L4'>L4</option>
                     <option value='L5'>L5</option>
                     <option value='HR'>HR Round</option>
+                     <option value='PLACED'>PLACED</option>
                   </select>
+
+                  <label
+                    htmlFor='date'
+                    className='block text-sm font-semibold text-gray-700'>
+                    Interview Date
+                  </label>
+                  <input
+                    type='datetime-local'
+                    id='date'
+                    name='date'
+                    value={editinterviewtiming}
+                    onChange={handleEditInteviewtimingChange}
+                    className='w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white shadow-sm'
+                    required
+                  />
                 </div>
                 <div className='flex space-x-4'>
                   <button
@@ -822,19 +971,22 @@ const InterviewTracker = () => {
                 </p>
                 <p>
                   <span className='font-semibold'>Date & Time:</span>{' '}
-                  {new Date(selectedCandidateDetails.date).toLocaleString('en-US', {
-                    weekday: 'short',
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true,
-                  })}
+                  {new Date(selectedCandidateDetails.date).toLocaleString(
+                    'en-US',
+                    {
+                      weekday: 'short',
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true,
+                    },
+                  )}
                 </p>
                 {/* Add more details as needed from selectedCandidateDetails.resource */}
               </div>
-             {/* <div className='p-6 border-t border-gray-200 flex justify-end'>
+              {/* <div className='p-6 border-t border-gray-200 flex justify-end'>
                 <a
                   href={generateMailtoLink(
                     selectedCandidateDetails.candidateEmail,

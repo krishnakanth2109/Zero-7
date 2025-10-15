@@ -1,5 +1,3 @@
-// File: src/Pages/BenchList.jsx
-
 import React, { useState, useEffect } from 'react'
 import api from '../api/axios' // Use your central axios instance
 import './BenchList.css'
@@ -31,7 +29,7 @@ const BenchList = () => {
   })
   const [isRequesting, setIsRequesting] = useState(false)
 
-  // --- UPDATED: State for the public enrollment form (resume field removed) ---
+  // State for the public "Candidate Enrollment" form (resume field removed)
   const [enrollmentFormData, setEnrollmentFormData] = useState({
     name: '',
     contact: '',
@@ -47,7 +45,7 @@ const BenchList = () => {
     setEnrollmentFormData({ ...enrollmentFormData, [name]: value })
   }
 
-  // --- FIXED: Submits to the correct '/api/candidate-enrollment' endpoint ---
+  // Submits to the correct '/api/candidate-enrollment' endpoint
   const handleEnrollmentSubmit = async (e) => {
     e.preventDefault()
     setIsEnrolling(true)
@@ -184,6 +182,7 @@ const BenchList = () => {
                 <tr key={c._id}>
                   <td title={c.name}>{c.name}</td>
                   <td title={c.role}>{c.role}</td>
+                  {/* --- CORRECTED: Git conflict resolved --- */}
                   <td title={c.industry}>{c.industry || 'N/A'}</td>
                   <td>{c.skills}</td>
                   <td>{c.exp} Years</td>

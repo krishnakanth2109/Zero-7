@@ -1,5 +1,3 @@
-// File: src/Pages/ManageBlogs.jsx
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaTrashAlt, FaEdit, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa'; // Combined icons
@@ -7,7 +5,7 @@ import { FaTrashAlt, FaEdit, FaCheckCircle, FaExclamationCircle } from 'react-ic
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 export default function ManageBlogs() {
-  // --- MERGED STATE: Combines state from both versions for full functionality ---
+  // --- MERGED STATE: A clean, non-redundant state management setup ---
   const [blogs, setBlogs] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -21,7 +19,7 @@ export default function ManageBlogs() {
     fetchBlogs();
   }, []);
 
-  // --- HELPER: Clears feedback messages after a delay ---
+  // --- HELPER: Clears feedback messages after a delay for better UX ---
   const clearMessages = () => {
     setTimeout(() => {
       setSuccessMessage('');
@@ -127,7 +125,7 @@ export default function ManageBlogs() {
             {editingId ? 'Edit Blog Post' : 'Add New Blog Post'}
           </h3>
           
-          {/* --- UI FEATURE: Styled Alerts --- */}
+          {/* --- MERGED UI: Styled Alerts for feedback --- */}
           {successMessage && (
             <div className='flex items-center bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded'>
               <FaCheckCircle className='mr-2 text-lg' />

@@ -2,77 +2,81 @@
 
 import express from 'express';
 import Enrollment from '../models/Enrollment.js';
-import Notification from '../models/notifications.js'; // <-- CORRECTED: Import path is singular
-import {
-  renderEmailTemplate,
-  prepareCandidateEnrollForAdmin,
-  prepareStudentAcknowledgment,
-} from '../utils/emailTemplates.js';
-import transporter from '../utils/mail.js';
+import Notification from '../models/notifications.js';
 
 const router = express.Router();
 
 /**
  * @route   POST /api/enrollments
- * @desc    Create a new student enrollment
+ * @desc    Create a new student enrollment for a digital course
  * @access  Public
  */
 router.post('/', async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, contact, message, course } = req.body;
 
-    // Check if the student has already enrolled
-    const emailCheck = await Enrollment.findOne({ email });
+    const emailCheck = await Enrollment.findOne({ email, course });
     if (emailCheck) {
-      // Use return to stop execution
-      return res.status(409).json({ message: 'You are already enrolled.' });
+      return res.status(409).json({ message: `You are already enrolled for the ${course} course.` });
     }
     
-    // Create and save the new enrollment record
-    const newEnrollment = new Enrollment(req.body);
+    const newEnrollment = new Enrollment({ name, email, contact, message, course });
     const savedEnrollment = await newEnrollment.save();
     
-    // --- Email Sending Logic ---
-    // 1. Send an alert email to the admin
-    // const adminTemplate = prepareCandidateEnrollForAdmin(newEnrollment);
-    // const adminHtml = renderEmailTemplate('enrollmentAlert', adminTemplate);
-    // await transporter.sendMail({
-    //   from: process.env.AUTH_MAIL,
-    //   to: process.env.AUTH_MAIL,
-    //   subject: 'Candidate Enrollment Form Alert',
-    //   html: adminHtml,
-    // });
-    
-    // 2. Send an acknowledgment email to the student
-    // const studentTemplate = prepareStudentAcknowledgment(name);
-    // const studentHtml = renderEmailTemplate('enrollmentStudentConfirmation', studentTemplate);
-    // await transporter.sendMail({
-    //   from: process.env.AUTH_MAIL,
-    //   to: email,
-    //   subject: 'Thank You for Your Response',
-    //   html: studentHtml,
-    // });
-    // --- End Email Logic ---
-
-    // --- Notification Logic ---
     const io = req.app.get('io');
-    const message = `New enrollment from student: ${name}.`;
-
+    const notificationMessage = `New enrollment for ${course} from student: ${name}.`;
     const notification = new Notification({
-        title: 'New Enrollment',
-        message: message,
+        title: 'New Course Enrollment',
+        message: notificationMessage,
         type: 'info',
-        link: '/admin/studentenrollment'
+        link: '/admin/digital-courses-enrollment'
     });
     await notification.save();
     
-    io.emit('newEnrollment', { message });
-    // -------------------------
+    io.emit('newEnrollment', { message: notificationMessage });
 
     res.status(201).json(savedEnrollment);
   } catch (err) {
     console.error("Error creating enrollment:", err);
     res.status(400).json({ message: "Failed to create enrollment.", error: err.message });
+  }
+});
+
+/**
+ * @route   GET /api/enrollments
+ * @desc    Get all student enrollments
+ * @access  Admin
+ */
+router.get('/', async (req, res) => {
+  try {
+    const enrollments = await Enrollment.find().sort({ createdAt: -1 });
+    res.json(enrollments);
+  } catch (err) {
+    console.error("Error fetching enrollments:", err);
+    res.status(500).json({ message: "Server error while fetching enrollments." });
+  }
+});
+
+/**
+ * @route   DELETE /api/enrollments/:id
+ * @desc    Delete a student enrollment by ID
+ * @access  Admin
+ * --- THIS ENTIRE BLOCK IS NEW ---
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    const enrollment = await Enrollment.findById(req.params.id);
+
+    if (!enrollment) {
+      return res.status(404).json({ message: 'Enrollment not found.' });
+    }
+
+    await enrollment.deleteOne();
+
+    res.json({ message: 'Enrollment deleted successfully.' });
+  } catch (err) {
+    console.error("Error deleting enrollment:", err);
+    res.status(500).json({ message: 'Server error while deleting enrollment.' });
   }
 });
 

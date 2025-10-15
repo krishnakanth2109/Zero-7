@@ -1,20 +1,11 @@
-import React, { useState } from 'react'
-import './DigitalCourses.css'
+import React, { useState } from 'react';
+import './DigitalCourses.css';
 import {
-  FaLaptopCode,
-  FaCloud,
-  FaChartLine,
-  FaBug,
-  FaUsers,
-  FaMobileAlt,
-  FaBriefcase,
-  FaMoneyBill,
-  FaStar,
-  FaRegStar,
-  FaClock,
-  FaSignal,
-  FaClosedCaptioning,
-} from 'react-icons/fa'
+  FaLaptopCode, FaCloud, FaChartLine, FaBug, FaUsers, FaMobileAlt,
+  FaBriefcase, FaMoneyBill, FaStar, FaRegStar, FaClock, FaSignal,
+  FaClosedCaptioning, FaGlobe,
+} from 'react-icons/fa';
+import api from '../api/axios'; // Import your central axios instance
 
 // ================= IT Courses =================
 const itCourses = [
@@ -97,7 +88,7 @@ const itCourses = [
   {
     title: 'Cybersecurity',
     desc: 'Defend against modern cyber threats',
-    icon: <FaBug />,
+    icon: <FaGlobe />,
     category: 'IT',
     rating: 4.8,
     reviews: 890,
@@ -132,7 +123,7 @@ const itCourses = [
       'Performance Optimization',
     ],
   },
-]
+];
 
 // ================= Non-IT Courses =================
 const nonItCourses = [
@@ -250,57 +241,82 @@ const nonItCourses = [
       'Portfolio Development',
     ],
   },
-]
+];
 
-const allCourses = [...itCourses, ...nonItCourses]
+const allCourses = [...itCourses, ...nonItCourses];
 
 // ================= Star Rating Component =================
 const StarRating = ({ rating }) => {
-  const fullStars = Math.floor(rating)
-  const hasHalfStar = rating % 1 >= 0.5
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
   return (
     <div className='flex flex-row items-center justify-center'>
       {[...Array(fullStars)].map((_, i) => (
-        <FaStar key={i} className='star filled' />
+        <FaStar key={`full-${i}`} className='star filled' />
       ))}
       {hasHalfStar && <FaRegStar className='star half' />}
       {[...Array(emptyStars)].map((_, i) => (
-        <FaRegStar key={i} className='star empty' />
+        <FaRegStar key={`empty-${i}`} className='star empty' />
       ))}
       <span className='rating-value'>{rating}</span>
     </div>
-  )
-}
+  );
+};
 
 // ================= DigitalCourses Main Component =================
 const DigitalCourses = () => {
-  const [filter, setFilter] = useState('All')
-  const [selectedCourse, setSelectedCourse] = useState(null)
+  const [filter, setFilter] = useState('All');
+  const [selectedCourse, setSelectedCourse] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     contact: '',
     message: '',
-  })
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const filteredCourses =
     filter === 'All'
       ? allCourses
-      : allCourses.filter((c) => c.category === filter)
+      : allCourses.filter((c) => c.category === filter);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData({ ...formData, [name]: value })
-  }
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault()
-    alert(`Request submitted for ${selectedCourse?.title}`)
-    setSelectedCourse(null)
-    setFormData({ name: '', email: '', contact: '', message: '' })
-  }
+  // --- UPDATED: This function now saves data to your backend ---
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedCourse) {
+      alert("No course selected. Please try again.");
+      return;
+    }
+    
+    setIsSubmitting(true);
+
+    const payload = {
+      ...formData,
+      course: selectedCourse.title, // Add the course title to the payload
+    };
+
+    try {
+      // Send the data to your '/api/enrollments' endpoint
+      await api.post('/enrollments', payload);
+      
+      alert(`Enrollment for ${selectedCourse.title} submitted successfully!`);
+      setSelectedCourse(null); // Close the form
+      setFormData({ name: '', email: '', contact: '', message: '' }); // Reset the form
+    } catch (error) {
+      console.error('Error submitting enrollment:', error);
+      const errorMessage = error.response?.data?.message || 'There was an error submitting your request.';
+      alert(`Error: ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className='digital-courses-container compact'>
@@ -333,44 +349,25 @@ const DigitalCourses = () => {
                 <div className='course-icon'>{course.icon}</div>
                 <h3>{course.title}</h3>
                 <p className='desc'>{course.desc}</p>
-
                 <div className='rating-container'>
                   <StarRating rating={course.rating} />
-                  <span className='reviews'>
-                    ({course.reviews.toLocaleString()})
-                  </span>
+                  <span className='reviews'>({course.reviews.toLocaleString()})</span>
                 </div>
-
-                {course.bestseller && (
-                  <div className='bestseller-badge'>Bestseller</div>
-                )}
+                {course.bestseller && <div className='bestseller-badge'>Bestseller</div>}
               </div>
 
               {/* Hover Info */}
               <div className='course-hover-info'>
                 <h4>{course.title}</h4>
                 <div className='bestseller-updated'>
-                  {course.bestseller && (
-                    <span className='bestseller-badge'>Bestseller</span>
-                  )}
+                  {course.bestseller && <span className='bestseller-badge'>Bestseller</span>}
                   <span className='updated-text'>{course.updated}</span>
                 </div>
-
                 <div className='course-meta'>
-                  <div className='meta-item'>
-                    <FaClock className='icon' /> <span>{course.duration}</span>
-                  </div>
-                  <div className='meta-item'>
-                    <FaSignal className='icon' /> <span>{course.level}</span>
-                  </div>
-                  {course.subtitles && (
-                    <div className='meta-item'>
-                      <FaClosedCaptioning className='icon' />{' '}
-                      <span>Subtitles</span>
-                    </div>
-                  )}
+                  <div className='meta-item'><FaClock className='icon' /> <span>{course.duration}</span></div>
+                  <div className='meta-item'><FaSignal className='icon' /> <span>{course.level}</span></div>
+                  {course.subtitles && <div className='meta-item'><FaClosedCaptioning className='icon' /> <span>Subtitles</span></div>}
                 </div>
-
                 <div className='learning-objectives'>
                   <h5>What you'll learn</h5>
                   <ul>
@@ -382,50 +379,21 @@ const DigitalCourses = () => {
 
                 <div className='hover-footer'>
                   {selectedCourse?.title === course.title ? (
-                    <form
-                      className='buy-form active'
-                      onSubmit={handleFormSubmit}>
+                    <form className='buy-form active' onSubmit={handleFormSubmit}>
                       <label>Your Name</label>
-                      <input
-                        type='text'
-                        name='name'
-                        placeholder='Enter your name'
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        required
-                      />
+                      <input type='text' name='name' pattern='[A-Za-z\s]+' title="Name should only contain letters." placeholder='Enter your name' value={formData.name} onChange={handleInputChange} required />
                       <label>Email</label>
-                      <input
-                        type='email'
-                        name='email'
-                        placeholder='Enter your email'
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                      />
+                      <input type='email' name='email' placeholder='Enter your email' value={formData.email} onChange={handleInputChange} required />
                       <label>Contact</label>
-                      <input
-                        type='text'
-                        name='contact'
-                        placeholder='Enter your contact'
-                        value={formData.contact}
-                        onChange={handleInputChange}
-                        required
-                      />
-                      <label>Message</label>
-                      <textarea
-                        name='message'
-                        placeholder='Your Message'
-                        value={formData.message}
-                        onChange={handleInputChange}></textarea>
-                      <button type='submit' className='submit-btn'>
-                        Submit
+                      <input type='tel' name='contact' placeholder='Enter your contact' value={formData.contact} onChange={handleInputChange} required pattern="^\d{10}$" title="Enter a valid 10-digit phone number."/>
+                      <label>Message (Optional)</label>
+                      <textarea name='message' placeholder='Your Message' value={formData.message} onChange={handleInputChange}></textarea>
+                      <button type='submit' className='submit-btn' disabled={isSubmitting}>
+                        {isSubmitting ? 'Submitting...' : 'Submit'}
                       </button>
                     </form>
                   ) : (
-                    <button
-                      className='add-to-cart-btn'
-                      onClick={() => setSelectedCourse(course)}>
+                    <button className='add-to-cart-btn' onClick={() => setSelectedCourse(course)}>
                       Buy Course
                     </button>
                   )}
@@ -436,7 +404,7 @@ const DigitalCourses = () => {
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default DigitalCourses
+export default DigitalCourses;

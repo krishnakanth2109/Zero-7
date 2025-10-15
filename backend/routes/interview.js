@@ -84,6 +84,72 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Server error while fetching interviews.' })
   }
 })
+//interview per User
+router.get('/user/:id', async (req, res) => {
+  try {
+    const userId = req.params.id
+    const pipeline = [
+      { $match: { approvalStatus: 'approved', userId: userId } },
+      {
+        $addFields: {
+          candidateObjectId: { $toObjectId: '$candidateId' },
+          jobObjectId: { $toObjectId: '$jobId' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'candidates',
+          localField: 'candidateObjectId',
+          foreignField: '_id',
+          as: 'candidateInfo',
+        },
+      },
+      { $unwind: '$candidateInfo' },
+      {
+        $lookup: {
+          from: 'jobs',
+          localField: 'jobObjectId',
+          foreignField: '_id',
+          as: 'jobInfo',
+        },
+      },
+      { $unwind: '$jobInfo' },
+      {
+        $lookup: {
+          from: 'companies',
+          localField: 'companyId',
+          foreignField: '_id',
+          as: 'companyInfo',
+        },
+      },
+      { $unwind: { path: '$companyInfo', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 1,
+          candidateId: 1,
+          jobId: 1,
+          status: 1,
+          companyId: 1,
+          userId: 1,
+          date: 1,
+          interviewLevel: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          candidateName: '$candidateInfo.name',
+          candidateEmail: '$candidateInfo.email',
+          companyName: '$companyInfo.name',
+          jobRole: '$jobInfo.role',
+        },
+      },
+      { $sort: { date: -1 } },
+    ]
+    const result = await Interview.aggregate(pipeline)
+    res.status(200).json(result)
+  } catch (err) {
+    console.error('Error fetching approved interviews:', err)
+    res.status(500).json({ message: 'Server error while fetching interviews.' })
+  }
+})
 
 /**
  * @route   GET /api/interview/all

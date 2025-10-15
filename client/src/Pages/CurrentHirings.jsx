@@ -1,4 +1,4 @@
-// File: src/Pages/CurrentHirings.jsx (Corrected with Resume URL)
+// File: src/Pages/CurrentHirings.jsx
 
 import React, { useState, useEffect } from 'react'
 import api from '../api/axios' // Use your central axios instance
@@ -11,6 +11,7 @@ import {
   FileText,
   DollarSign,
   Clock,
+  Building, // Icon for Industry
 } from 'lucide-react'
 import './CurrentHirings.css'
 
@@ -27,7 +28,7 @@ const CurrentHirings = () => {
     currentSalary: '',
     expectedSalary: '',
     location: '',
-    resume: '', // This will now hold the resume URL string
+    resume: '', // This will hold the resume URL string
   })
 
   const [selectedJobIndex, setSelectedJobIndex] = useState(null)
@@ -58,13 +59,11 @@ const CurrentHirings = () => {
     setFlippedProcess((s) => s.map((val, index) => (index === i ? !val : val)))
   }
 
-  // --- FIX 1: Simplified handler for all text inputs ---
   const handleApplyChange = (e) => {
     const { name, value } = e.target;
     setApplyData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // --- FIX 2: Simplified submit handler for JSON data ---
   const handleApplySubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
@@ -75,14 +74,12 @@ const CurrentHirings = () => {
       return;
     }
 
-    // The complete payload, including the job's ID
     const payload = {
       ...applyData,
       jobId: job._id
     };
 
     try {
-      // Post the plain JSON payload to your backend
       await api.post('/applications', payload);
 
       alert(`Application for ${job.role} submitted successfully!`);
@@ -189,9 +186,11 @@ const CurrentHirings = () => {
           <div className='jobs-table-wrap'>
             <table className='jobs-table' role='table'>
               <thead>
+                {/* --- ADDED: Industry column header --- */}
                 <tr>
                   <th>Posted</th>
                   <th>Role</th>
+                  <th>Industry</th>
                   <th>Experience</th>
                   <th>Skills</th>
                   <th>Salary</th>
@@ -206,6 +205,8 @@ const CurrentHirings = () => {
                       <tr>
                         <td>{daysAgo(job.createdAt)}</td>
                         <td>{job.role}</td>
+                        {/* --- ADDED: Industry data cell --- */}
+                        <td>{job.industry || 'N/A'}</td>
                         <td>{job.exp}</td>
                         <td>{job.skills}</td>
                         <td>{job.salary}</td>
@@ -224,7 +225,8 @@ const CurrentHirings = () => {
                       </tr>
                       {selectedJobIndex === index && (
                         <tr className='apply-form-row'>
-                          <td colSpan='7' className='apply-form-td'>
+                          {/* --- UPDATED: Colspan increased to 8 to match new column --- */}
+                          <td colSpan='8' className='apply-form-td'>
                             <div className='apply-form-container'>
                               <h3>
                                 <Briefcase size={18} /> Apply for {job.role}
@@ -232,112 +234,42 @@ const CurrentHirings = () => {
                               <form onSubmit={handleApplySubmit} className='apply-form'>
                                 <div className='input-group'>
                                   <User size={16} />
-                                  <input
-                                    type='text'
-                                    name='name'
-                                    placeholder='Your Name'
-                                    value={applyData.name}
-                                    onChange={handleApplyChange}
-                                    required
-                                    pattern='^[A-Za-z\s]{3,}$'
-                                    title='Name must be at least 3 letters and contain only alphabets'
-                                  />
+                                  <input type='text' name='name' placeholder='Your Name' value={applyData.name} onChange={handleApplyChange} required pattern='^[A-Za-z\s]{3,}$' title='Name must be at least 3 letters' />
                                 </div>
 
                                 <div className='input-group'>
                                   <Phone size={16} />
-                                  <input
-                                    type='tel'
-                                    name='contact'
-                                    placeholder='Contact Number'
-                                    value={applyData.contact}
-                                    onChange={handleApplyChange}
-                                    required
-                                    pattern='^\d{10}$'
-                                    title='Enter a valid 10-digit phone number'
-                                  />
+                                  <input type='tel' name='contact' placeholder='Contact Number' value={applyData.contact} onChange={handleApplyChange} required pattern='^\d{10}$' title='Enter a valid 10-digit phone number' />
                                 </div>
 
                                 <div className='input-group'>
                                   <Mail size={16} />
-                                  <input
-                                    type='email'
-                                    name='email'
-                                    placeholder='Email Address'
-                                    value={applyData.email}
-                                    onChange={handleApplyChange}
-                                    required
-                                    pattern='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-                                    title='Enter a valid email address'
-                                  />
+                                  <input type='email' name='email' placeholder='Email Address' value={applyData.email} onChange={handleApplyChange} required pattern='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$' title='Enter a valid email address' />
                                 </div>
 
                                 <div className='input-group'>
                                   <Clock size={16} />
-                                  <input
-                                    type='text'
-                                    name='experience'
-                                    placeholder='Experience (in years)'
-                                    value={applyData.experience}
-                                    onChange={handleApplyChange}
-                                    required
-                                    pattern='^\d+(\.\d{1,2})?$'
-                                    title='Enter a valid number of years (e.g., 2 or 2.5)'
-                                  />
+                                  <input type='text' name='experience' placeholder='Experience (in years)' value={applyData.experience} onChange={handleApplyChange} required pattern='^\d+(\.\d{1,2})?$' title='Enter a valid number of years (e.g., 2 or 2.5)' />
                                 </div>
 
                                 <div className='input-group'>
                                   <DollarSign size={16} />
-                                  <input
-                                    type='text'
-                                    name='currentSalary'
-                                    placeholder='Current Salary (Optional)'
-                                    value={applyData.currentSalary}
-                                    onChange={handleApplyChange}
-                                    pattern='^\d+(\.\d{1,2})?$'
-                                    title='Enter a valid salary amount (e.g., 50000 or 50000.50)'
-                                  />
+                                  <input type='text' name='currentSalary' placeholder='Current Salary (Optional)' value={applyData.currentSalary} onChange={handleApplyChange} pattern='^\d+(\.\d{1,2})?$' title='Enter a valid salary amount' />
                                 </div>
 
                                 <div className='input-group'>
                                   <DollarSign size={16} />
-                                  <input
-                                    type='text'
-                                    name='expectedSalary'
-                                    placeholder='Expected Salary (Optional)'
-                                    value={applyData.expectedSalary}
-                                    onChange={handleApplyChange}
-                                    pattern='^\d+(\.\d{1,2})?$'
-                                    title='Enter a valid salary amount (e.g., 60000 or 60000.75)'
-                                  />
+                                  <input type='text' name='expectedSalary' placeholder='Expected Salary (Optional)' value={applyData.expectedSalary} onChange={handleApplyChange} pattern='^\d+(\.\d{1,2})?$' title='Enter a valid salary amount' />
                                 </div>
 
                                 <div className='input-group'>
                                   <MapPin size={16} />
-                                  <input
-                                    type='text'
-                                    name='location'
-                                    placeholder='Your Location'
-                                    value={applyData.location}
-                                    onChange={handleApplyChange}
-                                    required
-                                    pattern='^[A-Za-z\s]{2,}$'
-                                    title='Location must contain only letters and at least 2 characters'
-                                  />
+                                  <input type='text' name='location' placeholder='Your Location' value={applyData.location} onChange={handleApplyChange} required pattern='^[A-Za-z\s]{2,}$' title='Location must be at least 2 letters' />
                                 </div>
 
                                 <div className='input-group'>
                                   <FileText size={16} />
-                                  <input
-                                    type='url'
-                                    name='resume'
-                                    placeholder='Paste link to your Resume (e.g., Google Drive, LinkedIn)'
-                                    value={applyData.resume}
-                                    onChange={handleApplyChange}
-                                    required
-                                    pattern='https?://.+'
-                                    title='Enter a valid URL starting with http:// or https://'
-                                  />
+                                  <input type='url' name='resume' placeholder='Paste link to your Resume (e.g., Google Drive)' value={applyData.resume} onChange={handleApplyChange} required pattern='https?://.+' title='Enter a valid URL' />
                                 </div>
 
                                 <div className='form-buttons'>
@@ -358,7 +290,7 @@ const CurrentHirings = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan='7' style={{ textAlign: 'center', padding: '20px' }}>
+                    <td colSpan='8' style={{ textAlign: 'center', padding: '20px' }}>
                       No open positions at this time. Please check back later.
                     </td>
                   </tr>

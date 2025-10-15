@@ -4,11 +4,10 @@ import express from 'express'
 const router = express.Router()
 import Job from '../models/jobs.js'
 import Company from '../models/Companies.js'
-import Notification from '../models/notifications.js' // <-- Corrected Import
+import Notification from '../models/notifications.js'
 
 // GET all jobs
 router.get('/', async (req, res) => {
-  // ... (logic is correct, no changes needed here)
   try {
     const jobs = await Job.aggregate([
       {
@@ -21,7 +20,21 @@ router.get('/', async (req, res) => {
       },
       { $unwind: '$companyInfo' },
       { $addFields: { companyName: '$companyInfo.name' } },
-      { $project: { companyInfo: 0 } },
+      {
+        // --- UPDATED: Added 'industry' to the project stage ---
+        $project: {
+          _id: 1,
+          role: 1,
+          exp: 1,
+          skills: 1,
+          salary: 1,
+          location: 1,
+          industry: 1, // This ensures the industry is sent in the response
+          status: 1,
+          createdAt: 1,
+          companyName: 1,
+        },
+      },
       { $sort: { createdAt: -1 } },
     ])
     res.json(jobs)
@@ -40,7 +53,7 @@ router.post('/', async (req, res) => {
       const newJob = new Job(req.body)
       const savedJob = await newJob.save()
 
-      // --- ADDED: Notification Logic ---
+      // --- Notification Logic ---
       const io = req.app.get('io')
       const message = `A new job for a ${role} was posted by ${companyExists.name}.`
 
@@ -48,7 +61,7 @@ router.post('/', async (req, res) => {
         title: 'New Job Posting',
         message: message,
         type: 'info',
-        link: '/admin/manage-jobs', // Update if your link is different
+        link: '/admin/manage-jobs',
       })
       await notification.save()
 
@@ -66,7 +79,6 @@ router.post('/', async (req, res) => {
 
 // DELETE a job by ID
 router.delete('/:id', async (req, res) => {
-  // ... (logic is correct, no changes needed here)
   try {
     const removedJob = await Job.findByIdAndDelete(req.params.id)
     if (!removedJob) return res.status(404).json({ message: 'Job not found' })
@@ -76,6 +88,7 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+// PATCH/UPDATE a job by ID
 router.patch('/:id', async (request, response) => {
   try {
     const companyUpdate = await Job.findByIdAndUpdate(

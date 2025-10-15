@@ -1,3 +1,5 @@
+// File: backend/models/Candidate.js
+
 import mongoose from 'mongoose'
 const { Schema } = mongoose
 
@@ -8,11 +10,6 @@ const CandidateSchema = new Schema(
     surname: { type: String, required: true },
     role: { type: String, required: true },
     skills: { type: String, required: true },
-    industry: {
-      type: String,
-      required: true,
-      default: 'Information Technology',
-    }, // New field
     exp: { type: String, required: true }, // e.g., "5+ Years"
     location: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -20,7 +17,7 @@ const CandidateSchema = new Schema(
     status: {
       type: String,
       enum: ['pending', 'approved', 'placed', 'rejected'],
-      default: 'pending',
+      default: 'pending', // New candidates from the public form will be 'pending'
     },
   },
   { timestamps: true },

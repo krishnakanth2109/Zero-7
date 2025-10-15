@@ -16,6 +16,7 @@ import {
   FaClosedCaptioning,
   FaGlobe,
 } from 'react-icons/fa'
+import api from '../api/axios' // Import your central axios instance
 
 // ================= IT Courses =================
 const itCourses = [
@@ -264,11 +265,11 @@ const StarRating = ({ rating }) => {
   return (
     <div className='flex flex-row items-center justify-center'>
       {[...Array(fullStars)].map((_, i) => (
-        <FaStar key={i} className='star filled' />
+        <FaStar key={`full-${i}`} className='star filled' />
       ))}
       {hasHalfStar && <FaRegStar className='star half' />}
       {[...Array(emptyStars)].map((_, i) => (
-        <FaRegStar key={i} className='star empty' />
+        <FaRegStar key={`empty-${i}`} className='star empty' />
       ))}
       <span className='rating-value'>{rating}</span>
     </div>
@@ -285,6 +286,7 @@ const DigitalCourses = () => {
     contact: '',
     message: '',
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const filteredCourses =
     filter === 'All'
@@ -296,11 +298,37 @@ const DigitalCourses = () => {
     setFormData({ ...formData, [name]: value })
   }
 
-  const handleFormSubmit = (e) => {
+  // --- UPDATED: This function now saves data to your backend ---
+  const handleFormSubmit = async (e) => {
     e.preventDefault()
-    alert(`Request submitted for ${selectedCourse?.title}`)
-    setSelectedCourse(null)
-    setFormData({ name: '', email: '', contact: '', message: '' })
+    if (!selectedCourse) {
+      alert('No course selected. Please try again.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    const payload = {
+      ...formData,
+      course: selectedCourse.title, // Add the course title to the payload
+    }
+
+    try {
+      // Send the data to your '/api/enrollments' endpoint
+      await api.post('/enrollments', payload)
+
+      alert(`Enrollment for ${selectedCourse.title} submitted successfully!`)
+      setSelectedCourse(null) // Close the form
+      setFormData({ name: '', email: '', contact: '', message: '' }) // Reset the form
+    } catch (error) {
+      console.error('Error submitting enrollment:', error)
+      const errorMessage =
+        error.response?.data?.message ||
+        'There was an error submitting your request.'
+      alert(`Error: ${errorMessage}`)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -334,14 +362,12 @@ const DigitalCourses = () => {
                 <div className='course-icon'>{course.icon}</div>
                 <h3>{course.title}</h3>
                 <p className='desc'>{course.desc}</p>
-
                 <div className='rating-container'>
                   <StarRating rating={course.rating} />
                   <span className='reviews'>
                     ({course.reviews.toLocaleString()})
                   </span>
                 </div>
-
                 {course.bestseller && (
                   <div className='bestseller-badge'>Bestseller</div>
                 )}
@@ -356,7 +382,6 @@ const DigitalCourses = () => {
                   )}
                   <span className='updated-text'>{course.updated}</span>
                 </div>
-
                 <div className='course-meta'>
                   <div className='meta-item'>
                     <FaClock className='icon' /> <span>{course.duration}</span>
@@ -371,7 +396,6 @@ const DigitalCourses = () => {
                     </div>
                   )}
                 </div>
-
                 <div className='learning-objectives'>
                   <h5>What you'll learn</h5>
                   <ul>
@@ -390,7 +414,8 @@ const DigitalCourses = () => {
                       <input
                         type='text'
                         name='name'
-                        pattern='[A-Za-z]*'
+                        pattern='[A-Za-z\s]+'
+                        title='Name should only contain letters.'
                         placeholder='Enter your name'
                         value={formData.name}
                         onChange={handleInputChange}

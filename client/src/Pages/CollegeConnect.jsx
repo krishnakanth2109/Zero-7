@@ -1,5 +1,8 @@
-import React from 'react'
+// File: src/components/CollegeConnect.jsx
+
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios' // Make sure to install axios: npm install axios
 import heroImage from '../assets/clg-cnt.jpg'
 import './CollegeConnect.css'
 import './CampusHiring.css' // reuse all CampusHiring styles here
@@ -9,15 +12,13 @@ import {
   FiCalendar,
   FiCheckCircle,
   FiTrendingUp,
-  FiClock,
   FiLayers,
   FiMapPin,
   FiFileText,
   FiShield,
 } from 'react-icons/fi'
 
-/* ---------------- DATA (moved from CampusHiring) ---------------- */
-
+// --- MOCKED DATA (remains unchanged) ---
 const colleges = [
   {
     title: 'MoU-based Placement Drives',
@@ -53,7 +54,6 @@ const colleges = [
     icon: <FiUsers aria-hidden='true' />,
   },
 ]
-
 const companies = [
   {
     title: 'Bulk Fresher Hiring',
@@ -77,7 +77,6 @@ const companies = [
     icon: <FiCalendar aria-hidden='true' />,
   },
 ]
-
 const steps = [
   { label: 'campus shortlisting', icon: <FiMapPin aria-hidden='true' /> },
   { label: 'MoU & scheduling', icon: <FiFileText aria-hidden='true' /> },
@@ -88,7 +87,6 @@ const steps = [
   { label: 'interviews & offers', icon: <FiBriefcase aria-hidden='true' /> },
   { label: 'onboarding & MIS', icon: <FiShield aria-hidden='true' /> },
 ]
-
 const partnerLogos = [
   { alt: 'google', src: 'https://logo.clearbit.com/google.com' },
   { alt: 'microsoft', src: 'https://logo.clearbit.com/microsoft.com' },
@@ -96,31 +94,48 @@ const partnerLogos = [
   { alt: 'amazon', src: 'https://logo.clearbit.com/amazon.com' },
   { alt: 'adobe', src: 'https://logo.clearbit.com/adobe.com' },
   { alt: 'intel', src: 'https://logo.clearbit.com/intel.com' },
-  { alt: 'cisco', src: 'https://logo.clearbit.com/cisco.com' },
-  { alt: 'shopify', src: 'https://logo.clearbit.com/shopify.com' },
-  { alt: 'facebook', src: 'https://logo.clearbit.com/facebook.com' },
-  { alt: 'linkedin', src: 'https://logo.clearbit.com/linkedin.com' },
-  { alt: 'twitter', src: 'https://logo.clearbit.com/twitter.com' },
-  { alt: 'tesla', src: 'https://logo.clearbit.com/tesla.com' },
-  { alt: 'uber', src: 'https://logo.clearbit.com/uber.com' },
-  { alt: 'airbnb', src: 'https://logo.clearbit.com/airbnb.com' },
-  { alt: 'spotify', src: 'https://logo.clearbit.com/spotify.com' },
-  { alt: 'netflix', src: 'https://logo.clearbit.com/netflix.com' },
-  { alt: 'slack', src: 'https://logo.clearbit.com/slack.com' },
-  { alt: 'zoom', src: 'https://logo.clearbit.com/zoom.us' },
-  { alt: 'oracle', src: 'https://logo.clearbit.com/oracle.com' },
-  { alt: 'paypal', src: 'https://logo.clearbit.com/paypal.com' },
-  { alt: 'salesforce', src: 'https://logo.clearbit.com/salesforce.com' },
-  { alt: 'sap', src: 'https://logo.clearbit.com/sap.com' },
-  { alt: 'dell', src: 'https://logo.clearbit.com/dell.com' },
-  { alt: 'hpe', src: 'https://logo.clearbit.com/hpe.com' },
 ]
 
-/* ---------------- VIEW ---------------- */
-
+// --- VIEW ---
 const CollegeConnect = () => {
   const navigate = useNavigate()
   const handleContactRedirect = () => navigate('/contact')
+
+  // --- FORM STATE AND HANDLERS ---
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
+  const initialFormState = {
+    collegeName: '',
+    contactPerson: '',
+    email: '',
+    phone: '',
+    proposalType: '',
+    message: '',
+  }
+  const [formData, setFormData] = useState(initialFormState)
+  const [statusMessage, setStatusMessage] = useState('')
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setStatusMessage('Submitting...')
+    try {
+      await axios.post(`${API_URL}/college-proposals`, formData)
+      setStatusMessage('Proposal submitted successfully!')
+      setFormData(initialFormState) // Reset form
+      setTimeout(() => setStatusMessage(''), 5000) // Clear message after 5s
+    } catch (error) {
+      setStatusMessage('Failed to submit proposal. Please try again.')
+      console.error('Submission error:', error)
+      setTimeout(() => setStatusMessage(''), 5000)
+    }
+  }
 
   return (
     <div className='college-connect'>
@@ -172,7 +187,7 @@ const CollegeConnect = () => {
         </div>
       </section>
 
-      {/* CAMPUS HIRING CONTENT BELOW */}
+      {/* --- Other sections (For Colleges, For Companies, etc.) remain unchanged --- */}
       <section
         className='campus-section'
         aria-labelledby='campus-colleges-title'>
@@ -239,7 +254,6 @@ const CollegeConnect = () => {
         </div>
       </section>
 
-      {/* TIMELINE */}
       <section
         className='campus-process'
         aria-labelledby='campus-process-title'>
@@ -256,7 +270,6 @@ const CollegeConnect = () => {
         </ol>
       </section>
 
-      {/* LOGO STRIP */}
       <section className='campus-logos' aria-label='partner company logos'>
         <div className='marquee-viewport'>
           <div className='marquee-track marquee-right'>
@@ -266,15 +279,6 @@ const CollegeConnect = () => {
                   className='marquee-logo-img'
                   src={logo.src}
                   alt={logo.alt}
-                  loading='lazy'
-                  decoding='async'
-                  referrerPolicy='no-referrer'
-                  onError={(e) => {
-                    e.currentTarget.onerror = null
-                    e.currentTarget.src =
-                      'https://dummyimage.com/120x36/e9eef6/6b7280.png&text=' +
-                      encodeURIComponent(logo.alt)
-                  }}
                 />
               </div>
             ))}
@@ -295,63 +299,86 @@ const CollegeConnect = () => {
       </section>
 
       {/* PROPOSAL FORM */}
-      <section className='proposal-form'>
+      <section className='proposal-form' id='proposal-form'>
         <h2>College to Company Proposal Form</h2>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className='form-group'>
-            <label>College Name</label>
+            <label htmlFor='collegeName'>College Name</label>
             <input
               type='text'
-              pattern='^[A-Za-z\s]{3,}$'
+              id='collegeName'
+              name='collegeName'
               placeholder='Enter your college name'
+              value={formData.collegeName}
+              onChange={handleChange}
               required
             />
           </div>
           <div className='form-group'>
-            <label>Contact Person</label>
+            <label htmlFor='contactPerson'>Contact Person</label>
             <input
               type='text'
-              pattern='^[A-Za-z\s]{3,}$'
+              id='contactPerson'
+              name='contactPerson'
               placeholder='Enter contact person name'
+              value={formData.contactPerson}
+              onChange={handleChange}
               required
             />
           </div>
           <div className='form-group'>
-            <label>Email</label>
+            <label htmlFor='email'>Email</label>
             <input
               type='email'
-              pattern='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+              id='email'
+              name='email'
               placeholder='Enter your email'
+              value={formData.email}
+              onChange={handleChange}
               required
             />
           </div>
           <div className='form-group'>
-            <label>Phone</label>
+            <label htmlFor='phone'>Phone</label>
             <input
               type='tel'
-              pattern='^\d{10}$'
-              title='Enter a valid 10-digit phone number'
+              id='phone'
+              name='phone'
               placeholder='Enter phone number'
+              value={formData.phone}
+              onChange={handleChange}
               required
             />
           </div>
           <div className='form-group'>
-            <label>Proposal Type</label>
-            <select required>
+            <label htmlFor='proposalType'>Proposal Type</label>
+            <select
+              id='proposalType'
+              name='proposalType'
+              value={formData.proposalType}
+              onChange={handleChange}
+              required>
               <option value=''>-- Select --</option>
-              <option value='placements'>Placements</option>
-              <option value='technologies'>Technologies</option>
-              <option value='internships'>Internships</option>
-              <option value='other'>Other</option>
+              <option value='Placements'>Placements</option>
+              <option value='Technologies'>Technologies</option>
+              <option value='Internships'>Internships</option>
+              <option value='Other'>Other</option>
             </select>
           </div>
           <div className='form-group'>
-            <label>Message</label>
-            <textarea placeholder='Write your proposal...' required></textarea>
+            <label htmlFor='message'>Message</label>
+            <textarea
+              id='message'
+              name='message'
+              placeholder='Write your proposal...'
+              value={formData.message}
+              onChange={handleChange}
+              required></textarea>
           </div>
           <button type='submit' className='btn-primary'>
             Submit Proposal
           </button>
+          {statusMessage && <p className='status-message'>{statusMessage}</p>}
         </form>
       </section>
     </div>

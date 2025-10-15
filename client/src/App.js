@@ -1,4 +1,4 @@
-// File: src/App.js (Corrected)
+// File: src/App.js
 
 import { useEffect } from 'react'
 import {
@@ -37,7 +37,6 @@ import AdminManageCandidates from './Pages/AdminManageCandidates'
 import AdminViewRequests from './Pages/AdminViewRequests'
 import AdminManageManagers from './Pages/AdminManageManagers'
 import AdminManageRecruiters from './Pages/AdminManageRecruiters'
-import './App.css'
 import DigitalCourses from './Pages/DigitalCourses.jsx'
 import PayrollServices from './Pages/PayrollServices.jsx'
 import Resumemarketing from './Pages/Resumemarketing.jsx'
@@ -47,17 +46,18 @@ import ViewEnrollments from './Pages/AdminStudentEnrollment.jsx'
 import InterviewTracker from './Pages/AdminInterviews.jsx'
 import AdminManageCompanies from './Pages/AdminManageCompanies.jsx'
 import AdminCandidateApprovals from './Pages/AdminCandidateApprovals.jsx'
-// --- 1. IMPORT THE PROVIDER ---
-import { NotificationProvider } from './context/NotificationContext'
 import AdminInterviewApprovals from './Pages/AdminInterviewApprovals.jsx'
 import PlacedCandidates from './Pages/Adminplacedcandidates.jsx'
-import AdminUserPage from './Pages/AdminUserPage.jsx'
+import AdminDigitalCoursesEnrollment from './Pages/AdminDigitalCoursesEnrollment'
+import AdminContactInquiries from './Pages/AdminContactInquiries'
+import AdminPayrollRequests from './Pages/AdminPayrollRequests'
+import { NotificationProvider } from './context/NotificationContext'
+import './App.css'
 
 const LoginPage = () => {
   const navigate = useNavigate()
   useEffect(() => {
-    const hasToken = Cookie.get('token')
-    if (hasToken) {
+    if (Cookie.get('token')) {
       navigate('/admin/dashboard', { replace: true })
     }
   }, [navigate])
@@ -69,14 +69,7 @@ const LoginPage = () => {
 }
 
 const PrivateRoute = ({ children }) => {
-  const token = Cookie.get('token')
-  const isAuthenticated = !!token // More robust check
-
-  if (!isAuthenticated) {
-    return <Navigate to='/admin' replace />
-  }
-
-  return children
+  return Cookie.get('token') ? children : <Navigate to='/admin' replace />
 }
 
 function App() {
@@ -84,7 +77,6 @@ function App() {
   const isAdminPage = location.pathname.startsWith('/admin')
 
   return (
-    // --- 2. WRAP YOUR ENTIRE APP CONTENT WITH THE PROVIDER ---
     <NotificationProvider>
       <div className='App'>
         {!isAdminPage && <Navbar />}
@@ -126,7 +118,7 @@ function App() {
 
             {/* --- Protected Admin Routes --- */}
             <Route
-              path='/admin/*'
+              path='/admin'
               element={
                 <PrivateRoute>
                   <AdminLayout />
@@ -151,7 +143,6 @@ function App() {
                 element={<AdminInterviewApprovals />}
               />
               <Route path='placedcandidates' element={<PlacedCandidates />} />
-
               <Route path='companies' element={<AdminManageCompanies />} />
               <Route
                 path='manage-candidates'
@@ -166,6 +157,20 @@ function App() {
               <Route
                 path='manage-recruiters'
                 element={<AdminManageRecruiters />}
+              />
+              <Route
+                path='digital-courses-enrollment'
+                element={<AdminDigitalCoursesEnrollment />}
+              />
+              <Route
+                path='contact-inquiries'
+                element={<AdminContactInquiries />}
+              />
+
+              {/* --- THIS IS THE FIX: The route is now correctly nested --- */}
+              <Route
+                path='payroll-requests'
+                element={<AdminPayrollRequests />}
               />
             </Route>
           </Routes>

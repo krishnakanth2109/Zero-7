@@ -1,33 +1,65 @@
-import React, { useState } from 'react'
-import './Contact.css'
+import React, { useState } from 'react';
+import axios from 'axios'; // Import axios to make HTTP requests
+import './Contact.css';
 
 const Contact = () => {
+  // The API URL for your backend
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
+  // Your existing state for form data remains the same
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     service: '',
     message: '',
-  })
+  });
+
+  // --- ADDED: New state to handle submission status and user feedback ---
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
+  // -----------------------------------------------------------------------
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // Form submission logic would go here
-    console.log('Form submitted:', formData)
-    alert('Thank you for your inquiry! We will get back to you soon.')
-    setFormData({
-      name: '',
-      email: '',
-      service: '',
-      message: '',
-    })
-  }
+  // --- UPDATED: The handleSubmit function is now connected to the backend ---
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatusMessage('Sending your message...');
+
+    try {
+      // The form data is sent to your backend endpoint
+      await axios.post(`${API_URL}/contact-inquiries`, formData);
+      
+      setStatusMessage('Thank you for your inquiry! We will get back to you soon.');
+      
+      // Reset form on success
+      setFormData({
+        name: '',
+        email: '',
+        service: '',
+        message: '',
+      });
+
+      // Clear the message after 5 seconds
+      setTimeout(() => setStatusMessage(''), 5000);
+
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setStatusMessage('An error occurred. Please try again later.');
+      // Clear the error message after 5 seconds
+      setTimeout(() => setStatusMessage(''), 5000);
+    } finally {
+      // This runs whether the submission succeeds or fails
+      setIsSubmitting(false);
+    }
+  };
+  // ----------------------------------------------------------------------------
 
   return (
     <div className='contact-container'>
@@ -74,11 +106,14 @@ const Contact = () => {
 
         <div className='inquiry-form'>
           <h2>Quick Inquiry Form</h2>
+          {/* The form now correctly uses the updated handleSubmit function */}
           <form onSubmit={handleSubmit}>
             <div className='form-group'>
               <input
                 type='text'
-                pattern='[A-Za-z]*'
+                // The pattern here only allows letters, which might be too strict.
+                // Consider pattern="[A-Za-z\s]+" to allow spaces.
+                pattern='[A-Za-z\s]*' 
                 name='name'
                 placeholder='Your Name'
                 value={formData.name}
@@ -103,11 +138,12 @@ const Contact = () => {
                 onChange={handleChange}
                 required>
                 <option value=''>Select a Service</option>
-                <option value='consultation'>Training</option>
-                <option value='design'>Payroll Services</option>
-                <option value='development'>Resume Marketing</option>
-                <option value='marketing'>Campus Hiring</option>
-                <option value='support'>Technical Support</option>
+                {/* --- UPDATED: Changed values to be more descriptive --- */}
+                <option value='Training'>Training</option>
+                <option value='Payroll Services'>Payroll Services</option>
+                <option value='Resume Marketing'>Resume Marketing</option>
+                <option value='Campus Hiring'>Campus Hiring</option>
+                <option value='Technical Support'>Technical Support</option>
               </select>
             </div>
             <div className='form-group'>
@@ -119,14 +155,17 @@ const Contact = () => {
                 onChange={handleChange}
                 required></textarea>
             </div>
-            <button type='submit' className='submit-btn'>
-              Send Message
+            {/* The button is now disabled during submission */}
+            <button type='submit' className='submit-btn' disabled={isSubmitting}>
+              {isSubmitting ? 'Sending...' : 'Send Message'}
             </button>
+            {/* Display feedback message to the user */}
+            {statusMessage && <p className="status-message">{statusMessage}</p>}
           </form>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Contact
+export default Contact;

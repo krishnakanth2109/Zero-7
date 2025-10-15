@@ -1,12 +1,11 @@
 // File: src/Components/AdminSidebar.jsx
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   AlignHorizontalJustifyStart,
   AudioLines,
   Building,
-  CardSim,
   ChevronDown,
   CircleUser,
   FileUser,
@@ -16,6 +15,8 @@ import {
   Layers,
   LayoutDashboard,
   LogOut,
+  MessageSquare,
+  Receipt, // <-- 1. IMPORT THE ICON
   Shield,
   Store,
   UserCog,
@@ -29,10 +30,8 @@ export default function AdminSidebar({ isOpen }) {
   const location = useLocation()
   const navigate = useNavigate()
   const [openServices, setOpenServices] = useState(false)
-  const [newCount, setNewCount] = useState(0)
   const [newRequestCount, setNewRequestCount] = useState(0)
 
-  // Get user info and role from cookie
   const user = Cookie.get('user') ? JSON.parse(Cookie.get('user')) : null
   const role = user?.role
 
@@ -45,12 +44,10 @@ export default function AdminSidebar({ isOpen }) {
     navigate('/admin')
   }
 
-  // Common links
   const commonLinks = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   ]
 
-  // All possible links for admin
   const allLinks = [
     ...commonLinks,
     { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
@@ -64,20 +61,27 @@ export default function AdminSidebar({ isOpen }) {
       label: 'Manage Bench List',
       icon: AlignHorizontalJustifyStart,
     },
-
+    {
+      path: '/admin/digital-courses-enrollment',
+      label: 'Digital Courses Enrollment',
+      icon: GraduationCap,
+    },
     {
       path: '/admin/placedcandidates',
       label: 'Placed Candidates',
       icon: CircleUser,
     },
-
-    {
-      path: '/admin/candidateList',
-      label: 'Bench Approvals',
-      icon: Hourglass,
-    },
+    { path: '/admin/candidateList', label: 'Bench Approvals', icon: Hourglass },
     { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
     { path: '/admin/companies', label: 'Manage Companies', icon: Building },
+
+    // --- 2. ADD THE PAYROLL REQUESTS LINK FOR ADMIN ---
+    {
+      path: '/admin/payroll-requests',
+      label: 'Payroll Requests',
+      icon: Receipt,
+    },
+
     {
       path: '/admin/studentenrollment',
       label: 'Student Enrollment',
@@ -102,7 +106,12 @@ export default function AdminSidebar({ isOpen }) {
       label: 'New Batches',
       icon: FileUser,
     },
-    { path: '/admin/forms', label: 'Carrer Consultation Form', icon: Layers },
+    { path: '/admin/forms', label: 'College Connect Form', icon: Layers },
+    {
+      path: '/admin/contact-inquiries',
+      label: 'Contact Inquiries',
+      icon: MessageSquare,
+    },
     {
       path: '/admin/it-programs',
       label: 'IT Programs',
@@ -111,7 +120,6 @@ export default function AdminSidebar({ isOpen }) {
     },
   ]
 
-  // Sidebar config for manager and recruiter
   const sidebarConfig = {
     manager: [
       ...commonLinks,
@@ -139,6 +147,14 @@ export default function AdminSidebar({ isOpen }) {
 
       { path: '/admin/companies', label: 'Manage Companies', icon: Building },
       { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
+
+      // --- 3. ADD THE PAYROLL REQUESTS LINK FOR MANAGER ---
+      {
+        path: '/admin/payroll-requests',
+        label: 'Payroll Requests',
+        icon: Receipt,
+      },
+
       {
         path: '/admin/studentenrollment',
         label: 'Student Enrollment',
@@ -152,11 +168,21 @@ export default function AdminSidebar({ isOpen }) {
         isNotification: true,
       },
       {
+        path: '/admin/digital-courses-enrollment',
+        label: 'Digital Courses Enrollment',
+        icon: GraduationCap,
+      },
+      {
         path: '/admin/manage-recruiters',
         label: 'Add Recruiter',
         icon: UserSearch,
       },
-      { path: '/admin/forms', label: 'Carrer Consultation Form', icon: Layers },
+      { path: '/admin/forms', label: 'College Connect Form', icon: Layers },
+      {
+        path: '/admin/contact-inquiries',
+        label: 'Contact Inquiries',
+        icon: MessageSquare,
+      },
       {
         path: '/admin/it-programs',
         label: 'IT Programs',
@@ -172,7 +198,6 @@ export default function AdminSidebar({ isOpen }) {
         label: 'Placed Candidates',
         icon: CircleUser,
       },
-
       {
         path: '/admin/manage-candidates',
         label: 'Manage Candidates',
@@ -182,7 +207,6 @@ export default function AdminSidebar({ isOpen }) {
     ],
   }
 
-  // Decide which links to render
   let linksToRender = []
   if (role === 'Admin') linksToRender = allLinks
   else if (role === 'manager') linksToRender = sidebarConfig.manager
@@ -191,22 +215,19 @@ export default function AdminSidebar({ isOpen }) {
 
   return (
     <aside
-      className={`admin-sidebar overflow-scroll ${!isOpen ? 'collapsed' : ''}`}>
+      className={`admin-sidebar overflow-y-auto ${!isOpen ? 'collapsed' : ''}`}>
       <div>
         <div className='admin-sidebar-header'>
           <div className='logo-img'>
             {isOpen ? (
               <img src='/Logo6.jpg' alt='logo' className='h-[30px] w-[40px]' />
             ) : (
-              <img src='/L1.png' alt='logo1' className='h-[32px]! w-[32px]!' />
+              <img src='/L1.png' alt='logo1' className='h-[32px] w-[32px]' />
             )}
           </div>
-          <div className='logo-side-name'></div>
         </div>
-
         <nav>
           {linksToRender.map((link) => {
-            // Handle dropdown submenu for IT/Non-IT programs
             if (link.isDropdown) {
               return (
                 <div className='dropdown-container' key={link.path}>
@@ -250,7 +271,6 @@ export default function AdminSidebar({ isOpen }) {
                 </div>
               )
             }
-
             return (
               <Link
                 key={link.path}
@@ -269,7 +289,6 @@ export default function AdminSidebar({ isOpen }) {
               </Link>
             )
           })}
-
           <button
             className='logout-btn'
             onClick={handleLogout}

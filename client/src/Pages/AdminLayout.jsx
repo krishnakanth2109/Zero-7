@@ -1,5 +1,3 @@
-// File: src/Pages/AdminLayout.jsx
-
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import AdminSidebar from '../Components/AdminSidebar';
@@ -15,27 +13,23 @@ export default function AdminLayout() {
   };
 
   return (
-    // 1. The Provider should be the top-level wrapper for the entire layout.
     <NotificationProvider>
-      <div className='bg-slate-50 h-screen'>
-        {/* 2. The Sidebar is rendered once. It's positioned independently with CSS. */}
+      <div className='bg-slate-50 h-screen flex'>
+        {/* The Sidebar is always rendered */}
         <AdminSidebar isOpen={isSidebarOpen} />
 
-        {/* 3. This is the main content area that adjusts its margin based on the sidebar state. */}
+        {/* This is the main content area */}
         <div
           className={`
-            transition-all duration-300 ease-in-out
+            flex-grow transition-all duration-300 ease-in-out
             ${isSidebarOpen ? 'ml-64' : 'ml-20'} 
-          `}>
-          
-          {/* 
-            4. Both components that use the notification context are now correctly placed
-               *inside* the Provider's scope.
-          */}
-          <AdminNotifications />
+          `}
+        >
           <AdminHeader toggleSidebar={toggleSidebar} isOpen={isSidebarOpen} />
+          <AdminNotifications />
           
-          <main className='p-4 sm:p-6'>
+          <main className='p-4 sm:p-6 overflow-y-auto h-[calc(100vh-64px)]'>
+            {/* All child pages (like AdminContactInquiries) will be rendered here */}
             <Outlet />
           </main>
         </div>

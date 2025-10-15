@@ -1,53 +1,39 @@
+// File: src/Pages/AdminStudentEnrollment.jsx
+
 import React, { useEffect, useState } from "react";
-import "./AdminStudentEnrollment.css"; // Import the CSS file
+import api from "../api/axios"; // Use your central axios instance
+import "./AdminStudentEnrollment.css";
 
-const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxf3HDT5zGZQqPkkDTC_72jSd-OASNrCd71FiRxtnv3Q3EK3o8YzfiHYRwBP1b_StjJ/exec"; // replace with your script URL
-
-const ViewEnrollments = () => {
+// Renamed component for clarity
+const AdminCandidateEnrollment = () => {
   const [enrollments, setEnrollments] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(null); // Add error state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch data on component mount
   useEffect(() => {
     const fetchEnrollments = async () => {
+      setLoading(true);
       try {
-        setLoading(true); // Set loading to true before fetching
-        const response = await fetch(GOOGLE_SHEETS_URL);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        // --- FIXED: Fetch from the new, correctly named endpoint ---
+        const { data } = await api.get("/candidate-enrollment");
         setEnrollments(data);
       } catch (e) {
         console.error("Error fetching enrollments:", e);
         setError("Failed to load enrollments. Please try again later.");
       } finally {
-        setLoading(false); // Set loading to false after fetching (success or error)
+        setLoading(false);
       }
     };
 
     fetchEnrollments();
   }, []);
 
-
-
-
   return (
     <div className="view-enrollments-container">
-      <h2 className="enrollments-title">Enrolled Students</h2>
+      <h2 className="enrollments-title">Candidate Enrollments</h2>
 
-      {loading && (
-        <div className="loading-spinner">
-        </div>
-        
-      )}
-
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
+      {loading && <div className="loading-spinner"></div>}
+      {error && <div className="error-message">{error}</div>}
 
       {!loading && !error && (
         <div className="table-wrapper">
@@ -58,33 +44,25 @@ const ViewEnrollments = () => {
                 <th>Contact</th>
                 <th>Email</th>
                 <th>Location</th>
-                <th>Resume</th>
+                <th>Role</th>
+                <th>Skills</th>
               </tr>
             </thead>
             <tbody>
-              {enrollments && enrollments.length > 0 ? (
-                enrollments.map((student, index) => (
-                  <tr key={index} className={index % 2 === 0 ? "even-row" : "odd-row"}>
-                    <td>{student.Name}</td>
-                    <td>{student.Contact}</td>
-                    <td>{student.Email}</td>
-                    <td>{student.Location}</td>
-                    <td>
-                      <a 
-                        href={student.Resume} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="resume-link"
-                      >
-                        View Resume
-                      </a>
-                    </td>
-
+              {enrollments.length > 0 ? (
+                enrollments.map((enrollment, index) => (
+                  <tr key={enrollment._id} className={index % 2 === 0 ? "even-row" : "odd-row"}>
+                    <td>{enrollment.name}</td>
+                    <td>{enrollment.contact}</td>
+                    <td>{enrollment.email}</td>
+                    <td>{enrollment.location}</td>
+                    <td>{enrollment.role}</td>
+                    <td>{enrollment.skills}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="no-enrollments">No enrollments yet</td>
+                  <td colSpan="6" className="no-enrollments">No new enrollments found.</td>
                 </tr>
               )}
             </tbody>
@@ -95,4 +73,4 @@ const ViewEnrollments = () => {
   );
 };
 
-export default ViewEnrollments;
+export default AdminCandidateEnrollment;

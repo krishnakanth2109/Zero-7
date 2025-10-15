@@ -9,6 +9,7 @@ import {
   ChevronDown,
   CircleUser,
   FileUser,
+  Gift, // <-- 1. IMPORT THE ICON
   GraduationCap,
   HardDrive,
   Hourglass,
@@ -16,7 +17,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessageSquare,
-  Receipt, // <-- 1. IMPORT THE ICON
+  Receipt,
   Shield,
   Store,
   UserCog,
@@ -112,6 +113,8 @@ export default function AdminSidebar({ isOpen }) {
       label: 'Contact Inquiries',
       icon: MessageSquare,
     },
+    // --- 2. ADD THE MANAGE OFFER LINK FOR ADMIN ---
+    { path: '/admin/manage-offer', label: 'Manage Offer', icon: Gift },
     {
       path: '/admin/it-programs',
       label: 'IT Programs',

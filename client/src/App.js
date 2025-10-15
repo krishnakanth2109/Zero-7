@@ -51,6 +51,7 @@ import PlacedCandidates from './Pages/Adminplacedcandidates.jsx'
 import AdminDigitalCoursesEnrollment from './Pages/AdminDigitalCoursesEnrollment'
 import AdminContactInquiries from './Pages/AdminContactInquiries'
 import AdminPayrollRequests from './Pages/AdminPayrollRequests'
+import AdminManageOffer from './Pages/AdminManageOffer' // <-- 1. IMPORT THE NEW PAGE
 import { NotificationProvider } from './context/NotificationContext'
 import AdminUserPage from './Pages/AdminUserPage.jsx'
 import './App.css'
@@ -167,12 +168,13 @@ function App() {
                 path='contact-inquiries'
                 element={<AdminContactInquiries />}
               />
-
-              {/* --- THIS IS THE FIX: The route is now correctly nested --- */}
               <Route
                 path='payroll-requests'
                 element={<AdminPayrollRequests />}
               />
+
+              {/* --- 2. ADD THE ROUTE FOR THE MANAGE OFFER PAGE --- */}
+              <Route path='manage-offer' element={<AdminManageOffer />} />
             </Route>
           </Routes>
         </div>

@@ -1,11 +1,9 @@
-import React, { useState } from 'react'
+// File: src/Pages/Home.jsx
+
+import React, { useState, useEffect, useRef } from 'react'
 import './Home.css'
 import Context from './Context.jsx'
-import axios from 'axios'
 import api from '../api/axios.js'
-import { useEffect } from 'react'
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api'
 
 const Home = () => {
   const [showForm, setShowForm] = useState(false)
@@ -18,13 +16,38 @@ const Home = () => {
   })
   const [loading, setLoading] = useState(false)
 
+  // State for the new offer section
+  const [offer, setOffer] = useState(null)
+  const [isOfferVisible, setIsOfferVisible] = useState(false)
+  const offerSectionRef = useRef(null)
+
   const fetchJobs = async () => {
-    const response = await api.get('/jobs')
-    const list = await response.data
-    setJobPostings(list)
+    try {
+      const response = await api.get('/jobs')
+      // --- FIX: Ensure the API response is an array to prevent crashes ---
+      if (Array.isArray(response.data)) {
+        setJobPostings(response.data)
+      } else {
+        console.error('Jobs API did not return an array:', response.data)
+        setJobPostings([]) // Default to an empty array on error
+      }
+    } catch (error) {
+      console.error('Failed to fetch jobs:', error)
+      setJobPostings([]) // Also default to empty on fetch failure
+    }
+  }
+
+  const fetchOffer = async () => {
+    try {
+      const response = await api.get('/offers/latest')
+      setOffer(response.data)
+    } catch (error) {
+      console.error('Failed to fetch offer:', error)
+    }
   }
 
   const daysAgo = (dateString) => {
+    if (!dateString) return ''
     const posted = new Date(dateString)
     const diffDays = Math.floor((new Date() - posted) / (1000 * 60 * 60 * 24))
     if (diffDays === 0) return 'Today'
@@ -32,9 +55,33 @@ const Home = () => {
     return `${diffDays} days ago`
   }
 
+  // Effect for initial data fetching
   useEffect(() => {
     fetchJobs()
+    fetchOffer()
   }, [])
+
+  // --- FIX: Separate useEffect for the Intersection Observer animation ---
+  // This effect will run whenever the `offer` state changes from null to having data.
+  useEffect(() => {
+    if (!offer || !offerSectionRef.current) return // Don't run if there's no offer or ref yet
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        if (entry.isIntersecting) {
+          setIsOfferVisible(true)
+          observer.unobserve(entry.target) // Stop observing after animation
+        }
+      },
+      { threshold: 0.2 }, // Trigger when 20% of the section is visible
+    )
+
+    observer.observe(offerSectionRef.current)
+
+    // Cleanup function to disconnect the observer when the component unmounts
+    return () => observer.disconnect()
+  }, [offer]) // The dependency array ensures this runs when 'offer' data arrives
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -44,11 +91,8 @@ const Home = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-
     try {
-      // ✅ Send form data to backend
-      await axios.post(`${API_URL}/forms`, formData)
-
+      await api.post('/forms', formData)
       alert('✅ Form submitted successfully! Manager will be notified.')
       setShowForm(false)
       setFormData({ name: '', number: '', email: '', purpose: '' })
@@ -67,10 +111,12 @@ const Home = () => {
         <p>
           🔔 A new job is posted:{' '}
           <strong>
-            {jobPostings[0]?.role ? jobPostings[0].role : 'Exciting Roles'}
+            {jobPostings.length > 0 ? jobPostings[0].role : 'Exciting Roles'}
           </strong>
         </p>
       </div>
+
+      {/* Hero with background video */}
       <header className='video-hero' role='banner'>
         <video
           className='hero-video'
@@ -91,7 +137,54 @@ const Home = () => {
         })}
       </div>
 
-      {/* Keep Context */}
+      {/* --- THIS IS THE NEW SPECIAL OFFER SECTION --- */}
+      {/* It will now render and animate correctly */}
+      {offer && (
+        <section
+          ref={offerSectionRef}
+          className='py-16 sm:py-24 bg-slate-50 overflow-hidden'>
+          <div className='container mx-auto px-4'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
+              {/* Text Content with slide-in animation */}
+              <div
+                className={`transition-all duration-1000 ease-out ${
+                  isOfferVisible
+                    ? 'opacity-100 translate-x-0'
+                    : 'opacity-0 -translate-x-10'
+                }`}>
+                <h2 className='text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4'>
+                  {offer.heading}
+                </h2>
+                <p className='text-lg text-gray-600 leading-relaxed'>
+                  {offer.paragraph}
+                </p>
+                <button
+                  onClick={() => setShowForm(true)}
+                  className='mt-8 inline-block bg-cyan-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-cyan-700 transition-transform transform hover:scale-105'>
+                  Inquire Now
+                </button>
+              </div>
+              {/* Animated Image with slide-in and rotate animation */}
+              <div
+                className={`transition-all duration-1000 ease-out delay-200 ${
+                  isOfferVisible
+                    ? 'opacity-100 translate-x-0 rotate-0'
+                    : 'opacity-0 translate-x-10 rotate-3'
+                }`}>
+                <div className='relative shadow-2xl rounded-2xl'>
+                  <div className='absolute -inset-2 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl blur opacity-60'></div>
+                  <img
+                    src={offer.imageUrl}
+                    alt={offer.heading}
+                    className='relative w-full h-auto object-cover rounded-2xl'
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       <Context />
 
       {/* Popup Form */}
@@ -136,7 +229,6 @@ const Home = () => {
                 value={formData.purpose}
                 onChange={handleChange}
                 required></textarea>
-
               <button type='submit' className='submit-btn' disabled={loading}>
                 {loading ? 'Submitting...' : 'Submit'}
               </button>

@@ -32,6 +32,10 @@ import notificationsRoutes from './routes/notifications.js';
 import candidateEnrollmentRoutes from './routes/candidateEnrollment.js';
 import contactInquiryRoutes from './routes/contactInquiryRoutes.js';
 import payrollConsultationRoutes from './routes/payrollConsultations.js';
+// Add this import with your other route imports
+import offerRoutes from './routes/offerRoutes.js';
+
+// ... other code
 
 const app = express();
 const server = http.createServer(app);
@@ -86,6 +90,8 @@ app.use('/api/contact-inquiries', contactInquiryRoutes);
 // --- FIX: The payroll route is now correctly placed after the middleware ---
 app.use('/api/payroll-consultations', payrollConsultationRoutes);
 
+// Add this line with your other app.use() statements
+app.use('/api/offers', offerRoutes);
 
 // ✅ Socket.io Connection Logic
 io.on('connection', (socket) => {

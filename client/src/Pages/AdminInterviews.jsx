@@ -18,7 +18,7 @@ const InterviewTracker = () => {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [user, setUser] = useState({})
-
+const [userRole, setUserRole] = useState({})
   const [showAddForm, setShowAddForm] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [currentEditInterview, setCurrentEditInterview] = useState(null)
@@ -28,6 +28,9 @@ const InterviewTracker = () => {
   const [selectedCandidateDetails, setSelectedCandidateDetails] = useState(null)
   // New state for alerts
   const [alertedInterviews, setAlertedInterviews] = useState(new Set())
+
+  // New state for the upcoming interviews modal
+  const [showUpcomingModal, setShowUpcomingModal] = useState(false)
 
   const fetchInterviews = async () => {
     try {
@@ -110,6 +113,7 @@ const InterviewTracker = () => {
     const data = Cookie.get('user')
     const res = JSON.parse(data)
     res.role === 'Admin' ? fetchInterviews() : fetchUserInterviews(res.id)
+    setUserRole(res.role)
     setUser(res.id)
   }, [showAddForm])
 
@@ -251,6 +255,19 @@ const InterviewTracker = () => {
     }
   }
 
+  // New function to get today's interviews
+  const getTodaysInterviews = () => {
+    const today = new Date()
+    return interviewData.filter((interview) => {
+      const interviewDate = new Date(interview.date)
+      return (
+        interviewDate.getDate() === today.getDate() &&
+        interviewDate.getMonth() === today.getMonth() &&
+        interviewDate.getFullYear() === today.getFullYear()
+      )
+    })
+  }
+
   const handleAddInputChange = async (e) => {
     const { name, value } = e.target
     if (name === 'companyName') {
@@ -337,7 +354,7 @@ const InterviewTracker = () => {
       })
       setShowEditModal(false)
       setCurrentEditInterview(null)
-      fetchInterviews()
+      userRole === 'Admin' ? fetchInterviews() : fetchUserInterviews(user )
     } catch (error) {
       console.error('Error updating status:', error)
       alert('Failed to update status.')
@@ -444,50 +461,74 @@ const InterviewTracker = () => {
           ))}
         </div>
 
-        {/* Add Interview Button */}
+        {/* Action Buttons Container */}
         <div className='flex justify-between items-center mb-8'>
           <h2 className='text-2xl font-bold text-gray-800'>
             Interview Schedule
           </h2>
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className='group relative px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'>
-            <span className='flex items-center'>
-              {showAddForm ? (
-                <>
-                  <svg
-                    className='w-5 h-5 mr-2'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'>
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M6 18L18 6M6 6l12 12'
-                    />
-                  </svg>
-                  Hide Form
-                </>
-              ) : (
-                <>
-                  <svg
-                    className='w-5 h-5 mr-2'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'>
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M12 4v16m8-8H4'
-                    />
-                  </svg>
-                  Add New Interview
-                </>
-              )}
-            </span>
-          </button>
+          <div className='flex space-x-4'>
+            {/* Upcoming Interviews Button (New) */}
+            <button
+              onClick={() => setShowUpcomingModal(true)}
+              className='group relative px-6 py-3 bg-gradient-to-r from-green-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 hover:from-green-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'>
+              <span className='flex items-center'>
+                <svg
+                  className='w-5 h-5 mr-2'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                  xmlns='http://www.w3.org/2000/svg'>
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'></path>
+                </svg>
+                Today Interviews
+              </span>
+            </button>
+
+            {/* Add New Interview Button (Existing) */}
+            <button
+              onClick={() => setShowAddForm(!showAddForm)}
+              className='group relative px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'>
+              <span className='flex items-center'>
+                {showAddForm ? (
+                  <>
+                    <svg
+                      className='w-5 h-5 mr-2'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M6 18L18 6M6 6l12 12'
+                      />
+                    </svg>
+                    Hide Form
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className='w-5 h-5 mr-2'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M12 4v16m8-8H4'
+                      />
+                    </svg>
+                    Add New Interview
+                  </>
+                )}
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Add Interview Form */}
@@ -1030,6 +1071,78 @@ const InterviewTracker = () => {
                   Send Confirmation Mail
                 </a>
               </div> */}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* NEW: Upcoming Interviews Modal */}
+      {showUpcomingModal && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4'>
+          <div className='relative w-full max-w-2xl mx-auto'>
+            <div className='relative bg-white rounded-2xl shadow-2xl transform transition-all duration-300 scale-100'>
+              <div className='p-6 border-b border-gray-200'>
+                <div className='flex items-center justify-between'>
+                  <h3 className='text-xl font-bold text-gray-800'>
+                    Today's Interviews
+                  </h3>
+                  <button
+                    className='p-2 hover:bg-gray-100 rounded-full transition-colors duration-200'
+                    onClick={() => setShowUpcomingModal(false)}>
+                    <svg
+                      className='w-5 h-5 text-gray-500'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M6 18L18 6M6 6l12 12'
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div className='p-6 max-h-[60vh] overflow-y-auto'>
+                {getTodaysInterviews().length > 0 ? (
+                  <ul className='space-y-4'>
+                    {getTodaysInterviews().map((interview) => (
+                      <li
+                        key={interview._id}
+                        className='p-4 bg-gray-50 rounded-lg border border-gray-200'>
+                        <div className='flex justify-between items-center'>
+                          <div>
+                            <p className='font-semibold text-lg text-gray-800'>
+                              {interview.candidateName}
+                            </p>
+                            <p className='text-sm text-gray-600'>
+                              {interview.jobRole} at {interview.companyName}
+                            </p>
+                          </div>
+                          <div className='text-right'>
+                            <p className='font-medium text-indigo-600'>
+                              {new Date(interview.date).toLocaleTimeString(
+                                [],
+                                { hour: '2-digit', minute: '2-digit' },
+                              )}
+                            </p>
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${getStatusColor(
+                                interview.status,
+                              )}`}>
+                              {interview.status}
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className='text-center text-gray-500 py-8'>
+                    No interviews scheduled for today.
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>

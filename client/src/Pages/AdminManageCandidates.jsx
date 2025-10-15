@@ -283,7 +283,7 @@ export default function AdminManageCandidates() {
   }
 
   return (
-    <div className='min-h-screen font-sans'>
+    <div className='min-h-screen font-sans w-[80vw]'>
       <div className='max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-8'>
         {/* Header Section */}
         <div className='mb-8 p-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg shadow-md flex flex-col sm:flex-row items-center justify-between gap-4'>

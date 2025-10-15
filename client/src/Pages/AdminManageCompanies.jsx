@@ -102,7 +102,7 @@ const AdminManageCompanies = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gray-100 p-6 font-sans'>
+    <div className='min-h-screen w-[80vw] bg-gray-100 p-6 font-sans'>
       {/* Header Section */}
       <div className='bg-[#267edc] rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between'>
         <div className='flex items-center space-x-4'>

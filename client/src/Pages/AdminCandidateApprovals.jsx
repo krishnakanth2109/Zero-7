@@ -235,7 +235,7 @@ const AdminCandidateApprovals = () => {
   }
 
   return (
-    <div className='container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen'>
+    <div className='container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen w-[80vw]'>
       {showAlert && (
         <Alert
           message={alertMessage}

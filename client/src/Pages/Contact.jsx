@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import axios from 'axios'; // Import axios to make HTTP requests
-import './Contact.css';
+import React, { useState } from 'react'
+import axios from 'axios' // Import axios to make HTTP requests
+import './Contact.css'
 
 const Contact = () => {
   // The API URL for your backend
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
 
   // Your existing state for form data remains the same
   const [formData, setFormData] = useState({
@@ -12,53 +12,54 @@ const Contact = () => {
     email: '',
     service: '',
     message: '',
-  });
+  })
 
   // --- ADDED: New state to handle submission status and user feedback ---
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [statusMessage, setStatusMessage] = useState('')
   // -----------------------------------------------------------------------
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    });
-  };
+    })
+  }
 
   // --- UPDATED: The handleSubmit function is now connected to the backend ---
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setStatusMessage('Sending your message...');
+    e.preventDefault()
+    setIsSubmitting(true)
+    setStatusMessage('Sending your message...')
 
     try {
       // The form data is sent to your backend endpoint
-      await axios.post(`${API_URL}/contact-inquiries`, formData);
-      
-      setStatusMessage('Thank you for your inquiry! We will get back to you soon.');
-      
+      await axios.post(`${API_URL}/contact-inquiries`, formData)
+
+      setStatusMessage(
+        'Thank you for your inquiry! We will get back to you soon.',
+      )
+
       // Reset form on success
       setFormData({
         name: '',
         email: '',
         service: '',
         message: '',
-      });
+      })
 
       // Clear the message after 5 seconds
-      setTimeout(() => setStatusMessage(''), 5000);
-
+      setTimeout(() => setStatusMessage(''), 5000)
     } catch (error) {
-      console.error('Form submission error:', error);
-      setStatusMessage('An error occurred. Please try again later.');
+      console.error('Form submission error:', error)
+      setStatusMessage('An error occurred. Please try again later.')
       // Clear the error message after 5 seconds
-      setTimeout(() => setStatusMessage(''), 5000);
+      setTimeout(() => setStatusMessage(''), 5000)
     } finally {
       // This runs whether the submission succeeds or fails
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
   // ----------------------------------------------------------------------------
 
   return (
@@ -113,7 +114,7 @@ const Contact = () => {
                 type='text'
                 // The pattern here only allows letters, which might be too strict.
                 // Consider pattern="[A-Za-z\s]+" to allow spaces.
-                pattern='[A-Za-z\s]*' 
+                pattern='[A-Za-z\s]*'
                 name='name'
                 placeholder='Your Name'
                 value={formData.name}
@@ -124,6 +125,7 @@ const Contact = () => {
             <div className='form-group'>
               <input
                 type='email'
+                pattern='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
                 name='email'
                 placeholder='Your Email'
                 value={formData.email}
@@ -156,16 +158,19 @@ const Contact = () => {
                 required></textarea>
             </div>
             {/* The button is now disabled during submission */}
-            <button type='submit' className='submit-btn' disabled={isSubmitting}>
+            <button
+              type='submit'
+              className='submit-btn'
+              disabled={isSubmitting}>
               {isSubmitting ? 'Sending...' : 'Send Message'}
             </button>
             {/* Display feedback message to the user */}
-            {statusMessage && <p className="status-message">{statusMessage}</p>}
+            {statusMessage && <p className='status-message'>{statusMessage}</p>}
           </form>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Contact;
+export default Contact

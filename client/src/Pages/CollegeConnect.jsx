@@ -146,7 +146,9 @@ const CollegeConnect = () => {
         <div className='hero-overlay'>
           <h1>Welcome to College Connect</h1>
           <p>Empowering Students with Opportunities for a brighter future.</p>
-          <button className='btn-primary'>Get Started</button>
+          <a href='#proposal-form' className='btn-primary'>
+            Get Started
+          </a>
         </div>
       </section>
 

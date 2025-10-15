@@ -1,54 +1,56 @@
 // File: src/Pages/AdminViewApplications.jsx
 
-import React, { useEffect, useState } from 'react';
-import api from '../api/axios'; // Use your central axios instance
-import './AdminViewApplications.css';
+import React, { useEffect, useState } from 'react'
+import api from '../api/axios' // Use your central axios instance
+import './AdminViewApplications.css'
 
 const AdminViewApplications = () => {
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [applications, setApplications] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        const response = await api.get('/applications');
+        setLoading(true)
+        setError(null)
+        const response = await api.get('/applications')
         // Sort data by most recent submission first
         const sortedData = response.data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-        );
-        setApplications(sortedData);
+        )
+        setApplications(sortedData)
       } catch (err) {
-        console.error('Failed to fetch applications:', err);
-        setError('Failed to load applications. Please ensure the backend is running and the endpoint is correct.');
+        console.error('Failed to fetch applications:', err)
+        setError(
+          'Failed to load applications. Please ensure the backend is running and the endpoint is correct.',
+        )
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchApplications();
-  }, []); // Empty array ensures this runs only once on component mount
+    fetchApplications()
+  }, []) // Empty array ensures this runs only once on component mount
 
   // Function to handle the "Reject" action, which deletes the application
   const handleReject = async (id) => {
     try {
       const confirmReject = window.confirm(
         'Are you sure you want to reject and delete this application? This action cannot be undone.',
-      );
-      if (!confirmReject) return;
+      )
+      if (!confirmReject) return
 
       // Send a DELETE request to the backend API
-      await api.delete(`/applications/${id}`);
+      await api.delete(`/applications/${id}`)
       // Immediately remove the application from the local state to update the UI
-      setApplications((prev) => prev.filter((app) => app._id !== id));
-      alert('Application rejected and removed successfully.');
+      setApplications((prev) => prev.filter((app) => app._id !== id))
+      alert('Application rejected and removed successfully.')
     } catch (err) {
-      console.error('Failed to reject application:', err);
-      alert('Failed to reject the application. Please try again.');
+      console.error('Failed to reject application:', err)
+      alert('Failed to reject the application. Please try again.')
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -56,17 +58,17 @@ const AdminViewApplications = () => {
         <div className='spinner'></div>
         <p>Loading applications...</p>
       </div>
-    );
+    )
   }
 
   if (error) {
-    return <p className='error-message'>{error}</p>;
+    return <p className='error-message'>{error}</p>
   }
 
   return (
-    <div className='admin-applications'>
+    <div className='admin-applications w-[80vw]'>
       <h2>Job Applications</h2>
-      <div className="table-wrapper">
+      <div className='table-wrapper'>
         <table className='applications-table'>
           <thead>
             <tr>
@@ -99,36 +101,39 @@ const AdminViewApplications = () => {
                     {app.resume ? (
                       <a
                         href={app.resume}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        target='_blank'
+                        rel='noopener noreferrer'
                         style={{
-                          color: "#007bff",
-                          fontWeight: "700",
-                          cursor: "pointer",
+                          color: '#007bff',
+                          fontWeight: '700',
+                          cursor: 'pointer',
                         }}
-                        onMouseOver={(e) => (e.target.style.textDecoration = "underline")}
-                        onMouseOut={(e) => (e.target.style.textDecoration = "none")}
-                      >
+                        onMouseOver={(e) =>
+                          (e.target.style.textDecoration = 'underline')
+                        }
+                        onMouseOut={(e) =>
+                          (e.target.style.textDecoration = 'none')
+                        }>
                         View Resume
                       </a>
                     ) : (
-                      <span style={{ color: "gray", fontStyle: "italic" }}>N/A</span>
+                      <span style={{ color: 'gray', fontStyle: 'italic' }}>
+                        N/A
+                      </span>
                     )}
                   </td>
 
                   <td>
                     <button
                       style={{
-                        color: "red",
-                        backgroundColor: "transparent",
-                        cursor: "pointer",
+                        color: 'red',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
                       }}
-                      className="reject-button"
-                      onClick={() => handleReject(app._id)}
-                    >
+                      className='reject-button'
+                      onClick={() => handleReject(app._id)}>
                       Remove Application
                     </button>
-
                   </td>
                 </tr>
               ))
@@ -142,7 +147,7 @@ const AdminViewApplications = () => {
         </table>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AdminViewApplications;
+export default AdminViewApplications

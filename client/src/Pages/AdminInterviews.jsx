@@ -18,7 +18,7 @@ const InterviewTracker = () => {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [user, setUser] = useState({})
-const [userRole, setUserRole] = useState({})
+  const [userRole, setUserRole] = useState({})
   const [showAddForm, setShowAddForm] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [currentEditInterview, setCurrentEditInterview] = useState(null)
@@ -354,7 +354,7 @@ const [userRole, setUserRole] = useState({})
       })
       setShowEditModal(false)
       setCurrentEditInterview(null)
-      userRole === 'Admin' ? fetchInterviews() : fetchUserInterviews(user )
+      userRole === 'Admin' ? fetchInterviews() : fetchUserInterviews(user)
     } catch (error) {
       console.error('Error updating status:', error)
       alert('Failed to update status.')
@@ -417,7 +417,7 @@ const [userRole, setUserRole] = useState({})
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8'>
+    <div className='min-h-screen w-[80vw] bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-7xl mx-auto'>
         {/* Header */}
         <div className='text-center mb-12'>
@@ -1121,10 +1121,10 @@ const [userRole, setUserRole] = useState({})
                           </div>
                           <div className='text-right'>
                             <p className='font-medium text-indigo-600'>
-                              {new Date(interview.date).toLocaleTimeString(
-                                [],
-                                { hour: '2-digit', minute: '2-digit' },
-                              )}
+                              {new Date(interview.date).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
                             </p>
                             <span
                               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${getStatusColor(

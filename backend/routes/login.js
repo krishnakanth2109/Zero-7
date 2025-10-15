@@ -12,6 +12,7 @@ import {
   renderEmailTemplate,
 } from '../utils/emailTemplates.js'
 import transporter from '../utils/mail.js'
+import { request } from 'http'
 dotenv.config()
 
 const router = express.Router()
@@ -171,11 +172,21 @@ router.post('/reset-password', async (request, response) => {
         text: 'Reset Password ',
         html: htmlContent,
       }
-      await transporter.sendMail(mailOptions)
+      // await transporter.sendMail(mailOptions)
       response.send({ message: 'Password Change Successful ✅' })
     }
   } catch (error) {
     response.send({ message: error })
+  }
+})
+
+router.get('/:id', async (request, response) => {
+  try {
+    const id = request.params.id
+    const user = await Users.findById({ _id: id }, { password: 0 })
+    response.send(user)
+  } catch (err) {
+    response.send(err)
   }
 })
 

@@ -9,6 +9,7 @@ import {
   ChevronDown,
   CircleUser,
   FileUser,
+  Gift, // <-- 1. IMPORT THE ICON
   GraduationCap,
   HardDrive,
   Hourglass,
@@ -16,7 +17,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessageSquare,
-  Receipt, // <-- 1. IMPORT THE ICON
+  Receipt,
   Shield,
   Store,
   UserCog,
@@ -58,10 +59,7 @@ export default function AdminSidebar({ isOpen }) {
     { path: '/admin/candidateList', label: 'Bench Approvals', icon: Hourglass },
     { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
     { path: '/admin/companies', label: 'Manage Companies', icon: Building },
-    
-    // --- 2. ADD THE PAYROLL REQUESTS LINK FOR ADMIN ---
     { path: '/admin/payroll-requests', label: 'Payroll Requests', icon: Receipt },
-
     { path: '/admin/studentenrollment', label: 'Student Enrollment', icon: Store },
     { path: '/admin/applications', label: 'View Applications', icon: Layers },
     { path: '/admin/view-requests', label: 'View Requests', icon: AudioLines, isNotification: true },
@@ -71,6 +69,8 @@ export default function AdminSidebar({ isOpen }) {
     { path: '/admin/new-batch-dashboard', label: 'New Batches', icon: FileUser },
     { path: '/admin/forms', label: 'College Connect Form', icon: Layers },
     { path: '/admin/contact-inquiries', label: 'Contact Inquiries', icon: MessageSquare },
+    // --- 2. ADD THE MANAGE OFFER LINK FOR ADMIN ---
+    { path: '/admin/manage-offer', label: 'Manage Offer', icon: Gift },
     { path: '/admin/it-programs', label: 'IT Programs', icon: HardDrive, isDropdown: true },
   ];
 
@@ -84,10 +84,7 @@ export default function AdminSidebar({ isOpen }) {
       { path: '/admin/placedcandidates', label: 'Placed Candidates', icon: CircleUser },
       { path: '/admin/companies', label: 'Manage Companies', icon: Building },
       { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
-      
-      // --- 3. ADD THE PAYROLL REQUESTS LINK FOR MANAGER ---
       { path: '/admin/payroll-requests', label: 'Payroll Requests', icon: Receipt },
-
       { path: '/admin/studentenrollment', label: 'Student Enrollment', icon: Store },
       { path: '/admin/applications', label: 'View Applications', icon: Layers },
       { path: '/admin/view-requests', label: 'View Requests', icon: AudioLines, isNotification: true },
@@ -95,6 +92,8 @@ export default function AdminSidebar({ isOpen }) {
       { path: '/admin/manage-recruiters', label: 'Add Recruiter', icon: UserSearch },
       { path: '/admin/forms', label: 'College Connect Form', icon: Layers },
       { path: '/admin/contact-inquiries', label: 'Contact Inquiries', icon: MessageSquare },
+      // --- 3. ADD THE MANAGE OFFER LINK FOR MANAGER ---
+      { path: '/admin/manage-offer', label: 'Manage Offer', icon: Gift },
       { path: '/admin/it-programs', label: 'IT Programs', icon: HardDrive, isDropdown: true },
     ],
     recruiter: [

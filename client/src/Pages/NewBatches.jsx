@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import Pagination from '../Components/Pagination'
 import './NewBatches.css'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -10,6 +11,8 @@ const NewBatches = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [coursesData, setCoursesData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(5)
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -48,8 +51,29 @@ const NewBatches = () => {
   }
 
   const handleCloseRegistration = () => setShowRegistration(false)
-  const handleSearchChange = (e) => setSearchTerm(e.target.value)
-  const clearSearch = () => setSearchTerm('')
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value)
+    setCurrentPage(1) // Reset to first page when searching
+  }
+  const clearSearch = () => {
+    setSearchTerm('')
+    setCurrentPage(1) // Reset to first page when clearing search
+  }
+
+  // Pagination handlers
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  const handleItemsPerPageChange = (items) => {
+    setItemsPerPage(items)
+    setCurrentPage(1) // Reset to first page when changing items per page
+  }
+
+  // Calculate paginated data
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedCourses = filteredCourses.slice(startIndex, endIndex)
 
   const RegistrationModal = ({ isOpen, onClose, initialCourse }) => {
     const [formData, setFormData] = useState({
@@ -246,8 +270,8 @@ const NewBatches = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredCourses.length > 0 ? (
-                  filteredCourses.map((course) => (
+                {paginatedCourses.length > 0 ? (
+                  paginatedCourses.map((course) => (
                     <tr key={course._id}>
                       {/* ✅ FIX: Render all fields from the course object */}
                       <td>{course.course}</td>
@@ -272,13 +296,23 @@ const NewBatches = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan='6' className='no-results'>
+                    <td colSpan='4' className='no-results'>
                       No courses found matching your search.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+          )}
+          {filteredCourses.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredCourses.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              itemsPerPageOptions={[5, 10, 20, 50]}
+            />
           )}
         </div>
       </div>

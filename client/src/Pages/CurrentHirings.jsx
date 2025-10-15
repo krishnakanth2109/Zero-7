@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import api from '../api/axios' // Use your central axios instance
+import Pagination from '../Components/Pagination'
 import {
   Briefcase,
   User,
@@ -34,6 +35,8 @@ const CurrentHirings = () => {
   const [selectedJobIndex, setSelectedJobIndex] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [flippedProcess, setFlippedProcess] = useState([false, false, false])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -118,6 +121,24 @@ const CurrentHirings = () => {
 
   const latestJob =
     jobPositions.length > 0 ? jobPositions[0] : { role: 'Exciting Roles' }
+
+  // Pagination handlers
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+    // Close any open application form when changing pages
+    setSelectedJobIndex(null)
+  }
+
+  const handleItemsPerPageChange = (items) => {
+    setItemsPerPage(items)
+    setCurrentPage(1) // Reset to first page when changing items per page
+    setSelectedJobIndex(null) // Close any open application form
+  }
+
+  // Calculate paginated data
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedJobs = jobPositions.slice(startIndex, endIndex)
 
   const processSteps = [
     {
@@ -226,34 +247,37 @@ const CurrentHirings = () => {
                 </tr>
               </thead>
               <tbody>
-                {jobPositions.length > 0 ? (
-                  jobPositions.map((job, index) => (
-                    <React.Fragment key={job._id}>
-                      <tr>
-                        <td>{daysAgo(job.createdAt)}</td>
-                        <td>{job.role}</td>
-                        {/* --- ADDED: Industry data cell --- */}
-                        <td>{job.industry || 'N/A'}</td>
-                        <td>{job.exp}</td>
-                        <td>{job.skills}</td>
-                        <td>{job.salary}</td>
-                        <td>{job.location}</td>
-                        <td>
-                          <button
-                            className='apply-btn'
-                            onClick={() =>
-                              setSelectedJobIndex(
-                                index === selectedJobIndex ? null : index,
-                              )
-                            }>
-                            {selectedJobIndex === index ? 'Close' : 'Apply'}
-                          </button>
-                        </td>
-                      </tr>
-                      {selectedJobIndex === index && (
-                        <tr className='apply-form-row'>
-                          {/* --- UPDATED: Colspan increased to 8 to match new column --- */}
-                          <td colSpan='8' className='apply-form-td'>
+                {paginatedJobs.length > 0 ? (
+                  paginatedJobs.map((job, index) => {
+                    // Calculate the actual index in the original array for proper form handling
+                    const actualIndex = startIndex + index;
+                    return (
+                      <React.Fragment key={job._id}>
+                        <tr>
+                          <td>{daysAgo(job.createdAt)}</td>
+                          <td>{job.role}</td>
+                          {/* --- ADDED: Industry data cell --- */}
+                          <td>{job.industry || 'N/A'}</td>
+                          <td>{job.exp}</td>
+                          <td>{job.skills}</td>
+                          <td>{job.salary}</td>
+                          <td>{job.location}</td>
+                          <td>
+                            <button
+                              className='apply-btn'
+                              onClick={() =>
+                                setSelectedJobIndex(
+                                  actualIndex === selectedJobIndex ? null : actualIndex,
+                                )
+                              }>
+                              {selectedJobIndex === actualIndex ? 'Close' : 'Apply'}
+                            </button>
+                          </td>
+                        </tr>
+                        {selectedJobIndex === actualIndex && (
+                          <tr className='apply-form-row'>
+                            {/* --- UPDATED: Colspan increased to 8 to match new column --- */}
+                            <td colSpan='8' className='apply-form-td'>
                             <div className='apply-form-container'>
                               <h3>
                                 <Briefcase size={18} /> Apply for {job.role}
@@ -390,14 +414,15 @@ const CurrentHirings = () => {
                               </form>
                             </div>
                           </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  ))
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    )
+                  })
                 ) : (
                   <tr>
                     <td
-                      colSpan='7'
+                      colSpan='8'
                       style={{ textAlign: 'center', padding: '20px' }}>
                       No open positions at this time. Please check back later.
                     </td>
@@ -405,6 +430,16 @@ const CurrentHirings = () => {
                 )}
               </tbody>
             </table>
+            {jobPositions.length > 0 && (
+              <Pagination
+                currentPage={currentPage}
+                totalItems={jobPositions.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={handleItemsPerPageChange}
+                itemsPerPageOptions={[5, 10, 20, 50]}
+              />
+            )}
           </div>
         )}
       </section>

@@ -26,6 +26,7 @@ import {
   Pie,
   Cell, // Cell is needed for custom pie chart colors
 } from 'recharts'
+import RecentActivity from '../Components/RecentActivity'
 
 // Helper function to capitalize the first letter of a string
 const capitalize = (s) => {
@@ -344,57 +345,9 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Recent Applications Table */}
-      <div className='bg-white w-full p-4 rounded-xl mt-4'>
-        <div className='flex justify-center gap-1 mb-4'>
-          <UsersRound className='stroke-2 stroke-[#0b325b]' />
-          <span className='text-xl font-bold'>Recent Applications</span>
-        </div>
-        <div className='overflow-x-auto'>
-          <table className='w-full'>
-            <thead className='bg-gray-50'>
-              <tr>
-                <th className='p-3 text-left text-sm font-semibold'>
-                  Candidate
-                </th>
-                <th className='p-3 text-left text-sm font-semibold'>
-                  Position
-                </th>
-                <th className='p-3 text-left text-sm font-semibold'>
-                  Experience
-                </th>
-                <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
-                  Location
-                </th>
-                <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
-                  Phone
-                </th>
-                <th className='hidden lg:table-cell p-3 text-left text-sm font-semibold'>
-                  Applied Date
-                </th>
-              </tr>
-            </thead>
-            <tbody className='divide-y divide-gray-100'>
-              {applications.map((applicant) => (
-                <tr key={applicant._id} className='hover:bg-gray-50'>
-                  <td className='p-3'>{applicant.name}</td>
-                  <td className='p-3'>{applicant.jobId?.role || 'N/A'}</td>
-                  <td className='p-3'>{applicant.experience}</td>
-                  <td className='hidden lg:table-cell p-3'>
-                    {applicant.location}
-                  </td>
-                  <td className='hidden lg:table-cell p-3'>
-                    {applicant.contact}
-                  </td>
-                  <td className='hidden lg:table-cell p-3'>
-                    {new Date(applicant.createdAt).toLocaleDateString('en-IN')}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+
+            {/* <<< 2. INSERT RECENT ACTIVITY COMPONENT HERE >>> */}
+      <RecentActivity />
     </div>
   )
 }

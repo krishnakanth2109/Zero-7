@@ -14,6 +14,7 @@ const InterviewTracker = () => {
   const [calendarEvents, setCalendarEvents] = useState([])
   const [candidateOptions, setCandidateOptions] = useState([])
   const [companyOptions, setCompanyOptions] = useState([])
+  const [jobOptions, setJobOptions] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [user, setUser] = useState({})
@@ -98,6 +99,7 @@ const InterviewTracker = () => {
       console.log(response.data)
       setCandidateOptions(response.data.candidates)
       setCompanyOptions(response.data.companies)
+      setJobOptions(response.data.jobs)
     } catch (error) {
       console.error('Error fetching options:', error)
     }
@@ -111,19 +113,19 @@ const InterviewTracker = () => {
     setUser(res.id)
   }, [showAddForm])
 
-// Check for upcoming interviews every minute
-// Check for upcoming interviews every minute
-// Check for upcoming interviews every minute
-useEffect(() => {
-const checkUpcomingInterviews = () => {
-  const now = new Date();
-  const upcoming = interviewData.filter(
-    (interview) =>
-      interview.status === 'Scheduled' &&
-      !alertedInterviews.has(interview._id) &&
-      new Date(interview.date) - now > 0 &&
-      new Date(interview.date) - now <= 10 * 60 * 1000
-  );
+  // Check for upcoming interviews every minute
+  // Check for upcoming interviews every minute
+  // Check for upcoming interviews every minute
+  useEffect(() => {
+    const checkUpcomingInterviews = () => {
+      const now = new Date()
+      const upcoming = interviewData.filter(
+        (interview) =>
+          interview.status === 'Scheduled' &&
+          !alertedInterviews.has(interview._id) &&
+          new Date(interview.date) - now > 0 &&
+          new Date(interview.date) - now <= 10 * 60 * 1000,
+      )
 
       if (upcoming.length === 0) return
 
@@ -249,8 +251,13 @@ const checkUpcomingInterviews = () => {
     }
   }
 
-  const handleAddInputChange = (e) => {
+  const handleAddInputChange = async (e) => {
     const { name, value } = e.target
+    if (name === 'companyName') {
+      const jobs = await api.get(`interview/jobSearch/${value}`)
+      const data = await jobs.data.jobs
+      setJobOptions(data)
+    }
     setNewInterview((prev) => ({ ...prev, [name]: value }))
   }
 
@@ -536,8 +543,29 @@ const checkUpcomingInterviews = () => {
                   ))}
                 </select>
               </div>
-
               <div className='space-y-2'>
+                <label
+                  htmlFor='job'
+                  className='block text-sm font-semibold text-gray-700'>
+                  Select Job
+                </label>
+                <select
+                  id='job'
+                  name='job'
+                  value={newInterview.job}
+                  onChange={handleAddInputChange}
+                  className='w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white shadow-sm'>
+                  <option value=''>Select a Job</option>
+                  {jobOptions &&
+                    jobOptions.map((job) => (
+                      <option key={job._id} value={job._id}>
+                        {job.role}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              {/* <div className='space-y-2'>
                 <label
                   htmlFor='job'
                   className='block text-sm font-semibold text-gray-700'>
@@ -553,7 +581,7 @@ const checkUpcomingInterviews = () => {
                   className='w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white shadow-sm'
                   required
                 />
-              </div>
+              </div> */}
 
               <div className='space-y-2'>
                 <label
@@ -865,7 +893,7 @@ const checkUpcomingInterviews = () => {
                     <option value='L4'>L4</option>
                     <option value='L5'>L5</option>
                     <option value='HR'>HR Round</option>
-                     <option value='PLACED'>PLACED</option>
+                    <option value='PLACED'>PLACED</option>
                   </select>
 
                   <label

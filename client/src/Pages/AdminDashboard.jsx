@@ -239,20 +239,20 @@ export default function AdminDashboard() {
           percentage='+12%'
         />
         <StatCard
-          title='Placements'
-          value={stats.placements}
-          subtext='Candidates Placed'
-          icon={<Award className='stroke-[#0b325b] stroke-2' />}
-          percentage='+12%'
-          path='placedcandidates'
-        />
-        <StatCard
           title='Interviews'
           value={stats.interviews}
           subtext='Interviews scheduled'
           icon={<BookUser className='stroke-[#0b325b] stroke-2' />}
           percentage='+12%'
           path='interviews'
+        />
+        <StatCard
+          title='Placements'
+          value={stats.placements}
+          subtext='Candidates Placed'
+          icon={<Award className='stroke-[#0b325b] stroke-2' />}
+          percentage='+12%'
+          path='placedcandidates'
         />
       </div>
 

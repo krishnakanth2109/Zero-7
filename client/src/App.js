@@ -51,6 +51,7 @@ import AdminCandidateApprovals from './Pages/AdminCandidateApprovals.jsx'
 import { NotificationProvider } from './context/NotificationContext'
 import AdminInterviewApprovals from './Pages/AdminInterviewApprovals.jsx'
 import PlacedCandidates from './Pages/Adminplacedcandidates.jsx'
+import AdminUserPage from './Pages/AdminUserPage.jsx'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -132,6 +133,7 @@ function App() {
                 </PrivateRoute>
               }>
               <Route path='dashboard' element={<AdminDashboard />} />
+              <Route path='userPage/:id' element={<AdminUserPage />} />
               <Route path='it-programs' element={<AdminItPrograms />} />
               <Route path='non-it-programs' element={<AdminNonItPrograms />} />
               <Route path='forms' element={<AdminForms />} />

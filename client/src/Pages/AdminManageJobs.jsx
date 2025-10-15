@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import api from '../api/axios' // <-- CORRECT: Imports the central API connection
 import './AdminManageJobs.css' // Import the new CSS file
 import * as XLSX from 'xlsx'
-import { FilePenLine, FileText, Trash } from 'lucide-react'
+import { FilePenLine, FileText, Trash, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const AdminManageJobs = () => {
   const [jobs, setJobs] = useState([])
@@ -20,6 +20,8 @@ const AdminManageJobs = () => {
   })
   const [showPopup, setShowPopup] = useState(false) // State for controlling the pop-up
   const [editPopup, setEditPopup] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
   const fetchJobs = async () => {
     try {
@@ -140,6 +142,21 @@ const AdminManageJobs = () => {
     reader.readAsBinaryString(file)
     // Reset file input to allow uploading the same file again
     e.target.value = ''
+  }
+
+  // Pagination logic
+  const totalPages = Math.ceil(jobs.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentJobs = jobs.slice(startIndex, endIndex)
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value))
+    setCurrentPage(1) // Reset to first page when changing items per page
   }
 
   return (
@@ -459,7 +476,7 @@ const AdminManageJobs = () => {
               </thead>
               <tbody>
                 {jobs.length > 0 ? (
-                  jobs.map((job) => (
+                  currentJobs.map((job) => (
                     <tr key={job._id}>
                       <td>{job._id}</td>
                       <td>{job.companyName}</td>
@@ -492,6 +509,74 @@ const AdminManageJobs = () => {
                 )}
               </tbody>
             </table>
+            
+            {/* Pagination */}
+            {jobs.length > 0 && (
+              <div className='p-5 border-t border-gray-200 bg-gray-50'>
+                <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
+                  {/* Items per page selector and info */}
+                  <div className='flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-600'>
+                    <div className='flex items-center gap-2'>
+                      <span>Show:</span>
+                      <select
+                        value={itemsPerPage}
+                        onChange={handleItemsPerPageChange}
+                        className='border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+                      >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                      </select>
+                      <span>per page</span>
+                    </div>
+                    <div>
+                      Showing{' '}
+                      <strong className='font-semibold'>
+                        {jobs.length === 0 ? 0 : startIndex + 1}
+                      </strong>
+                      {' '}-{' '}
+                      <strong className='font-semibold'>
+                        {Math.min(endIndex, jobs.length)}
+                      </strong>
+                      {' '}of{' '}
+                      <strong className='font-semibold'>{jobs.length}</strong>{' '}
+                      jobs
+                    </div>
+                  </div>
+                  
+                  {/* Simple Pagination Controls - Previous/Next Only */}
+                  {totalPages > 1 && (
+                    <div className='flex items-center gap-4'>
+                      {/* Previous Page Button */}
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className='flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200'
+                      >
+                        <ChevronLeft size={16} className='mr-2' />
+                        Previous Page
+                      </button>
+                      
+                      {/* Current Page Info */}
+                      <span className='text-sm text-gray-600'>
+                        Page {currentPage} of {totalPages}
+                      </span>
+                      
+                      {/* Next Page Button */}
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className='flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200'
+                      >
+                        Next Page
+                        <ChevronRight size={16} className='ml-2' />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

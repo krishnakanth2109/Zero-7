@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Cookie from 'js-cookie'
-import { PanelLeftClose, PanelRightClose } from 'lucide-react'
+import { PanelLeftClose, PanelRightClose, User } from 'lucide-react'
 import { useNotifications } from '../context/NotificationContext'
 
 const AdminHeader = ({ toggleSidebar, isOpen }) => {
@@ -165,11 +165,7 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
             onClick={() => setShowUserMenu(!showUserMenu)}
             aria-label='User menu'>
             <div className='relative'>
-              <img
-                src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format'
-                alt='Admin Avatar'
-                className='w-8 h-8 rounded-full object-cover ring-2 ring-white shadow-sm'
-              />
+              <User className='w-8 h-8 rounded-full object-cover' />
               <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-white rounded-full'></div>
             </div>
             <div className='hidden md:block text-left'>
@@ -208,11 +204,7 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
             <div className='absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border z-50'>
               <div className='flex items-center p-4 border-b'>
                 <div className='flex-shrink-0'>
-                  <img
-                    src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face&auto=format'
-                    alt='Admin Avatar'
-                    className='w-12 h-12 rounded-full object-cover'
-                  />
+                  <User className='w-12 h-12 rounded-full object-cover' />
                 </div>
                 <div className='ml-3 flex-1'>
                   <div className='text-sm font-medium text-gray-900'>
@@ -224,9 +216,11 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
                 </div>
               </div>
               <div className='py-2'>
-                <button className='flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
+                <a
+                  href={`userPage/${user.id}`}
+                  className='flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'>
                   Profile Settings
-                </button>
+                </a>
                 <hr className='my-2 border-gray-200' />
                 <button
                   className='flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50'

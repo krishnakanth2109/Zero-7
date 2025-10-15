@@ -60,9 +60,9 @@ const CurrentHirings = () => {
 
   // --- FIX 1: Simplified handler for all text inputs ---
   const handleApplyChange = (e) => {
-    const { name, value } = e.target;
-    setApplyData((prev) => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setApplyData((prev) => ({ ...prev, [name]: value }))
+  }
 
   // --- FIX 2: Simplified submit handler for JSON data ---
   const handleApplySubmit = async (e) => {
@@ -70,36 +70,45 @@ const CurrentHirings = () => {
     setIsSubmitting(true)
     const job = jobPositions[selectedJobIndex]
     if (!job || !applyData.resume) {
-      alert('Please provide a link to your resume.');
-      setIsSubmitting(false);
-      return;
+      alert('Please provide a link to your resume.')
+      setIsSubmitting(false)
+      return
     }
 
     // The complete payload, including the job's ID
     const payload = {
       ...applyData,
-      jobId: job._id
-    };
+      jobId: job._id,
+    }
 
     try {
       // Post the plain JSON payload to your backend
-      await api.post('/applications', payload);
+      const posted = await api.post('/applications', payload)
+      console.log(posted.data)
 
-      alert(`Application for ${job.role} submitted successfully!`);
+      alert(`${posted.data.message}`)
       // Reset form
       setApplyData({
-        name: '', contact: '', email: '', experience: '',
-        currentSalary: '', expectedSalary: '', location: '', resume: '',
-      });
-      setSelectedJobIndex(null);
-
+        name: '',
+        contact: '',
+        email: '',
+        experience: '',
+        currentSalary: '',
+        expectedSalary: '',
+        location: '',
+        resume: '',
+      })
+      setSelectedJobIndex(null)
     } catch (error) {
-      console.error('Application submission error:', error);
-      alert('There was an error submitting your application. ' + (error.response?.data?.message || 'Please try again.'));
+      console.error('Application submission error:', error)
+      alert(
+        'There was an error submitting your application. ' +
+          (error.response?.data?.message || 'Please try again.'),
+      )
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const daysAgo = (dateString) => {
     const posted = new Date(dateString)
@@ -113,9 +122,24 @@ const CurrentHirings = () => {
     jobPositions.length > 0 ? jobPositions[0] : { role: 'Exciting Roles' }
 
   const processSteps = [
-    { title: 'Step 1: Application', content: 'Fill out the application form with your details and a link to your resume.', icon: '📝', },
-    { title: 'Step 2: Screening', content: 'Our recruiters review your profile. Shortlisted candidates get a call.', icon: '🔍', },
-    { title: 'Step 3: Interviews & Placement', content: 'Attend technical & HR interviews. We support you through the final placement.', icon: '🎯', },
+    {
+      title: 'Step 1: Application',
+      content:
+        'Fill out the application form with your details and a link to your resume.',
+      icon: '📝',
+    },
+    {
+      title: 'Step 2: Screening',
+      content:
+        'Our recruiters review your profile. Shortlisted candidates get a call.',
+      icon: '🔍',
+    },
+    {
+      title: 'Step 3: Interviews & Placement',
+      content:
+        'Attend technical & HR interviews. We support you through the final placement.',
+      icon: '🎯',
+    },
   ]
 
   return (
@@ -145,7 +169,8 @@ const CurrentHirings = () => {
       <section className='intro-section'>
         <h2>We are Hiring!</h2>
         <p>
-          At Zero7 Technologies, we connect professionals with top companies. Explore our open positions and apply.
+          At Zero7 Technologies, we connect professionals with top companies.
+          Explore our open positions and apply.
         </p>
       </section>
 
@@ -155,8 +180,9 @@ const CurrentHirings = () => {
           {processSteps.map((step, i) => (
             <div
               key={i}
-              className={`process-card ${flippedProcess[i] ? 'is-flipped' : ''
-                }`}
+              className={`process-card ${
+                flippedProcess[i] ? 'is-flipped' : ''
+              }`}
               onClick={() => toggleProcess(i)}
               tabIndex={0}
               role='button'
@@ -229,7 +255,9 @@ const CurrentHirings = () => {
                               <h3>
                                 <Briefcase size={18} /> Apply for {job.role}
                               </h3>
-                              <form onSubmit={handleApplySubmit} className='apply-form'>
+                              <form
+                                onSubmit={handleApplySubmit}
+                                className='apply-form'>
                                 <div className='input-group'>
                                   <User size={16} />
                                   <input
@@ -341,15 +369,22 @@ const CurrentHirings = () => {
                                 </div>
 
                                 <div className='form-buttons'>
-                                  <button type='submit' className='submit-apply' disabled={isSubmitting}>
-                                    {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                                  <button
+                                    type='submit'
+                                    className='submit-apply'
+                                    disabled={isSubmitting}>
+                                    {isSubmitting
+                                      ? 'Submitting...'
+                                      : 'Submit Application'}
                                   </button>
-                                  <button type='button' className='cancel-btn' onClick={() => setSelectedJobIndex(null)}>
+                                  <button
+                                    type='button'
+                                    className='cancel-btn'
+                                    onClick={() => setSelectedJobIndex(null)}>
                                     Cancel
                                   </button>
                                 </div>
                               </form>
-
                             </div>
                           </td>
                         </tr>
@@ -358,7 +393,9 @@ const CurrentHirings = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan='7' style={{ textAlign: 'center', padding: '20px' }}>
+                    <td
+                      colSpan='7'
+                      style={{ textAlign: 'center', padding: '20px' }}>
                       No open positions at this time. Please check back later.
                     </td>
                   </tr>

@@ -52,6 +52,7 @@ import AdminDigitalCoursesEnrollment from './Pages/AdminDigitalCoursesEnrollment
 import AdminContactInquiries from './Pages/AdminContactInquiries'
 import AdminPayrollRequests from './Pages/AdminPayrollRequests'
 import { NotificationProvider } from './context/NotificationContext'
+import AdminUserPage from './Pages/AdminUserPage.jsx'
 import './App.css'
 
 const LoginPage = () => {

@@ -300,23 +300,40 @@ const CollegeConnect = () => {
         <form>
           <div className='form-group'>
             <label>College Name</label>
-            <input type='text' placeholder='Enter your college name' required />
+            <input
+              type='text'
+              pattern='^[A-Za-z\s]{3,}$'
+              placeholder='Enter your college name'
+              required
+            />
           </div>
           <div className='form-group'>
             <label>Contact Person</label>
             <input
               type='text'
+              pattern='^[A-Za-z\s]{3,}$'
               placeholder='Enter contact person name'
               required
             />
           </div>
           <div className='form-group'>
             <label>Email</label>
-            <input type='email' placeholder='Enter your email' required />
+            <input
+              type='email'
+              pattern='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+              placeholder='Enter your email'
+              required
+            />
           </div>
           <div className='form-group'>
             <label>Phone</label>
-            <input type='tel' placeholder='Enter phone number' required />
+            <input
+              type='tel'
+              pattern='^\d{10}$'
+              title='Enter a valid 10-digit phone number'
+              placeholder='Enter phone number'
+              required
+            />
           </div>
           <div className='form-group'>
             <label>Proposal Type</label>

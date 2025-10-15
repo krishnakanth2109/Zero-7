@@ -117,7 +117,7 @@ export default function AdminSidebar({ isOpen }) {
       ...commonLinks,
       { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
       {
-        path: 'interviews/approvals',
+        path: '/admin/interviews/approvals',
         label: 'Interviews Approvals',
         icon: Hourglass,
       },

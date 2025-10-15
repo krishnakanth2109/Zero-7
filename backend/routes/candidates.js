@@ -52,13 +52,12 @@ router.get('/', async (req, res) => {
           name: 1,
           role: 1,
           location: 1,
-          industry: 1,
           email: 1,
           skills: 1,
-          industry: 1, // <-- ADDED
           exp: 1,
           updatedAt: 1,
           userName: '$userDetails.name',
+          surname: 1,
         },
       },
       { $sort: { updatedAt: -1 } },
@@ -108,7 +107,6 @@ router.get('/pendings', async (req, res) => {
           location: 1,
           email: 1,
           skills: 1,
-          industry: 1, // <-- ADDED
           exp: 1,
           status: 1,
           userName: '$userDetails.name',
@@ -161,7 +159,6 @@ router.get('/all', async (req, res) => {
           industry: 1,
           email: 1,
           skills: 1,
-          industry: 1, // <-- ADDED
           exp: 1,
           status: 1,
           userName: '$userDetails.name',

@@ -8,14 +8,9 @@ import {
   X,
   Loader2, // For loading spinners
   Users, // New icon for candidates section
-  Mail,
-  Phone,
-  Briefcase,
-  Lightbulb,
-  MapPin,
-  Hash, // For ID field
   XCircle,
-  Building, // Icon for Industry
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import api from '../api/axios'
 import Cookie from 'js-cookie'
@@ -27,11 +22,10 @@ export default function AdminManageCandidates() {
   const [formData, setFormData] = useState({
     userId: '',
     name: '',
+    surname: '',
     role: '',
     skills: '',
-    industry: '', // <-- ADDED
     exp: '',
-    industry: '',
     location: '',
     email: '',
     phone: '',
@@ -43,6 +37,8 @@ export default function AdminManageCandidates() {
   const [submitting, setSubmitting] = useState(false) // For modal form submission
   const [deletingId, setDeletingId] = useState(null) // For delete button loading
   const [importing, setImporting] = useState(false) // For import button loading
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
   const fileInputRef = useRef(null) // Ref for hidden file input
 
@@ -54,7 +50,8 @@ export default function AdminManageCandidates() {
   const fetchCandidates = async () => {
     try {
       setLoading(true)
-      const { data } = await api.get('/candidates/all') // Using /all to see all statuses
+      const { data } = await api.get('/candidates/') // Using /all to see all statuses
+      console.log(data)
       setCandidates(data)
     } catch (error) {
       console.error('Failed to fetch candidates:', error)
@@ -87,11 +84,10 @@ export default function AdminManageCandidates() {
     setFormData({
       userId: userId, // Ensure userId is passed to new candidate form
       name: '',
+      surname: '',
       role: '',
       skills: '',
-      industry: 'Information Technology', // <-- ADDED with default
       exp: '',
-      industry: '',
       location: '',
       email: '',
       phone: '',
@@ -162,14 +158,13 @@ export default function AdminManageCandidates() {
   const exportToExcel = () => {
     try {
       const dataToExport = candidates.map(
-        ({ name, role, skills, exp, location, industry, email, phone }) => ({
+        ({ name, surname, role, skills, exp, location, email, phone }) => ({
           Name: name,
+          Surname: surname,
           Role: role,
           Skills: skills,
-          Industry: industry, // <-- ADDED
           'Experience (Years)': exp,
           Location: location,
-          Industry: industry,
           Email: email,
           Phone: phone,
         }),
@@ -216,25 +211,22 @@ export default function AdminManageCandidates() {
 
           const formattedData = data.map((item, index) => {
             // Basic validation for required fields
-            if (!item.Name || !item.Role || !item.Email || !item.Industry) {
+            if (!item.Name || !item.Surname || !item.Role || !item.Email) {
               // <-- ADDED Industry check
               throw new Error(
-                `Row ${
-                  index + 2
-                }: Missing required fields (Name, Role, Email, Industry)`,
+                `Row ${index + 2}: Missing required fields (Name, Role, Email)`,
               )
             }
             return {
               userId: userId, // Assign current recruiter's ID
               name: item.Name ? String(item.Name).trim() : '',
+              surname: item.Surname ? String(item.Surname).trim() : '',
               role: item.Role ? String(item.Role).trim() : '',
               skills: item.Skills ? String(item.Skills).trim() : '',
-              industry: item.Industry ? String(item.Industry).trim() : '', // <-- ADDED
               exp: item['Experience (Years)']
                 ? Number(item['Experience (Years)'])
                 : 0,
               location: item.Location ? String(item.Location).trim() : '',
-              industry: item.Industry ? String(item.Industry).trim() : '',
               email: item.Email ? String(item.Email).trim().toLowerCase() : '',
               phone: item.Phone ? String(item.Phone).trim() : '',
             }
@@ -296,6 +288,39 @@ export default function AdminManageCandidates() {
       // Prevent clicking while already importing
       fileInputRef.current.click()
     }
+  }
+
+  // Pagination logic
+  const totalPages = Math.ceil(candidates.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentCandidates = candidates.slice(startIndex, endIndex)
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value))
+    setCurrentPage(1) // Reset to first page when changing items per page
+  }
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pageNumbers = []
+    const maxVisiblePages = 5
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1)
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i)
+    }
+
+    return pageNumbers
   }
 
   return (
@@ -405,6 +430,11 @@ export default function AdminManageCandidates() {
                   <th
                     scope='col'
                     className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    Surname
+                  </th>
+                  <th
+                    scope='col'
+                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                     Role
                   </th>
                   <th
@@ -416,11 +446,6 @@ export default function AdminManageCandidates() {
                     scope='col'
                     className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                     Experience
-                  </th>
-                  <th
-                    scope='col'
-                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Industry
                   </th>
                   <th
                     scope='col'
@@ -454,12 +479,15 @@ export default function AdminManageCandidates() {
                     </td>
                   </tr>
                 ) : (
-                  candidates.map((c) => (
+                  currentCandidates.map((c) => (
                     <tr
                       key={c._id}
                       className='hover:bg-gray-50 transition duration-150 ease-in-out'>
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
                         {c.name}
+                      </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+                        {c.surname || 'N/A'}
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
                         {c.role}
@@ -469,9 +497,6 @@ export default function AdminManageCandidates() {
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
                         {c.exp} years
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
-                        {c.industry}
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
                         {c.location}
@@ -511,13 +536,66 @@ export default function AdminManageCandidates() {
             </table>
           </div>
 
-          {/* Table Footer */}
-          <div className='p-5 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between text-sm text-gray-600'>
-            <div className='mb-2 sm:mb-0'>
-              Showing{' '}
-              <strong className='font-semibold'>{candidates.length}</strong> of{' '}
-              <strong className='font-semibold'>{candidates.length}</strong>{' '}
-              candidates
+          {/* Table Footer with Pagination */}
+          <div className='p-5 border-t border-gray-200 bg-gray-50'>
+            <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
+              {/* Items per page selector and info */}
+              <div className='flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-600'>
+                <div className='flex items-center gap-2'>
+                  <span>Show:</span>
+                  <select
+                    value={itemsPerPage}
+                    onChange={handleItemsPerPageChange}
+                    className='border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'>
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                  </select>
+                  <span>per page</span>
+                </div>
+                <div>
+                  Showing{' '}
+                  <strong className='font-semibold'>
+                    {candidates.length === 0 ? 0 : startIndex + 1}
+                  </strong>{' '}
+                  -{' '}
+                  <strong className='font-semibold'>
+                    {Math.min(endIndex, candidates.length)}
+                  </strong>{' '}
+                  of{' '}
+                  <strong className='font-semibold'>{candidates.length}</strong>{' '}
+                  candidates
+                </div>
+              </div>
+
+              {/* Simple Pagination Controls - Previous/Next Only */}
+              {totalPages > 1 && (
+                <div className='flex items-center gap-4'>
+                  {/* Previous Page Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className='flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200'>
+                    <ChevronLeft size={16} className='mr-2' />
+                    Previous Page
+                  </button>
+
+                  {/* Current Page Info */}
+                  <span className='text-sm text-gray-600'>
+                    Page {currentPage} of {totalPages}
+                  </span>
+
+                  {/* Next Page Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className='flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200'>
+                    Next Page
+                    <ChevronRight size={16} className='ml-2' />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -538,10 +616,6 @@ export default function AdminManageCandidates() {
             </div>
             <form onSubmit={handleSubmit} className='flex flex-col gap-2 h-fit'>
               <div className='relative'>
-                <Hash
-                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
-                  size={18}
-                />
                 <input
                   name='userId'
                   id='user-id'
@@ -551,12 +625,9 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
-                <Users
-                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
-                  size={18}
-                />
                 <input
                   name='name'
+                  pattern='[A-Za-z]*'
                   value={formData.name}
                   onChange={handleChange}
                   placeholder='Candidate Name'
@@ -565,12 +636,20 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
-                <Briefcase
-                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
-                  size={18}
+                <input
+                  name='surname'
+                  pattern='[A-Za-z]*'
+                  value={formData.surname}
+                  onChange={handleChange}
+                  placeholder='Candidate Surname'
+                  required
+                  className='pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700'
                 />
+              </div>
+              <div className='relative'>
                 <input
                   name='role'
+                  type='text'
                   value={formData.role}
                   onChange={handleChange}
                   placeholder='Role (e.g., Software Engineer)'
@@ -578,27 +657,7 @@ export default function AdminManageCandidates() {
                   className='pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700'
                 />
               </div>
-              {/* --- NEW FIELD ADDED --- */}
               <div className='relative'>
-                <Building
-                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
-                  size={18}
-                />
-                <input
-                  name='industry'
-                  value={formData.industry}
-                  onChange={handleChange}
-                  placeholder='Industry (e.g., IT, Finance, Healthcare)'
-                  required
-                  className='pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700'
-                />
-              </div>
-              {/* --- END OF NEW FIELD --- */}
-              <div className='relative'>
-                <Lightbulb
-                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
-                  size={18}
-                />
                 <input
                   name='skills'
                   value={formData.skills}
@@ -609,10 +668,6 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
-                <Briefcase
-                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
-                  size={18}
-                />
                 <input
                   name='exp'
                   type='number'
@@ -624,23 +679,9 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
-                <MapPin
-                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
-                  size={18}
-                />
-                <input
-                  name='industry'
-                  type='text'
-                  value={formData.industry}
-                  onChange={handleChange}
-                  placeholder='Industry'
-                  required
-                  className='pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700'
-                />
-              </div>
-              <div className='relative'>
                 <input
                   name='location'
+                  pattern='[A-Za-z]*'
                   value={formData.location}
                   onChange={handleChange}
                   placeholder='Location'
@@ -649,13 +690,10 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
-                <Mail
-                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
-                  size={18}
-                />
                 <input
                   name='email'
                   type='email'
+                  pattern='[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}'
                   value={formData.email}
                   onChange={handleChange}
                   placeholder='Email Address'
@@ -664,10 +702,6 @@ export default function AdminManageCandidates() {
                 />
               </div>
               <div className='relative'>
-                <Phone
-                  className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400'
-                  size={18}
-                />
                 <input
                   name='phone'
                   type='tel'

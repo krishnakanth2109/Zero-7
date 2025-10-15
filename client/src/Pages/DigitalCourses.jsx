@@ -400,6 +400,7 @@ const DigitalCourses = () => {
                       <input
                         type='email'
                         name='email'
+                        pattern='[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}'
                         placeholder='Enter your email'
                         value={formData.email}
                         onChange={handleInputChange}
@@ -407,7 +408,7 @@ const DigitalCourses = () => {
                       />
                       <label>Contact</label>
                       <input
-                        type='phone'
+                        type='number'
                         name='contact'
                         placeholder='Enter your contact'
                         value={formData.contact}

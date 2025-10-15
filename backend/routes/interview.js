@@ -12,6 +12,7 @@ import {
   prepareCandidateInterview,
 } from '../utils/emailTemplates.js'
 import transporter from '../utils/mail.js'
+import jobs from '../models/jobs.js'
 
 const router = express.Router()
 
@@ -367,7 +368,7 @@ router.patch('/:id', async (req, res) => {
  */
 router.get('/search', async (req, res) => {
   try {
-    const [candidates, companies] = await Promise.all([
+    const [candidates, companies, jobs] = await Promise.all([
       Candidate.find({}, { _id: 1, name: 1 }),
       Company.find({}, { _id: 1, name: 1 }),
     ])
@@ -375,6 +376,19 @@ router.get('/search', async (req, res) => {
   } catch (error) {
     console.error('Error fetching search options:', error)
     res.status(500).json({ message: 'Internal server error.' })
+  }
+})
+
+router.get('/jobSearch/:id', async (req, res) => {
+  try {
+    const companyId = req.params.id
+    const jobs = await Job.find(
+      { companyId: companyId, status: 'active' },
+      { _id: 1, role: 1, status: 1 },
+    )
+    res.send({ jobs })
+  } catch (err) {
+    res.send(err)
   }
 })
 

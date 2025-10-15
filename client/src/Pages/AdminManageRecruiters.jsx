@@ -316,7 +316,7 @@ export default function AdminManageRecruiters() {
             name: row['Name'].toString().trim(),
             email: row['Email'].toString().trim().toLowerCase(),
             employeeID: row['Employee ID'].toString().trim(),
-            password: 'DefaultPassword123!', // You can modify this
+            password: 'Zero7@123', // You can modify this
           }
         })
 

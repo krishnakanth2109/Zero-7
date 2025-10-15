@@ -294,6 +294,9 @@
   box-sizing: border-box;
   animation: scroll 10s linear infinite;
 }
+.ticker-bar:hover {
+  animation-play-state: paused;
+}
 
 @keyframes scroll {
   0% {
@@ -309,6 +312,9 @@
   padding-top: 15px;
   padding-left: 100%;
   animation: ticker 20s linear infinite;
+}
+.ticker-content:hover {
+  animation-play-state: paused;
 }
 
 .ticker-item {

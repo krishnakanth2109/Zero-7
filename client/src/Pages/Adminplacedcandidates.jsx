@@ -93,54 +93,55 @@ const PlacedCandidates = () => {
           <>
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8'>
               {currentCandidates.map((candidate) => (
-              <div
-                key={candidate._id}
-                className='bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 border border-green-200'>
-                <div className='p-6'>
-                  <div className='flex items-center mb-4'>
-                    <FaUserTie className='text-indigo-500 text-xl mr-3' />
-                    <h3 className='text-md font-bold text-gray-800'>
-                      {candidate.candidateName}
-                    </h3>
+                <div
+                  key={candidate._id}
+                  className='bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 border border-green-200'>
+                  <div className='p-6'>
+                    <div className='flex items-center mb-4'>
+                      <FaUserTie className='text-indigo-500 text-xl mr-3' />
+                      <h3 className='text-md font-bold text-gray-800'>
+                        {candidate.candidateName}
+                      </h3>
+                    </div>
+                    <div className='space-y-3'>
+                      <p className='flex items-center text-gray-700'>
+                        <FaBuilding className='text-purple-400 mr-3' />
+                        <span className='font-semibold'>Company:</span>{' '}
+                        {candidate.companyName}
+                      </p>
+                      <p className='flex items-center text-gray-700'>
+                        <FaBriefcase className='text-teal-400 mr-3' />
+                        <span className='font-semibold'>Job Role:</span>{' '}
+                        {candidate.jobRole}
+                      </p>
+                      <p className='flex items-center text-gray-700'>
+                        <FaCheckCircle className='text-green-500 mr-3' />
+                        <span className='font-semibold'>Level:</span>{' '}
+                        {candidate.interviewLevel}
+                      </p>
+                      <p className='flex items-center text-gray-700'>
+                        <FaCalendarAlt className='text-orange-400 mr-3' />
+                        <span className='font-semibold'>Date Placed:</span>{' '}
+                        {new Date(candidate.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </p>
+                    </div>
                   </div>
-                  <div className='space-y-3'>
-                    <p className='flex items-center text-gray-700'>
-                      <FaBuilding className='text-purple-400 mr-3' />
-                      <span className='font-semibold'>Company:</span>{' '}
-                      {candidate.companyName}
-                    </p>
-                    <p className='flex items-center text-gray-700'>
-                      <FaBriefcase className='text-teal-400 mr-3' />
-                      <span className='font-semibold'>Job Role:</span>{' '}
-                      {candidate.jobRole}
-                    </p>
-                    <p className='flex items-center text-gray-700'>
-                      <FaCheckCircle className='text-green-500 mr-3' />
-                      <span className='font-semibold'>Level:</span>{' '}
-                      {candidate.interviewLevel}
-                    </p>
-                    <p className='flex items-center text-gray-700'>
-                      <FaCalendarAlt className='text-orange-400 mr-3' />
-                      <span className='font-semibold'>Date Placed:</span>{' '}
-                      {new Date(candidate.date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
+                  <div className='bg-green-50 px-6 py-3 rounded-b-xl border-t border-green-100'>
+                    <p className='text-green-700 text-sm font-medium'>
+                      Status:{' '}
+                      <span className='font-bold uppercase'>Placed</span>
                     </p>
                   </div>
                 </div>
-                <div className='bg-green-50 px-6 py-3 rounded-b-xl border-t border-green-100'>
-                  <p className='text-green-700 text-sm font-medium'>
-                    Status: <span className='font-bold uppercase'>Placed</span>
-                  </p>
-                </div>
-              </div>
               ))}
             </div>
-            
+
             {/* Pagination */}
-            {totalPages > 1 && (
+            {totalPages >= 1 && (
               <div className='bg-white rounded-xl shadow-md border border-gray-100 p-6'>
                 <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
                   {/* Items per page selector and info */}
@@ -150,8 +151,7 @@ const PlacedCandidates = () => {
                       <select
                         value={itemsPerPage}
                         onChange={handleItemsPerPageChange}
-                        className='border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-                      >
+                        className='border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'>
                         <option value={4}>4</option>
                         <option value={8}>8</option>
                         <option value={12}>12</option>
@@ -163,40 +163,40 @@ const PlacedCandidates = () => {
                       Showing{' '}
                       <strong className='font-semibold'>
                         {placedCandidates.length === 0 ? 0 : startIndex + 1}
-                      </strong>
-                      {' '}-{' '}
+                      </strong>{' '}
+                      -{' '}
                       <strong className='font-semibold'>
                         {Math.min(endIndex, placedCandidates.length)}
-                      </strong>
-                      {' '}of{' '}
-                      <strong className='font-semibold'>{placedCandidates.length}</strong>{' '}
+                      </strong>{' '}
+                      of{' '}
+                      <strong className='font-semibold'>
+                        {placedCandidates.length}
+                      </strong>{' '}
                       placed candidates
                     </div>
                   </div>
-                  
+
                   {/* Simple Pagination Controls - Previous/Next Only */}
                   <div className='flex items-center gap-4'>
                     {/* Previous Page Button */}
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className='flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200'
-                    >
+                      className='flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200'>
                       <FaChevronLeft className='mr-2' />
                       Previous Page
                     </button>
-                    
+
                     {/* Current Page Info */}
                     <span className='text-sm text-gray-600'>
                       Page {currentPage} of {totalPages}
                     </span>
-                    
+
                     {/* Next Page Button */}
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className='flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200'
-                    >
+                      className='flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200'>
                       Next Page
                       <FaChevronRight className='ml-2' />
                     </button>

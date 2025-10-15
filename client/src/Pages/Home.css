@@ -243,3 +243,6 @@
   animation: scroll 15s linear infinite;
   white-space: nowrap;
 }
+.ticker:hover {
+  animation-play-state: paused;
+}

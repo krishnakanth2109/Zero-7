@@ -63,7 +63,7 @@ const Home = () => {
   return (
     <div className='home-root'>
       {/* Hero with background video only */}
-      <div className='bg-white w-screen p-2 overflow-none text-blue-500 ticker'>
+      <div className='bg-gray-100 w-screen p-2 overflow-none text-blue-500 ticker'>
         <p>
           🔔 A new job is posted:{' '}
           <strong>
@@ -81,7 +81,7 @@ const Home = () => {
           playsInline
         />
       </header>
-      <div className='bg-white w-screen p-2 overflow-none text-blue-500 ticker'>
+      <div className='bg-gray-100 w-screen p-2 overflow-none text-blue-500 ticker'>
         {jobPostings.slice(0, 5).map((job) => {
           return (
             <span className='mr-12' key={job._id}>

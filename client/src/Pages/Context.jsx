@@ -290,7 +290,7 @@ export default function Context() {
         </div>
 
         {/* Career Consultation Button + Popup */}
-        <div className='career-consultation'>
+        {/* <div className='career-consultation'>
           <h3>Ready to Transform Your Career?</h3>
           <p>Schedule a free consultation with our career experts</p>
           <button
@@ -298,18 +298,18 @@ export default function Context() {
             onClick={() => setShowForm(true)}>
             <FaRocket /> Schedule Free Career Consultation
           </button>
-        </div>
+        </div> */}
 
         {/* ✅ Success Notification */}
-        {showSuccess && (
+        {/* {showSuccess && (
           <div className='success-message'>
             🎉 Your consultation request has been submitted successfully! Our
             team will contact you soon.
           </div>
-        )}
+        )} */}
 
         {/* Popup Form */}
-        {showForm && (
+        {/* {showForm && (
           <div className='popup-form-overlay'>
             <div className='popup-form'>
               <h2>Free Career Consultation</h2>
@@ -362,7 +362,7 @@ export default function Context() {
               </form>
             </div>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Testimonials */}

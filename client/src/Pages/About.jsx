@@ -550,7 +550,7 @@ const About = () => {
 
       {/* CTA Section */}
       <section className='cta-section'>
-        <h2>Be Part of the Change</h2>
+        <h3 className='text-2xl font-bold'>Be Part of the Change</h3>
         <p>
           Whether you’re a job seeker or a business looking for top talent,
           Zero7 Technologies is here to support your growth journey.

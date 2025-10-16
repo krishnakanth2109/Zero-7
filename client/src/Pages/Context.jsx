@@ -376,10 +376,7 @@ export default function Context() {
           {/* Testimonial 1 */}
           <div className='testimonial-card' style={{ animationDelay: '0.1s' }}>
             <div className='testimonial-image'>
-              <img
-                src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-                alt='Rahul Sharma'
-              />
+              <img src='/test2.jpeg' alt='Manikraj' />
               <div className='quote-icon'>"</div>
             </div>
             <div className='testimonial-content'>
@@ -389,7 +386,7 @@ export default function Context() {
                 just 3 months!
               </p>
               <div className='testimonial-author'>
-                <span className='testimonial-name'>Rahul Sharma</span>
+                <span className='testimonial-name'>Manikraj</span>
                 <span className='testimonial-role'>
                   Software Developer at TechSolutions
                 </span>
@@ -409,10 +406,7 @@ export default function Context() {
           {/* Testimonial 2 */}
           <div className='testimonial-card' style={{ animationDelay: '0.2s' }}>
             <div className='testimonial-image'>
-              <img
-                src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-                alt='Priya Mehta'
-              />
+              <img src='/test1.jpeg' alt='Vindhya' />
               <div className='quote-icon'>"</div>
             </div>
             <div className='testimonial-content'>
@@ -422,7 +416,7 @@ export default function Context() {
                 half.
               </p>
               <div className='testimonial-author'>
-                <span className='testimonial-name'>Priya Mehta</span>
+                <span className='testimonial-name'>Vindhya</span>
                 <span className='testimonial-role'>
                   HR Director at InnovateTech
                 </span>
@@ -443,7 +437,7 @@ export default function Context() {
           <div className='testimonial-card' style={{ animationDelay: '0.3s' }}>
             <div className='testimonial-image'>
               <img
-                src='https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+                src='https://img.freepik.com/premium-photo/hyper-realistic-happiest-indian-handsome-man-chex-shirt-hands-up-isolated-yellow-background_862994-259364.jpg?semt=ais_hybrid&w=740&q=80'
                 alt='Arjun Kapoor'
               />
               <div className='quote-icon'>"</div>

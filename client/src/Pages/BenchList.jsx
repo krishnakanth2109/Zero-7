@@ -162,17 +162,17 @@ const BenchList = () => {
     {
       name: 'Ramesh - HR Manager',
       text: 'Zero7 helped us find quality candidates in record time. Excellent service!',
-      img: 'https://randomuser.me/api/portraits/men/32.jpg',
+      img: 'https://randomuser.me/api/portraits/men/50.jpg',
     },
     {
       name: 'Priya - Placed Candidate',
       text: 'The resume marketing service worked for me. I got interviews within a week!',
-      img: 'https://randomuser.me/api/portraits/women/45.jpg',
+      img: 'https://randomuser.me/api/portraits/women/19.jpg',
     },
     {
       name: 'Sandeep - Client',
       text: 'Professional team, transparent process, and great support. Highly recommend.',
-      img: 'https://randomuser.me/api/portraits/men/46.jpg',
+      img: 'https://randomuser.me/api/portraits/men/48.jpg',
     },
   ]
   const faqs = [

@@ -470,7 +470,7 @@ const InterviewTracker = () => {
             {/* Upcoming Interviews Button (New) */}
             <button
               onClick={() => setShowUpcomingModal(true)}
-              className='group relative px-6 py-3 bg-gradient-to-r from-green-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 hover:from-green-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'>
+              className='group relative px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 hover:from-blue-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'>
               <span className='flex items-center'>
                 <svg
                   className='w-5 h-5 mr-2'
@@ -605,24 +605,6 @@ const InterviewTracker = () => {
                     ))}
                 </select>
               </div>
-
-              {/* <div className='space-y-2'>
-                <label
-                  htmlFor='job'
-                  className='block text-sm font-semibold text-gray-700'>
-                  Job ID
-                </label>
-                <input
-                  type='text'
-                  id='job'
-                  name='job'
-                  value={newInterview.job}
-                  onChange={handleAddInputChange}
-                  placeholder='Enter the Job ID'
-                  className='w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white shadow-sm'
-                  required
-                />
-              </div> */}
 
               <div className='space-y-2'>
                 <label
@@ -854,14 +836,14 @@ const InterviewTracker = () => {
                 eventPropGetter={eventStyleGetter}
                 views={['month', 'week', 'day']}
                 popup
-                onSelectEvent={handleEventClick} // NEW: Add onSelectEvent handler
+                onSelectEvent={handleEventClick}
               />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Edit Status Modal (Existing) */}
+      {/* Edit Status Modal */}
       {showEditModal && currentEditInterview && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4'>
           <div className='relative w-full max-w-md mx-auto'>
@@ -939,7 +921,7 @@ const InterviewTracker = () => {
 
                   <label
                     htmlFor='date'
-                    className='block text-sm font-semibold text-gray-700'>
+                    className='block text-sm font-semibold text-gray-700 mt-4'>
                     Interview Date
                   </label>
                   <input
@@ -971,7 +953,8 @@ const InterviewTracker = () => {
           </div>
         </div>
       )}
-      {/* NEW: Candidate Details Pop-up Modal */}
+
+      {/* Candidate Details Pop-up Modal */}
       {showCandidateDetailsModal && selectedCandidateDetails && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-700 bg-opacity-60 backdrop-blur-sm p-4'>
           <div className='relative w-full max-w-md mx-auto'>
@@ -1006,7 +989,6 @@ const InterviewTracker = () => {
                 </p>
                 <p>
                   <span className='font-semibold'>Email:</span>{' '}
-                  {/* Display the dynamically fetched email */}
                   <a
                     href={`mailto:${selectedCandidateDetails.candidateEmail}`}
                     className='text-indigo-600 hover:underline'>
@@ -1053,29 +1035,73 @@ const InterviewTracker = () => {
                     },
                   )}
                 </p>
-                {/* Add more details as needed from selectedCandidateDetails.resource */}
               </div>
-              {/* <div className='p-6 border-t border-gray-200 flex justify-end'>
-                <a
-                  href={generateMailtoLink(
-                    selectedCandidateDetails.candidateEmail,
-                    selectedCandidateDetails.candidateName,
-                    selectedCandidateDetails.date,
-                    selectedCandidateDetails.jobRole, // Pass jobRole for email body
-                    selectedCandidateDetails.companyName // Pass companyName for email body
-                  )}
-                  // Remove target='_blank' and rel='noopener noreferrer'
-                  // target='_blank'
-                  // rel='noopener noreferrer'
-                  className='px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
+              <div className='p-6 border-t border-gray-200 flex justify-end'>
+                <button
+                  onClick={() => {
+                    const interviewDate = new Date(selectedCandidateDetails.date);
+                    const formattedDate = interviewDate.toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    });
+                    const formattedTime = interviewDate.toLocaleTimeString('en-US', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true,
+                    });
+                    
+                    const subject = encodeURIComponent(`Interview Confirmation - ${selectedCandidateDetails.jobRole} Position at ${selectedCandidateDetails.companyName}`);
+                    const body = encodeURIComponent(`Dear ${selectedCandidateDetails.candidateName},
+
+We are pleased to confirm your interview for the ${selectedCandidateDetails.jobRole} position at ${selectedCandidateDetails.companyName}.
+
+Interview Details:
+━━━━━━━━━━━━━━━━━
+📅 Date: ${formattedDate}
+🕐 Time: ${formattedTime}
+💼 Position: ${selectedCandidateDetails.jobRole}
+🏢 Company: ${selectedCandidateDetails.companyName}
+📊 Interview Level: ${selectedCandidateDetails.interviewLevel}
+
+Please ensure you:
+• Keep your resume and relevant documents handy
+• Prepare questions you'd like to ask about the role
+
+If you need to reschedule or have any questions, please let us know as soon as possible.
+
+We look forward to speaking with you!
+
+Best regards,
+Zero7 Technologies
+Recruitment Team`);
+                    
+                    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${selectedCandidateDetails.candidateEmail}&su=${subject}&body=${body}`;
+                    window.open(gmailUrl, '_blank');
+                  }}
+                  className='px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center'>
+                  <svg
+                    className='w-5 h-5 mr-2'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'>
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
+                    />
+                  </svg>
                   Send Confirmation Mail
-                </a>
-              </div> */}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
-      {/* NEW: Upcoming Interviews Modal */}
+
+      {/* Upcoming Interviews Modal */}
       {showUpcomingModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4'>
           <div className='relative w-full max-w-2xl mx-auto'>

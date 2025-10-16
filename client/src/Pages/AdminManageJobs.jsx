@@ -15,8 +15,10 @@ const AdminManageJobs = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [company, SetCompany] = useState([])
+  const [selectedCompany, setSelectedCompany] = useState('')
+  // --- ADDED: State for the new status filter ---
+  const [selectedStatus, setSelectedStatus] = useState('')
 
-  // --- UPDATED: 'industry' field is now included in the form state ---
   const [formState, setFormState] = useState({
     companyId: '',
     role: '',
@@ -24,11 +26,11 @@ const AdminManageJobs = () => {
     skills: '',
     salary: '',
     location: '',
-    industry: 'Information Technology', // Added with a default value
+    industry: 'Information Technology',
     status: 'active',
   })
 
-  const [showPopup, setShowPopup] = useState(false) // State for controlling the pop-up
+  const [showPopup, setShowPopup] = useState(false)
   const [editPopup, setEditPopup] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
@@ -58,7 +60,7 @@ const AdminManageJobs = () => {
   useEffect(() => {
     fetchJobs()
     fetchCompanies()
-  }, []) // Dependency array is now empty to prevent re-fetching on popup state change
+  }, [])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -77,9 +79,8 @@ const AdminManageJobs = () => {
     e.preventDefault()
     try {
       await api.post('/jobs', formState)
-      fetchJobs() // Refresh the list from the server
+      fetchJobs()
       setShowPopup(false)
-      // Reset form to its initial state
       setFormState({
         companyId: '',
         role: '',
@@ -106,7 +107,7 @@ const AdminManageJobs = () => {
     try {
       await api.patch(`jobs/${formState._id}`, formState)
       setEditPopup(false)
-      fetchJobs() // Refresh the list from the server
+      fetchJobs()
     } catch (err) {
       console.log(err)
     }
@@ -126,15 +127,16 @@ const AdminManageJobs = () => {
   }
 
   const handleExportToExcel = () => {
-    // --- UPDATED: Excel export now includes the 'industry' field ---
-    const jobsToExport = jobs.map(({ _id, __v, companyId, ...rest }) => ({
-      ...rest,
-      industry: rest.industry || 'N/A', // Ensure industry is included
-    }))
+    const jobsToExport = filteredJobs.map(
+      ({ _id, __v, companyId, ...rest }) => ({
+        ...rest,
+        industry: rest.industry || 'N/A',
+      }),
+    )
     const worksheet = XLSX.utils.json_to_sheet(jobsToExport)
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Jobs')
-    XLSX.writeFile(workbook, 'JobListings.xlsx')
+    XLSX.writeFile(workbook, 'FilteredJobListings.xlsx')
   }
 
   const handleImportFromExcel = (e) => {
@@ -150,9 +152,7 @@ const AdminManageJobs = () => {
         const worksheet = workbook.Sheets[sheetName]
         const data = XLSX.utils.sheet_to_json(worksheet)
 
-        // Post each job sequentially and wait for all to complete
         for (const job of data) {
-          // Ensure imported job has an industry or set a default
           const jobPayload = {
             ...job,
             industry: job.industry || 'Information Technology',
@@ -161,7 +161,7 @@ const AdminManageJobs = () => {
         }
 
         alert('Jobs imported successfully!')
-        fetchJobs() // Refresh the job list from the server
+        fetchJobs()
       } catch (err) {
         alert(
           'Failed to import jobs. Please check the file format and console for details.',
@@ -173,11 +173,31 @@ const AdminManageJobs = () => {
     e.target.value = ''
   }
 
+  const handleCompanyFilterChange = (e) => {
+    setSelectedCompany(e.target.value)
+    setCurrentPage(1)
+  }
+
+  // --- ADDED: Handler for the new status filter ---
+  const handleStatusFilterChange = (e) => {
+    setSelectedStatus(e.target.value)
+    setCurrentPage(1)
+  }
+
+  // --- MODIFIED: Filtering logic now checks for both company and status ---
+  const filteredJobs = jobs.filter((job) => {
+    const companyMatch = selectedCompany
+      ? job.companyName === selectedCompany
+      : true
+    const statusMatch = selectedStatus ? job.status === selectedStatus : true
+    return companyMatch && statusMatch
+  })
+
   // Pagination logic
-  const totalPages = Math.ceil(jobs.length / itemsPerPage)
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentJobs = jobs.slice(startIndex, endIndex)
+  const currentJobs = filteredJobs.slice(startIndex, endIndex)
 
   const handlePageChange = (page) => {
     setCurrentPage(page)
@@ -185,7 +205,7 @@ const AdminManageJobs = () => {
 
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(Number(e.target.value))
-    setCurrentPage(1) // Reset to first page when changing items per page
+    setCurrentPage(1)
   }
 
   return (
@@ -210,24 +230,28 @@ const AdminManageJobs = () => {
         </div>
       </div>
 
-      <button onClick={() => setShowPopup(true)} className='add-new-job-button'>
-        Add New Job Posting
-      </button>
-
-      <div className='excel-actions-container'>
-        <label htmlFor='import-excel' className='excel-action-link'>
-          Import from Excel
-        </label>
-        <input
-          id='import-excel'
-          type='file'
-          accept='.xlsx, .xls'
-          onChange={handleImportFromExcel}
-          style={{ display: 'none' }}
-        />
-        <button onClick={handleExportToExcel} className='excel-action-link'>
-          Export to Excel
+      <div className='flex justify-between items-center mb-4'>
+        <button
+          onClick={() => setShowPopup(true)}
+          className='add-new-job-button'>
+          Add New Job Posting
         </button>
+
+        <div className='flex items-center gap-4'>
+          <label htmlFor='import-excel' className='excel-action-link'>
+            Import
+          </label>
+          <input
+            id='import-excel'
+            type='file'
+            accept='.xlsx, .xls'
+            onChange={handleImportFromExcel}
+            style={{ display: 'none' }}
+          />
+          <button onClick={handleExportToExcel} className='excel-action-link'>
+            Export
+          </button>
+        </div>
       </div>
 
       {showPopup && (
@@ -312,7 +336,6 @@ const AdminManageJobs = () => {
                   required
                 />
               </div>
-              {/* --- ADDED: Industry field in Add form --- */}
               <div className='form-group'>
                 <label htmlFor='industry'>Industry</label>
                 <input
@@ -456,7 +479,6 @@ const AdminManageJobs = () => {
                   className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm'
                 />
               </div>
-              {/* --- ADDED: Industry field in Edit form --- */}
               <div>
                 <label
                   htmlFor='industry'
@@ -496,14 +518,49 @@ const AdminManageJobs = () => {
       )}
 
       <div className='listings-container card'>
-        <h2>Current Job Listings</h2>
+        <div className='flex justify-between items-center p-5'>
+          <h2>Current Job Listings</h2>
+          {/* --- MODIFIED: Wrapper for filters to align them together --- */}
+          <div className='flex items-center gap-4'>
+            {/* Company Filter */}
+            <div className='flex items-center gap-2'>
+              <label htmlFor='company-filter'>Filter by Company:</label>
+              <select
+                id='company-filter'
+                value={selectedCompany}
+                onChange={handleCompanyFilterChange}
+                className='border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'>
+                <option value=''>All Companies</option>
+                {company.map((comp) => (
+                  <option key={comp._id} value={comp.name}>
+                    {comp.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* --- ADDED: New filter for job status --- */}
+            <div className='flex items-center gap-2'>
+              <label htmlFor='status-filter'>Filter by Status:</label>
+              <select
+                id='status-filter'
+                value={selectedStatus}
+                onChange={handleStatusFilterChange}
+                className='border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'>
+                <option value=''>All Statuses</option>
+                <option value='active'>Active</option>
+                <option value='in active'>In Active</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         {isLoading && <p>Loading jobs...</p>}
         {error && <p className='error-message'>{error}</p>}
         {!isLoading && !error && (
           <div className='table-responsive'>
             <table className='jobs-table'>
               <thead>
-                {/* --- UPDATED: Added 'Industry' column to table header --- */}
                 <tr>
                   <th>Job Id</th>
                   <th>Company</th>
@@ -518,7 +575,7 @@ const AdminManageJobs = () => {
                 </tr>
               </thead>
               <tbody>
-                {jobs.length > 0 ? (
+                {currentJobs.length > 0 ? (
                   currentJobs.map((job) => (
                     <tr key={job._id}>
                       <td>{job._id}</td>
@@ -528,7 +585,6 @@ const AdminManageJobs = () => {
                       <td>{job.skills}</td>
                       <td>{job.salary}</td>
                       <td>{job.location}</td>
-                      {/* --- ADDED: Displaying industry data in table row --- */}
                       <td>{job.industry || 'N/A'}</td>
                       <td>{job.status || 'N/A'}</td>
                       <td className='flex align-center justify-center gap-3 p-5 '>
@@ -555,11 +611,9 @@ const AdminManageJobs = () => {
               </tbody>
             </table>
 
-            {/* Pagination */}
-            {jobs.length > 0 && (
+            {filteredJobs.length > 0 && (
               <div className='p-5 border-t border-gray-200 bg-gray-50'>
                 <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
-                  {/* Items per page selector and info */}
                   <div className='flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-600'>
                     <div className='flex items-center gap-2'>
                       <span>Show:</span>
@@ -577,22 +631,22 @@ const AdminManageJobs = () => {
                     <div>
                       Showing{' '}
                       <strong className='font-semibold'>
-                        {jobs.length === 0 ? 0 : startIndex + 1}
+                        {filteredJobs.length === 0 ? 0 : startIndex + 1}
                       </strong>{' '}
                       -{' '}
                       <strong className='font-semibold'>
-                        {Math.min(endIndex, jobs.length)}
+                        {Math.min(endIndex, filteredJobs.length)}
                       </strong>{' '}
                       of{' '}
-                      <strong className='font-semibold'>{jobs.length}</strong>{' '}
+                      <strong className='font-semibold'>
+                        {filteredJobs.length}
+                      </strong>{' '}
                       jobs
                     </div>
                   </div>
 
-                  {/* Simple Pagination Controls - Previous/Next Only */}
                   {totalPages > 1 && (
                     <div className='flex items-center gap-4'>
-                      {/* Previous Page Button */}
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
@@ -601,12 +655,10 @@ const AdminManageJobs = () => {
                         Previous Page
                       </button>
 
-                      {/* Current Page Info */}
                       <span className='text-sm text-gray-600'>
                         Page {currentPage} of {totalPages}
                       </span>
 
-                      {/* Next Page Button */}
                       <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}

@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import api from "../api/axios";
-import { ClipboardList, Loader2, ShieldX, Trash2 } from "lucide-react";
+import { ClipboardList, Loader2, ShieldX, Trash2, Download } from "lucide-react";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 const AdminBatchEnrollments = () => {
   const [enrollments, setEnrollments] = useState([]);
@@ -37,6 +39,27 @@ const AdminBatchEnrollments = () => {
     }
   };
 
+  const handleExport = () => {
+    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const fileExtension = '.xlsx';
+
+    const formattedData = enrollments.map(item => ({
+        Name: item.name,
+        Contact: `${item.phone}, ${item.email}`,
+        Course: item.selectedCourse,
+        "Enrollment Type": item.programType,
+        Message: item.message || 'N/A',
+        "Submitted On": new Date(item.createdAt).toLocaleString()
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(formattedData);
+    const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const data = new Blob([excelBuffer], {type: fileType});
+    saveAs(data, "enrollments" + fileExtension);
+  };
+
+
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-full">
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between text-white">
@@ -54,6 +77,15 @@ const AdminBatchEnrollments = () => {
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="flex justify-end mb-4">
+            <button
+            onClick={handleExport}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center space-x-2 transition duration-300 ease-in-out"
+            >
+                <Download size={20} />
+                <span>Export to Excel</span>
+            </button>
+        </div>
         {loading && <div className="flex justify-center py-16"><Loader2 className="animate-spin text-blue-500" size={48} /></div>}
         {error && <div className="text-center py-16 text-red-600"><ShieldX size={48} className="mx-auto" /><p className="mt-4 font-semibold">{error}</p></div>}
         {!loading && !error && (
@@ -65,7 +97,6 @@ const AdminBatchEnrollments = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Course</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Enrollment Type</th>
-                  {/* --- 1. ADDED: New header for the Message column --- */}
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Message</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted On</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
@@ -79,7 +110,6 @@ const AdminBatchEnrollments = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.phone}<br/><span className="text-xs text-gray-500">{item.email}</span></td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.selectedCourse}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.programType}</td>
-                      {/* --- 2. ADDED: New data cell to display the message --- */}
                       <td className="px-6 py-4 text-sm text-gray-600 max-w-xs whitespace-pre-wrap">{item.message || 'N/A'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(item.createdAt).toLocaleString()}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -88,7 +118,6 @@ const AdminBatchEnrollments = () => {
                     </tr>
                   ))
                 ) : (
-                  // --- 3. UPDATED: Colspan increased to 7 to match new column count ---
                   <tr><td colSpan="7" className="px-6 py-10 text-center text-gray-500">No batch enrollments found.</td></tr>
                 )}
               </tbody>

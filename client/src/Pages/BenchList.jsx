@@ -234,7 +234,6 @@ const BenchList = () => {
               <tr>
                 <th>Name</th>
                 <th>Role</th>
-                <th>Industry</th>
                 <th>Skills</th>
                 <th>Experience</th>
                 <th>Location</th>
@@ -247,8 +246,6 @@ const BenchList = () => {
                   <tr key={c._id}>
                     <td title={c.name}>{c.name}</td>
                     <td title={c.role}>{c.role}</td>
-                    {/* --- CORRECTED: Git conflict resolved --- */}
-                    <td title={c.industry}>{c.industry || 'N/A'}</td>
                     <td>{c.skills}</td>
                     <td>{c.exp} Years</td>
                     <td>{c.location}</td>

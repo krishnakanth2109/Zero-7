@@ -11,7 +11,9 @@ import {
   EyeOff,
   AlertCircle,
   CheckCircle,
+  Edit2,
 } from 'lucide-react'
+import Cookie from 'js-cookie'
 import api from '../api/axios'
 
 const AdminUserPage = () => {
@@ -29,6 +31,11 @@ const AdminUserPage = () => {
   const [resetLoading, setResetLoading] = useState(false)
   const [resetError, setResetError] = useState('')
   const [resetSuccess, setResetSuccess] = useState(false)
+  const [showEditNameModal, setShowEditNameModal] = useState(false)
+  const [editNameForm, setEditNameForm] = useState({ name: '' })
+  const [editNameLoading, setEditNameLoading] = useState(false)
+  const [editNameError, setEditNameError] = useState('')
+  const [editNameSuccess, setEditNameSuccess] = useState(false)
   const { id } = useParams()
   const navigate = useNavigate()
 
@@ -134,6 +141,59 @@ const AdminUserPage = () => {
     }
   }
 
+  const openEditNameModal = () => {
+    setShowEditNameModal(true)
+    setEditNameForm({ name: user.name || '' })
+    setEditNameError('')
+    setEditNameSuccess(false)
+  }
+
+  const closeEditNameModal = () => {
+    setShowEditNameModal(false)
+    setEditNameForm({ name: '' })
+    setEditNameError('')
+    setEditNameSuccess(false)
+  }
+
+  const handleEditNameChange = (e) => {
+    const { value } = e.target
+    setEditNameForm({ name: value })
+    setEditNameError('')
+  }
+
+  const handleEditName = async (e) => {
+    e.preventDefault()
+
+    if (!editNameForm.name.trim()) {
+      setEditNameError('Name is required')
+      return
+    }
+
+    try {
+      setEditNameLoading(true)
+      setEditNameError('')
+
+      // API call to update user name
+      const response = await api.patch(`/user/${id}`, {
+        name: editNameForm.name.trim(),
+      })
+      console.log(response.data)
+      Cookie.set('user', JSON.stringify(response.data))
+
+      // Update local user state
+      setUser((prev) => ({ ...prev, name: editNameForm.name.trim() }))
+      setEditNameSuccess(true)
+
+      setTimeout(() => {
+        closeEditNameModal()
+      }, 1500)
+    } catch (err) {
+      setEditNameError(err.response?.data?.message || 'Failed to update name')
+    } finally {
+      setEditNameLoading(false)
+    }
+  }
+
   const getRoleColor = (role) => {
     switch (role?.toLowerCase()) {
       case 'admin':
@@ -190,8 +250,14 @@ const AdminUserPage = () => {
           {/* User Info */}
           <div className='flex-1'>
             <div className='flex items-center gap-3 mb-2'>
-              <h1 className='text-3xl font-bold text-gray-900'>
+              <h1 className='text-3xl font-bold text-gray-900 flex items-center gap-2'>
                 {user.name || 'Unknown User'}
+                <button
+                  onClick={openEditNameModal}
+                  className='p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors'
+                  title='Edit name'>
+                  <Edit2 className='h-5 w-5' />
+                </button>
               </h1>
               <span
                 className={`px-3 py-1 rounded-full text-sm font-medium border ${getRoleColor(
@@ -437,6 +503,102 @@ const AdminUserPage = () => {
                       </>
                     ) : (
                       'Reset Password'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Name Modal */}
+      {showEditNameModal && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
+          <div className='bg-white rounded-2xl max-w-md w-full'>
+            <div className='p-6'>
+              {/* Modal Header */}
+              <div className='flex items-center justify-between mb-6'>
+                <h3 className='text-xl font-semibold text-gray-900'>
+                  Edit User Name
+                </h3>
+                <button
+                  onClick={closeEditNameModal}
+                  className='text-gray-400 hover:text-gray-600 transition-colors'>
+                  <X className='h-6 w-6' />
+                </button>
+              </div>
+
+              {/* Success Message */}
+              {editNameSuccess && (
+                <div className='mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3'>
+                  <CheckCircle className='h-5 w-5 text-green-600' />
+                  <div>
+                    <p className='text-green-800 font-medium'>
+                      Name Updated Successfully!
+                    </p>
+                    <p className='text-green-700 text-sm'>
+                      The user's name has been updated.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Error Message */}
+              {editNameError && (
+                <div className='mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3'>
+                  <AlertCircle className='h-5 w-5 text-red-600' />
+                  <div>
+                    <p className='text-red-800 font-medium'>Error</p>
+                    <p className='text-red-700 text-sm'>{editNameError}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Edit Name Form */}
+              <form onSubmit={handleEditName} className='space-y-4'>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    Full Name
+                  </label>
+                  <div className='relative'>
+                    <input
+                      type='text'
+                      name='name'
+                      value={editNameForm.name}
+                      onChange={handleEditNameChange}
+                      className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors'
+                      placeholder='Enter full name'
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className='flex gap-3 pt-4'>
+                  <button
+                    type='button'
+                    onClick={closeEditNameModal}
+                    className='flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium'
+                    disabled={editNameLoading}>
+                    Cancel
+                  </button>
+                  <button
+                    type='submit'
+                    disabled={editNameLoading || editNameSuccess}
+                    className='flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'>
+                    {editNameLoading ? (
+                      <>
+                        <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white'></div>
+                        Updating...
+                      </>
+                    ) : editNameSuccess ? (
+                      <>
+                        <CheckCircle className='h-4 w-4' />
+                        Updated!
+                      </>
+                    ) : (
+                      'Update Name'
                     )}
                   </button>
                 </div>

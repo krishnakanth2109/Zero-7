@@ -79,7 +79,7 @@ const AdminPayrollRequests = () => {
         <div className="mb-4 text-right">
           <button
             onClick={handleExport}
-            className="inline-flex items-center px-4 py-2 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 disabled:bg-gray-400"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 disabled:bg-gray-400"
             disabled={loading || requests.length === 0}
           >
             <Download size={18} className="mr-2" />

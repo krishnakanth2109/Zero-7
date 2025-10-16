@@ -240,10 +240,8 @@ const NewBatches = () => {
                       <td>{course.course}</td>
                       <td>
                         {new Date(course.date).toLocaleDateString('En-IN', {
-                          weekday: 'short',
                           year: 'numeric',
                           month: 'short',
-                          day: 'numeric',
                         })}
                       </td>
                       <td>{course.duration || 'N/A'}</td>

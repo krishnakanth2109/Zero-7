@@ -190,4 +190,25 @@ router.get('/:id', async (request, response) => {
   }
 })
 
+router.patch('/:id', async (request, response) => {
+  const userId = request.params.id
+  try {
+    const userUpdate = await Users.findByIdAndUpdate(
+      { _id: userId },
+      { $set: request.body },
+      { new: true },
+    ).select('-password')
+    const payload = {
+      id: userUpdate._id,
+      name: userUpdate.name,
+      email: userUpdate.email,
+      role: userUpdate.role,
+      employeeId: userUpdate.employeeId,
+    }
+    response.send(payload)
+  } catch (err) {
+    response.send(err)
+  }
+})
+
 export default router

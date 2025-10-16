@@ -34,8 +34,11 @@ import contactInquiryRoutes from './routes/contactInquiryRoutes.js';
 import payrollConsultationRoutes from './routes/payrollConsultations.js';
 // Add this import with your other route imports
 import offerRoutes from './routes/offerRoutes.js';
+import batchEnrollmentRoutes from './routes/batchEnrollmentRoutes.js';
 
 // ... other code
+
+// Add this line with your other app.use() statements
 
 const app = express();
 const server = http.createServer(app);
@@ -90,6 +93,8 @@ app.use('/api/contact-inquiries', contactInquiryRoutes);
 // --- FIX: The payroll route is now correctly placed after the middleware ---
 app.use('/api/payroll-consultations', payrollConsultationRoutes);
 
+app.use('/api/batch-enrollments', batchEnrollmentRoutes);
+// ... other code
 // Add this line with your other app.use() statements
 app.use('/api/offers', offerRoutes);
 

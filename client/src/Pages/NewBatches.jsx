@@ -1,6 +1,9 @@
+// File: src/Pages/NewBatches.jsx
+
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import Pagination from '../Components/Pagination'
+import api from '../api/axios' // Import your central api instance
 import './NewBatches.css'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -17,6 +20,7 @@ const NewBatches = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
+        // This still fetches the list of available batches correctly
         const response = await axios.get(`${API_URL}/batches`)
         setCoursesData(response.data)
       } catch (error) {
@@ -28,23 +32,19 @@ const NewBatches = () => {
     fetchCourses()
   }, [])
 
-  // ✅ FIX: Mapped `course.course` instead of `course.name`
   const courses = coursesData.map((course) => course.course)
 
-  // ✅ FIX: Filtering logic now uses the correct field names (`course`, `timing`)
   const filteredCourses = coursesData.filter((course) => {
     const searchLower = searchTerm.toLowerCase()
     return (
       (course.course && course.course.toLowerCase().includes(searchLower)) ||
       (course.date && course.date.toLowerCase().includes(searchLower)) ||
       (course.timing && course.timing.toLowerCase().includes(searchLower)) ||
-      (course.duration &&
-        course.duration.toLowerCase().includes(searchLower)) ||
+      (course.duration && course.duration.toLowerCase().includes(searchLower)) ||
       (course.trainer && course.trainer.toLowerCase().includes(searchLower))
     )
   })
 
-  // ✅ FIX: Pass the correct course name string to the handler
   const handleRegister = (courseName) => {
     setSelectedCourse(courseName)
     setShowRegistration(true)
@@ -53,11 +53,11 @@ const NewBatches = () => {
   const handleCloseRegistration = () => setShowRegistration(false)
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value)
-    setCurrentPage(1) // Reset to first page when searching
+    setCurrentPage(1)
   }
   const clearSearch = () => {
     setSearchTerm('')
-    setCurrentPage(1) // Reset to first page when clearing search
+    setCurrentPage(1)
   }
 
   // Pagination handlers
@@ -67,10 +67,9 @@ const NewBatches = () => {
 
   const handleItemsPerPageChange = (items) => {
     setItemsPerPage(items)
-    setCurrentPage(1) // Reset to first page when changing items per page
+    setCurrentPage(1)
   }
 
-  // Calculate paginated data
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const paginatedCourses = filteredCourses.slice(startIndex, endIndex)
@@ -85,6 +84,7 @@ const NewBatches = () => {
       message: '',
     })
     const [submitted, setSubmitted] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false) // State for loading feedback
 
     if (!isOpen) return null
 
@@ -92,43 +92,38 @@ const NewBatches = () => {
       setFormData({ ...formData, [e.target.name]: e.target.value })
     }
 
+    // --- THIS IS THE UPDATED SUBMISSION LOGIC ---
     const handleSubmit = async (e) => {
       e.preventDefault()
       if (!formData.programType) {
-        alert('Please select a Type of option before submitting.')
+        alert('Please select an Enrollment Type before submitting.')
         return
       }
+      setIsSubmitting(true)
       try {
-        // ✅ FIX: Find the course object by `c.course`
-        const selectedCourseObj = coursesData.find(
-          (c) => c.course === formData.selectedCourse,
-        )
+        const selectedCourseObj = coursesData.find((c) => c.course === formData.selectedCourse)
         const payload = {
           ...formData,
           trainer: selectedCourseObj?.trainer || '',
           date: selectedCourseObj?.date || '',
-          // ✅ FIX: Use `timing` instead of `timings`
           timings: selectedCourseObj?.timing || '',
           duration: selectedCourseObj?.duration || '',
         }
-        const response = await fetch(
-          'https://script.google.com/macros/s/AKfycbzXzDo0cVEMDIXaU3j-fxrW5Fqi7LggylggenCQHltP300R2PgK6H11YAdeYnpVfhVb/exec',
-          {
-            method: 'POST',
-            body: JSON.stringify(payload),
-            headers: { 'Content-Type': 'application/json' },
-          },
-        )
-        const result = await response.json()
-        if (result.result === 'success') {
-          setSubmitted(true)
-        } else {
-          alert('Error: ' + result.message)
-        }
+        
+        // Use the axios instance to post to your new backend endpoint
+        await api.post('/batch-enrollments', payload)
+
+        setSubmitted(true) // Show the success message
       } catch (err) {
-        alert('Something went wrong. Try again.')
+        console.error("Registration failed:", err)
+        const errorMessage = err.response?.data?.message || 'Something went wrong. Please try again.'
+        alert(`Error: ${errorMessage}`)
+      } finally {
+        setIsSubmitting(false)
       }
     }
+    // ---------------------------------------------
+
     return (
       <div className='modal-overlay' onClick={onClose}>
         <div className='modal-content' onClick={(e) => e.stopPropagation()}>
@@ -151,43 +146,20 @@ const NewBatches = () => {
               <form onSubmit={handleSubmit} className='registration-form'>
                 <div className='form-group'>
                   <label>Full Name *</label>
-                  <input
-                    type='text'
-                    name='name'
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type='text' name='name' value={formData.name} onChange={handleInputChange} required />
                 </div>
                 <div className='form-group'>
                   <label>Email Address *</label>
-                  <input
-                    type='email'
-                    name='email'
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type='email' name='email' value={formData.email} onChange={handleInputChange} required />
                 </div>
                 <div className='form-group'>
                   <label>Phone Number *</label>
-                  <input
-                    type='tel'
-                    name='phone'
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type='tel' name='phone' value={formData.phone} onChange={handleInputChange} required />
                 </div>
                 <div className='form-group'>
                   <label>Select Course *</label>
-                  <select
-                    name='selectedCourse'
-                    value={formData.selectedCourse}
-                    onChange={handleInputChange}
-                    required>
+                  <select name='selectedCourse' value={formData.selectedCourse} onChange={handleInputChange} required>
                     <option value=''>-- Select a Course --</option>
-                    {/* ✅ FIX: Use a more descriptive variable name */}
                     {courses.map((courseName, index) => (
                       <option key={index} value={courseName}>
                         {courseName}
@@ -198,11 +170,7 @@ const NewBatches = () => {
                 {formData.selectedCourse && (
                   <div className='form-group'>
                     <label>Enrollment Type *</label>
-                    <select
-                      name='programType'
-                      value={formData.programType}
-                      onChange={handleInputChange}
-                      required>
+                    <select name='programType' value={formData.programType} onChange={handleInputChange} required>
                       <option value=''>-- Select Type --</option>
                       <option value='Training'>Training</option>
                       <option value='Internship'>Internship</option>
@@ -213,14 +181,10 @@ const NewBatches = () => {
                 )}
                 <div className='form-group'>
                   <label>Message (Optional)</label>
-                  <textarea
-                    name='message'
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    rows='3'></textarea>
+                  <textarea name='message' value={formData.message} onChange={handleInputChange} rows='3'></textarea>
                 </div>
-                <button type='submit' className='submit-button'>
-                  Register for Demo
+                <button type='submit' className='submit-button' disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Register for Demo'}
                 </button>
               </form>
             </>
@@ -273,7 +237,6 @@ const NewBatches = () => {
                 {paginatedCourses.length > 0 ? (
                   paginatedCourses.map((course) => (
                     <tr key={course._id}>
-                      {/* ✅ FIX: Render all fields from the course object */}
                       <td>{course.course}</td>
                       <td>
                         {new Date(course.date).toLocaleDateString('En-IN', {
@@ -287,7 +250,6 @@ const NewBatches = () => {
                       <td>
                         <button
                           className='register-btn'
-                          // ✅ FIX: Pass `course.course` to the handler
                           onClick={() => handleRegister(course.course)}>
                           Register Now
                         </button>

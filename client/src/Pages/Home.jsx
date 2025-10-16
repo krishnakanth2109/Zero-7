@@ -1,112 +1,116 @@
-// File: src/Pages/Home.jsx
-
-import React, { useState, useEffect, useRef } from 'react'
-import './Home.css'
-import Context from './Context.jsx'
-import api from '../api/axios.js'
+import React, { useState, useEffect, useRef } from 'react';
+// --- ADDED: The necessary import for navigation ---
+import { useNavigate } from 'react-router-dom';
+import './Home.css';
+import Context from './Context.jsx';
+import api from '../api/axios.js';
 
 const Home = () => {
-  const [showForm, setShowForm] = useState(false)
-  const [jobPostings, setJobPostings] = useState([])
+  // State for the Career Consultation popup form
+  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     number: '',
     email: '',
     purpose: '',
-  })
-  const [loading, setLoading] = useState(false)
+  });
+  const [loading, setLoading] = useState(false);
 
-  // State for the new offer section
-  const [offer, setOffer] = useState(null)
-  const [isOfferVisible, setIsOfferVisible] = useState(false)
-  const offerSectionRef = useRef(null)
+  // State for job postings ticker
+  const [jobPostings, setJobPostings] = useState([]);
+  
+  // State for the special offer section
+  const [offer, setOffer] = useState(null);
+  const [isOfferVisible, setIsOfferVisible] = useState(false);
+  const offerSectionRef = useRef(null);
+
+  // --- ADDED: Initialize the navigate function from React Router ---
+  const navigate = useNavigate();
 
   const fetchJobs = async () => {
     try {
-      const response = await api.get('/jobs')
-      // --- FIX: Ensure the API response is an array to prevent crashes ---
+      const response = await api.get('/jobs');
       if (Array.isArray(response.data)) {
-        setJobPostings(response.data)
+        setJobPostings(response.data);
       } else {
-        console.error('Jobs API did not return an array:', response.data)
-        setJobPostings([]) // Default to an empty array on error
+        console.error('Jobs API did not return an array:', response.data);
+        setJobPostings([]);
       }
     } catch (error) {
-      console.error('Failed to fetch jobs:', error)
-      setJobPostings([]) // Also default to empty on fetch failure
+      console.error('Failed to fetch jobs:', error);
+      setJobPostings([]);
     }
-  }
+  };
 
   const fetchOffer = async () => {
     try {
-      const response = await api.get('/offers/latest')
-      setOffer(response.data)
+      const response = await api.get('/offers/latest');
+      setOffer(response.data);
     } catch (error) {
-      console.error('Failed to fetch offer:', error)
+      console.error('Failed to fetch offer:', error);
     }
-  }
+  };
 
   const daysAgo = (dateString) => {
-    if (!dateString) return ''
-    const posted = new Date(dateString)
-    const diffDays = Math.floor((new Date() - posted) / (1000 * 60 * 60 * 24))
-    if (diffDays === 0) return 'Today'
-    if (diffDays === 1) return '1 day ago'
-    return `${diffDays} days ago`
-  }
+    if (!dateString) return '';
+    const posted = new Date(dateString);
+    const diffDays = Math.floor((new Date() - posted) / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return '1 day ago';
+    return `${diffDays} days ago`;
+  };
 
   // Effect for initial data fetching
   useEffect(() => {
-    fetchJobs()
-    fetchOffer()
-  }, [])
+    fetchJobs();
+    fetchOffer();
+  }, []);
 
-  // --- FIX: Separate useEffect for the Intersection Observer animation ---
-  // This effect will run whenever the `offer` state changes from null to having data.
+  // Effect for the Intersection Observer animation
   useEffect(() => {
-    if (!offer || !offerSectionRef.current) return // Don't run if there's no offer or ref yet
+    if (!offer || !offerSectionRef.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const entry = entries[0]
+        const entry = entries[0];
         if (entry.isIntersecting) {
-          setIsOfferVisible(true)
-          observer.unobserve(entry.target) // Stop observing after animation
+          setIsOfferVisible(true);
+          observer.unobserve(entry.target);
         }
       },
-      { threshold: 0.2 }, // Trigger when 20% of the section is visible
-    )
+      { threshold: 0.2 }
+    );
 
-    observer.observe(offerSectionRef.current)
+    observer.observe(offerSectionRef.current);
 
-    // Cleanup function to disconnect the observer when the component unmounts
-    return () => observer.disconnect()
-  }, [offer]) // The dependency array ensures this runs when 'offer' data arrives
+    return () => observer.disconnect();
+  }, [offer]);
 
+  // Handler for the Career Consultation popup form
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
+  // Handler to submit the Career Consultation popup form
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
     try {
-      await api.post('/forms', formData)
-      alert('✅ Form submitted successfully! Manager will be notified.')
-      setShowForm(false)
-      setFormData({ name: '', number: '', email: '', purpose: '' })
+      await api.post('/forms', formData);
+      alert('✅ Form submitted successfully! Manager will be notified.');
+      setShowForm(false);
+      setFormData({ name: '', number: '', email: '', purpose: '' });
     } catch (error) {
-      console.error('❌ Form submission error:', error)
-      alert('Something went wrong. Please try again.')
+      console.error('❌ Form submission error:', error);
+      alert('Something went wrong. Please try again.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className='home-root'>
-      {/* Hero with background video only */}
       <div className='bg-gray-100 w-screen p-2 overflow-none text-blue-500 ticker'>
         <p>
           🔔 A new job is posted:{' '}
@@ -116,7 +120,6 @@ const Home = () => {
         </p>
       </div>
 
-      {/* Hero with background video */}
       <header className='video-hero' role='banner'>
         <video
           className='hero-video'
@@ -127,25 +130,22 @@ const Home = () => {
           playsInline
         />
       </header>
+      
       <div className='bg-gray-100 w-screen p-2 overflow-none text-blue-500 ticker'>
-        {jobPostings.slice(0, 5).map((job) => {
-          return (
-            <span className='mr-12' key={job._id}>
-              🔔 New: {job.role} - {daysAgo(job.createdAt)}
-            </span>
-          )
-        })}
+        {jobPostings.slice(0, 5).map((job) => (
+          <span className='mr-12' key={job._id}>
+            🔔 New: {job.role} - {daysAgo(job.createdAt)}
+          </span>
+        ))}
       </div>
 
-      {/* --- THIS IS THE NEW SPECIAL OFFER SECTION --- */}
-      {/* It will now render and animate correctly */}
+      {/* Special Offer Section */}
       {offer && (
         <section
           ref={offerSectionRef}
           className='py-16 sm:py-24 bg-slate-50 overflow-hidden'>
           <div className='container mx-auto px-4'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
-              {/* Text Content with slide-in animation */}
               <div
                 className={`transition-all duration-1000 ease-out ${
                   isOfferVisible
@@ -158,13 +158,13 @@ const Home = () => {
                 <p className='text-lg text-gray-600 leading-relaxed'>
                   {offer.paragraph}
                 </p>
+                {/* This button now correctly navigates to the Contact page */}
                 <button
-                  onClick={() => setShowForm(true)}
+                  onClick={() => navigate('/contact')}
                   className='mt-8 inline-block bg-cyan-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-cyan-700 transition-transform transform hover:scale-105'>
                   Inquire Now
                 </button>
               </div>
-              {/* Animated Image with slide-in and rotate animation */}
               <div
                 className={`transition-all duration-1000 ease-out delay-200 ${
                   isOfferVisible
@@ -187,7 +187,7 @@ const Home = () => {
 
       <Context />
 
-      {/* Popup Form */}
+      {/* Popup Form for Career Consultation (This code is preserved) */}
       {showForm && (
         <div className='form-popup' role='dialog' aria-modal='true'>
           <div className='form-container'>
@@ -243,7 +243,7 @@ const Home = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

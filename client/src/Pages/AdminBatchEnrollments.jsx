@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from 'react'
 import api from '../api/axios'
-import { ClipboardList, Loader2, ShieldX, Trash2 } from 'lucide-react'
+import { ClipboardList, Loader2, ShieldX, Trash2, Download } from 'lucide-react'
+import * as XLSX from 'xlsx'
+import { saveAs } from 'file-saver'
 
 const AdminBatchEnrollments = () => {
   const [enrollments, setEnrollments] = useState([])
@@ -37,6 +39,27 @@ const AdminBatchEnrollments = () => {
     }
   }
 
+  const handleExport = () => {
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
+    const formattedData = enrollments.map((item) => ({
+      Name: item.name,
+      Contact: `${item.phone}, ${item.email}`,
+      Course: item.selectedCourse,
+      'Enrollment Type': item.programType,
+      Message: item.message || 'N/A',
+      'Submitted On': new Date(item.createdAt).toLocaleString(),
+    }))
+
+    const ws = XLSX.utils.json_to_sheet(formattedData)
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    const data = new Blob([excelBuffer], { type: fileType })
+    saveAs(data, 'enrollments' + fileExtension)
+  }
+
   return (
     <div className='p-4 sm:p-6 bg-gray-50 min-h-full'>
       <div className='bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between text-white'>
@@ -62,6 +85,14 @@ const AdminBatchEnrollments = () => {
       </div>
 
       <div className='bg-white rounded-xl shadow-lg p-6'>
+        <div className='flex justify-end mb-4'>
+          <button
+            onClick={handleExport}
+            className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center space-x-2 transition duration-300 ease-in-out'>
+            <Download size={20} />
+            <span>Export to Excel</span>
+          </button>
+        </div>
         {loading && (
           <div className='flex justify-center py-16'>
             <Loader2 className='animate-spin text-blue-500' size={48} />

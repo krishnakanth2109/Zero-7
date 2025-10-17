@@ -376,7 +376,7 @@ export default function Context() {
           {/* Testimonial 1 */}
           <div className='testimonial-card' style={{ animationDelay: '0.1s' }}>
             <div className='testimonial-image'>
-              <img src='/test2.jpeg' alt='Manikraj' />
+              <img src='/success.jpeg' alt='Manikraj' />
               <div className='quote-icon'>"</div>
             </div>
             <div className='testimonial-content'>
@@ -406,7 +406,7 @@ export default function Context() {
           {/* Testimonial 2 */}
           <div className='testimonial-card' style={{ animationDelay: '0.2s' }}>
             <div className='testimonial-image'>
-              <img src='/test1.jpeg' alt='Vindhya' />
+              <img src='/success1.png' alt='Vindhya' />
               <div className='quote-icon'>"</div>
             </div>
             <div className='testimonial-content'>

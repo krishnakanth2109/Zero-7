@@ -88,11 +88,20 @@ const steps = [
   { label: 'onboarding & MIS', icon: <FiShield aria-hidden='true' /> },
 ]
 const partnerLogos = [
-  { alt: 'google', src: 'https://logo.clearbit.com/google.com' },
+  {
+    alt: 'google',
+    src: 'https://similarpng.com/_next/image?url=https%3A%2F%2Fimage.similarpng.com%2Ffile%2Fsimilarpng%2Fvery-thumbnail%2F2020%2F06%2FLogo-google-icon-PNG.png&w=3840&q=75',
+  },
   { alt: 'microsoft', src: 'https://logo.clearbit.com/microsoft.com' },
-  { alt: 'ibm', src: 'https://logo.clearbit.com/ibm.com' },
+  {
+    alt: 'ibm',
+    src: 'https://www.ibm.com/brand/experience-guides/developer/b1db1ae501d522a1a4b49613fe07c9f1/01_8-bar-positive.svg',
+  },
   { alt: 'amazon', src: 'https://logo.clearbit.com/amazon.com' },
-  { alt: 'adobe', src: 'https://logo.clearbit.com/adobe.com' },
+  {
+    alt: 'adobe',
+    src: 'https://1000logos.net/wp-content/uploads/2021/04/Adobe-logo.png',
+  },
   { alt: 'intel', src: 'https://logo.clearbit.com/intel.com' },
 ]
 
@@ -275,7 +284,13 @@ const CollegeConnect = () => {
       <section className='campus-logos' aria-label='partner company logos'>
         <div className='marquee-viewport'>
           <div className='marquee-track marquee-right'>
-            {[...partnerLogos, ...partnerLogos].map((logo, i) => (
+            {[
+              ...partnerLogos,
+              ...partnerLogos,
+              ...partnerLogos,
+              ...partnerLogos,
+              ...partnerLogos,
+            ].map((logo, i) => (
               <div className='marquee-logo' key={i}>
                 <img
                   className='marquee-logo-img'

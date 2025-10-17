@@ -9,6 +9,42 @@ const About = () => {
     retention: 0,
   })
 
+  // --- Start of new code for typewriter effect ---
+
+  // Full text for the paragraphs
+  const fullParagraph1 =
+    'At Zero7 Technologies, we believe every career deserves a second chance and every talent deserves the right platform. Established in 2025, we specialize in IT & Non-IT Training, Payroll Process Outsourcing, Resume Marketing, and Campus Drives.'
+  const fullParagraph2 =
+    'Our mission is to empower individuals with skills, confidence, and opportunities while supporting organizations with trained and reliable talent.'
+
+  // State to hold the "typed" text
+  const [typedParagraph1, setTypedParagraph1] = useState('')
+  const [typedParagraph2, setTypedParagraph2] = useState('')
+
+  // useEffect to handle the typing animation for both paragraphs
+  useEffect(() => {
+    // Typing logic for the first paragraph
+    if (typedParagraph1.length < fullParagraph1.length) {
+      const timeoutId = setTimeout(() => {
+        setTypedParagraph1(fullParagraph1.slice(0, typedParagraph1.length + 1))
+      }, 35) // Adjust typing speed (milliseconds)
+      return () => clearTimeout(timeoutId)
+    }
+
+    // Typing logic for the second paragraph (starts after the first one finishes)
+    if (
+      typedParagraph1.length === fullParagraph1.length &&
+      typedParagraph2.length < fullParagraph2.length
+    ) {
+      const timeoutId = setTimeout(() => {
+        setTypedParagraph2(fullParagraph2.slice(0, typedParagraph2.length + 1))
+      }, 35) // Adjust typing speed (milliseconds)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [typedParagraph1, typedParagraph2])
+
+  // --- End of new code for typewriter effect ---
+
   const navigate = useNavigate()
 
   // Animate stats dynamically
@@ -44,23 +80,27 @@ const About = () => {
           </p>
         </div>
       </section>
-      {/* Who We Are Section */}
+
+      {/* Who We Are Section - MODIFIED FOR TYPEWRITER EFFECT */}
       <section className='who-we-are'>
         <div className='container'>
           <div className='section-content'>
             <div className='text-content'>
-              <h2>Who We Are</h2>
-              <p>
-                At <strong>Zero7 Technologies</strong>, we believe every career
-                deserves a second chance and every talent deserves the right
-                platform. Established in 2025, we specialize in IT & Non-IT
-                Training, Payroll Process Outsourcing, Resume Marketing, and
-                Campus Drives.
+              <h2 className='text-3xl font-bold mb-4'>Who We Are</h2>
+              <p className='text-lg'>
+                <strong>{typedParagraph1}</strong>
+                {/* Blinking cursor for the first paragraph */}
+                {typedParagraph1.length < fullParagraph1.length && (
+                  <span className='inline-block w-0.5 h-6 bg-gray-800 ml-1 animate-blink align-middle'></span>
+                )}
               </p>
-              <p>
-                Our mission is to empower individuals with skills, confidence,
-                and opportunities while supporting organizations with trained
-                and reliable talent.
+              <p className='text-lg mt-4'>
+                {typedParagraph2}
+                {/* Blinking cursor for the second paragraph */}
+                {typedParagraph1.length === fullParagraph1.length &&
+                  typedParagraph2.length < fullParagraph2.length && (
+                    <span className='inline-block w-0.5 h-6 bg-gray-800 ml-1 animate-blink align-middle'></span>
+                  )}
               </p>
             </div>
             <div className='image-container'>
@@ -72,6 +112,7 @@ const About = () => {
           </div>
         </div>
       </section>
+
       {/* Vision & Values Section */}
       <section className='vision-values'>
         <div className='container'>
@@ -287,82 +328,64 @@ const About = () => {
           </div>
         </div>
       </section>
-      {/* Who We Help */}
+
+      {/* === MODIFIED SECTION STARTS HERE === */}
       <section className='py-16 md:py-24 bg-gray-50'>
         <div className='container mx-auto px-6'>
-          <h2 className='text-3xl md:text-5xl font-extrabold mb-12 text-center text-blue-700 leading-tight'>
+          <h2 className='text-3xl md:text-5xl font-extrabold mb-16 text-center text-blue-700 leading-tight'>
             Who We Empower
           </h2>
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16'>
-            {/* For Job Seekers */}
-            <div className='bg-white p-8 rounded-lg shadow-lg flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8'>
-              <div className='flex-shrink-0 text-7xl text-purple-600'>
+          {/* Updated grid for 3 columns on large screens */}
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {/* Card 1: For Job Seekers (Dynamic Styling) */}
+            <div className='bg-white p-8 rounded-xl shadow-lg flex flex-col items-center text-center transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2'>
+              <div className='text-6xl text-purple-600 mb-5'>
                 <i className='fas fa-user-tie'></i>
               </div>
-              <div>
-                <h3 className='text-3xl font-bold mb-4 text-gray-800'>
-                  For Job Seekers
-                </h3>
-                <p className='text-lg text-gray-700 mb-4'>
-                  We provide the tools and confidence you need to succeed. Our
-                  training programs and resume marketing services are designed
-                  to help you secure a new job, make a successful career shift,
-                  or re-enter the workforce after a break.
-                </p>
-                <ul className='list-disc list-inside text-gray-700 text-lg space-y-2'>
-                  <li>Transition smoothly into new technologies.</li>
-                  <li>Restart your career with confidence.</li>
-                </ul>
-              </div>
+              <h3 className='text-2xl font-bold mb-3 text-gray-800'>
+                For Job Seekers
+              </h3>
+              <p className='text-gray-600 leading-relaxed'>
+                We provide the tools, training, and confidence to help you land
+                your next role, whether you're starting fresh, switching
+                careers, or returning to work.
+              </p>
             </div>
 
-            {/* For Companies */}
-            <div className='bg-white p-8 rounded-lg shadow-lg flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8'>
-              <div className='flex-shrink-0 text-7xl text-blue-600'>
+            {/* Card 2: For Companies (Dynamic Styling) */}
+            <div className='bg-white p-8 rounded-xl shadow-lg flex flex-col items-center text-center transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2'>
+              <div className='text-6xl text-blue-600 mb-5'>
                 <i className='fas fa-building'></i>
               </div>
-              <div>
-                <h3 className='text-3xl font-bold mb-4 text-gray-800'>
-                  For Companies
-                </h3>
-                <p className='text-lg text-gray-700 mb-4'>
-                  We provide access to a pool of highly skilled and thoroughly
-                  vetted candidates. Partner with us to efficiently fill
-                  critical roles with trained professionals ready to contribute
-                  from day one, reducing hiring costs and time-to-hire.
-                </p>
-                <ul className='list-disc list-inside text-gray-700 text-lg space-y-2'>
-                  <li>Access skilled and vetted candidates.</li>
-                  <li>Reduce hiring costs and time.</li>
-                </ul>
-              </div>
+              <h3 className='text-2xl font-bold mb-3 text-gray-800'>
+                For Companies
+              </h3>
+              <p className='text-gray-600 leading-relaxed'>
+                Access a pool of vetted, skilled candidates ready to contribute
+                from day one. We streamline your hiring process, saving you time
+                and reducing costs.
+              </p>
             </div>
 
-            {/* For Colleges */}
-            <div className='bg-white p-8 rounded-lg shadow-lg col-span-1 lg:col-span-2 flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8'>
-              <div className='flex-shrink-0 text-7xl text-green-600'>
+            {/* Card 3: For Colleges (Dynamic Styling) */}
+            <div className='bg-white p-8 rounded-xl shadow-lg flex flex-col items-center text-center transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2'>
+              <div className='text-6xl text-green-600 mb-5'>
                 <i className='fas fa-university'></i>
               </div>
-              <div>
-                <h3 className='text-3xl font-bold mb-4 text-gray-800'>
-                  For Colleges
-                </h3>
-                <p className='text-lg text-gray-700 mb-4'>
-                  We bridge the gap between academic learning and industry
-                  demands. We partner with colleges to host targeted hiring
-                  drives, offering students valuable career opportunities and
-                  helping educational institutions achieve higher placement
-                  rates.
-                </p>
-                <ul className='list-disc list-inside text-gray-700 text-lg space-y-2'>
-                  <li>Bridge academic and industry gaps.</li>
-                  <li>Improve student placement rates.</li>
-                </ul>
-              </div>
+              <h3 className='text-2xl font-bold mb-3 text-gray-800'>
+                For Colleges
+              </h3>
+              <p className='text-gray-600 leading-relaxed'>
+                Bridge the gap between academia and industry. We partner with
+                you to host campus drives, connecting your students with top
+                companies and boosting placement rates.
+              </p>
             </div>
           </div>
         </div>
       </section>
+      {/* === MODIFIED SECTION ENDS HERE === */}
+
       {/* Our Values */}
       <div className='min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8'>
         <div className='max-w-7xl mx-auto'>
@@ -376,7 +399,7 @@ const About = () => {
               </div>
               <div className='relative flex justify-center'>
                 <span className='px-3 bg-gray-50 text-lg font-medium text-gray-900'>
-                  Our Vision
+                  ✨ Our Vision
                 </span>
               </div>
             </div>
@@ -399,7 +422,7 @@ const About = () => {
               </div>
               <div className='relative flex justify-center'>
                 <span className='px-3 bg-gray-50 text-lg font-medium text-gray-900'>
-                  Our Mission
+                  🎯 Our Mission
                 </span>
               </div>
             </div>
@@ -422,7 +445,7 @@ const About = () => {
               </div>
               <div className='relative flex justify-center'>
                 <span className='px-3 bg-gray-50 text-lg font-medium text-gray-900'>
-                  Our Values
+                  💎 Our Values
                 </span>
               </div>
             </div>
@@ -567,7 +590,9 @@ const About = () => {
             Explore Opportunities
           </button>
         </div>
+       
       </section>
+      <br />
     </div>
   )
 }

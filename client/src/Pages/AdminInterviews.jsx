@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react'
 import api from '../api/axios'
 import { Calendar, momentLocalizer } from 'react-big-calendar'
@@ -32,14 +33,16 @@ const InterviewTracker = () => {
   // New state for the upcoming interviews modal
   const [showUpcomingModal, setShowUpcomingModal] = useState(false)
 
+  // State for notification bell
+  const [upcomingAlerts, setUpcomingAlerts] = useState([])
+  const [showAlertsDropdown, setShowAlertsDropdown] = useState(false)
+
   const fetchInterviews = async () => {
     try {
       setLoading(true)
       const response = await api.get('/interview')
       setInterviewData(response.data)
 
-      // Transform interview data for the calendar
-      // Now using candidateInfo.email if your backend provides it
       console.log(response.data)
       const events = response.data.map((interview) => ({
         title: `${interview.candidateName} @ ${interview.companyName}`,
@@ -47,13 +50,9 @@ const InterviewTracker = () => {
         end: new Date(interview.date),
         allDay: true,
         resource: {
-          ...interview, // Keep all interview details
-          // ASSUMPTION: Your backend's /interview endpoint response looks like this for candidate email:
-          // { ..., candidateInfo: { email: "some@email.com", ... }, ... }
-          // If the email is directly on the interview object, e.g., interview.candidateEmail,
-          // then change this line to: candidateEmail: interview.candidateEmail,
+          ...interview,
           candidateEmail:
-            interview.candidateEmail || 'no-email-provided@example.com', // Dynamically fetch candidate email
+            interview.candidateEmail || 'no-email-provided@example.com',
         },
       }))
       setCalendarEvents(events)
@@ -70,8 +69,6 @@ const InterviewTracker = () => {
       const response = await api.get(`/interview/user/${id}`)
       setInterviewData(response.data)
 
-      // Transform interview data for the calendar
-      // Now using candidateInfo.email if your backend provides it
       console.log(response.data)
       const events = response.data.map((interview) => ({
         title: `${interview.candidateName} @ ${interview.companyName}`,
@@ -79,13 +76,9 @@ const InterviewTracker = () => {
         end: new Date(interview.date),
         allDay: true,
         resource: {
-          ...interview, // Keep all interview details
-          // ASSUMPTION: Your backend's /interview endpoint response looks like this for candidate email:
-          // { ..., candidateInfo: { email: "some@email.com", ... }, ... }
-          // If the email is directly on the interview object, e.g., interview.candidateEmail,
-          // then change this line to: candidateEmail: interview.candidateEmail,
+          ...interview,
           candidateEmail:
-            interview.candidateEmail || 'no-email-provided@example.com', // Dynamically fetch candidate email
+            interview.candidateEmail || 'no-email-provided@example.com',
         },
       }))
       setCalendarEvents(events)
@@ -118,100 +111,28 @@ const InterviewTracker = () => {
   }, [showAddForm])
 
   // Check for upcoming interviews every minute
-  // Check for upcoming interviews every minute
-  // Check for upcoming interviews every minute
   useEffect(() => {
     const checkUpcomingInterviews = () => {
       const now = new Date()
       const upcoming = interviewData.filter(
         (interview) =>
           interview.status === 'Scheduled' &&
-          !alertedInterviews.has(interview._id) &&
           new Date(interview.date) - now > 0 &&
-          new Date(interview.date) - now <= 10 * 60 * 1000,
+          new Date(interview.date) - now <= 15 * 60 * 1000,
       )
 
-      if (upcoming.length === 0) return
-
-      // Play sound once
-      const audio = new Audio(
-        'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3',
-      )
-      audio.play().catch((err) => console.log('Audio play failed:', err))
-
-      // Build card-style HTML
-      const html = upcoming
-        .map(
-          (interview) => `
-        <div style="
-          border: 1px solid #ddd;
-          border-radius: 12px;
-          padding: 12px 16px;
-          margin-bottom: 12px;
-          background: #f9f9f9;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        ">
-          <p style="margin:4px 0;"><strong>📋 Candidate:</strong> ${
-            interview.candidateName
-          }</p>
-          <p style="margin:4px 0;"><strong>💼 Role:</strong> ${
-            interview.jobRole
-          }</p>
-          <p style="margin:4px 0;"><strong>🏢 Company:</strong> ${
-            interview.companyName
-          }</p>
-          <p style="margin:4px 0;"><strong>🕐 Time:</strong> ${new Date(
-            interview.date,
-          ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-          <p style="margin-top:8px; font-weight:bold; color:#e74c3c;">
-            ⚡ Starting in ${Math.ceil(
-              (new Date(interview.date) - now) / 60000,
-            )} min!
-          </p>
-        </div>
-      `,
-        )
-        .join('')
-
-      Swal.fire({
-        title: '⏰ Upcoming Interviews!',
-        html: `<div style="display:flex; flex-direction:column; gap:10px;">${html}</div>`,
-        icon: 'warning',
-        iconColor: '#f39c12',
-        confirmButtonText: 'Got it!',
-        confirmButtonColor: '#6366f1',
-        background: '#fff',
-        timerProgressBar: true,
-        allowOutsideClick: false,
-        customClass: {
-          popup: 'rounded-2xl shadow-2xl',
-          title: 'text-2xl font-bold',
-          confirmButton: 'px-6 py-3 rounded-xl shadow-lg',
-        },
-      })
-
-      // Mark all as alerted
-      setAlertedInterviews((prev) => {
-        const updated = new Set(prev)
-        upcoming.forEach((i) => updated.add(i._id))
-        return updated
-      })
+      setUpcomingAlerts(upcoming)
     }
 
-    // Check immediately on mount
     checkUpcomingInterviews()
-
-    // Then check every minute
     const intervalId = setInterval(checkUpcomingInterviews, 60000)
-
-    // Cleanup interval on unmount
     return () => clearInterval(intervalId)
-  }, [interviewData, alertedInterviews])
+  }, [interviewData])
 
   const [newInterview, setNewInterview] = useState({
     candidateName: '',
     companyName: '',
-    job: '', // This state holds the Job ID
+    job: '',
     status: 'Scheduled',
     interviewLevel: '',
     date: '',
@@ -255,7 +176,6 @@ const InterviewTracker = () => {
     }
   }
 
-  // New function to get today's interviews
   const getTodaysInterviews = () => {
     const today = new Date()
     return interviewData.filter((interview) => {
@@ -363,7 +283,6 @@ const InterviewTracker = () => {
     }
   }
 
-  // Custom calendar event styles
   const eventStyleGetter = (event) => {
     const status = event.resource?.status
     let backgroundColor = '#3174ad'
@@ -401,7 +320,7 @@ const InterviewTracker = () => {
   }
 
   const handleEventClick = (event) => {
-    setSelectedCandidateDetails(event.resource) // event.resource contains the full interview object
+    setSelectedCandidateDetails(event.resource)
     setShowCandidateDetailsModal(true)
   }
 
@@ -466,8 +385,91 @@ const InterviewTracker = () => {
           <h2 className='text-2xl font-bold text-gray-800'>
             Interview Schedule
           </h2>
-          <div className='flex space-x-4'>
-            {/* Upcoming Interviews Button (New) */}
+          <div className='flex space-x-4 items-center'>
+            {/* Notification Bell Icon */}
+            {upcomingAlerts.length > 0 && (
+              <div className='relative'>
+                <button
+                  onClick={() => setShowAlertsDropdown(!showAlertsDropdown)}
+                  className='relative p-3 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 animate-bounce'>
+                  <svg
+                    className='w-6 h-6'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                    xmlns='http://www.w3.org/2000/svg'>
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth='2'
+                      d='M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'></path>
+                  </svg>
+                  <span className='absolute -top-1 -right-1 bg-yellow-400 text-red-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse'>
+                    {upcomingAlerts.length}
+                  </span>
+                </button>
+
+                {/* Alerts Dropdown */}
+                {showAlertsDropdown && (
+                  <div className='absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-96 overflow-y-auto'>
+                    <div className='p-4 border-b border-gray-200 bg-gradient-to-r from-red-50 to-orange-50'>
+                      <h4 className='font-bold text-gray-800 flex items-center'>
+                        <svg
+                          className='w-5 h-5 mr-2 text-red-500'
+                          fill='currentColor'
+                          viewBox='0 0 20 20'>
+                          <path d='M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z'></path>
+                        </svg>
+                        Upcoming Interviews (Next 15 min)
+                      </h4>
+                    </div>
+                    <div className='divide-y divide-gray-100'>
+                      {upcomingAlerts.map((interview) => {
+                        const now = new Date()
+                        const minutesLeft = Math.ceil(
+                          (new Date(interview.date) - now) / 60000,
+                        )
+                        return (
+                          <div
+                            key={interview._id}
+                            className='p-4 hover:bg-gray-50 transition-colors duration-150'>
+                            <div className='flex items-start justify-between'>
+                              <div className='flex-1'>
+                                <p className='font-semibold text-gray-900'>
+                                  {interview.candidateName}
+                                </p>
+                                <p className='text-sm text-gray-600 mt-1'>
+                                  {interview.jobRole}
+                                </p>
+                                <p className='text-sm text-gray-500'>
+                                  {interview.companyName}
+                                </p>
+                                <p className='text-xs text-gray-400 mt-1'>
+                                  {new Date(interview.date).toLocaleTimeString(
+                                    [],
+                                    {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                    },
+                                  )}
+                                </p>
+                              </div>
+                              <div className='ml-3 flex-shrink-0'>
+                                <span className='inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800'>
+                                  {minutesLeft} min
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Today Interviews Button */}
             <button
               onClick={() => setShowUpcomingModal(true)}
               className='group relative px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 hover:from-blue-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'>
@@ -488,7 +490,7 @@ const InterviewTracker = () => {
               </span>
             </button>
 
-            {/* Add New Interview Button (Existing) */}
+            {/* Add New Interview Button */}
             <button
               onClick={() => setShowAddForm(!showAddForm)}
               className='group relative px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'>
@@ -642,7 +644,6 @@ const InterviewTracker = () => {
                   <option value='Rejected'>Rejected</option>
                 </select>
               </div>
-              {/*  */}
               <div className='lg:col-span-2 space-y-2'>
                 <label
                   htmlFor='interviewLevel'
@@ -714,7 +715,7 @@ const InterviewTracker = () => {
               <thead className='bg-gradient-to-r from-gray-50 to-gray-100'>
                 <tr>
                   <th className='px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider'>
-                    Candidate
+                    Candidate Name
                   </th>
                   <th className='px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider'>
                     Company
@@ -1051,7 +1052,7 @@ const InterviewTracker = () => {
                       minute: '2-digit',
                       hour12: true,
                     });
-                    
+
                     const subject = encodeURIComponent(`Interview Confirmation - ${selectedCandidateDetails.jobRole} Position at ${selectedCandidateDetails.companyName}`);
                     const body = encodeURIComponent(`Dear ${selectedCandidateDetails.candidateName},
 
@@ -1076,7 +1077,7 @@ We look forward to speaking with you!
 Best regards,
 Zero7 Technologies
 Recruitment Team`);
-                    
+
                     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${selectedCandidateDetails.candidateEmail}&su=${subject}&body=${body}`;
                     window.open(gmailUrl, '_blank');
                   }}

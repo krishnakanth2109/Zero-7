@@ -15,8 +15,11 @@ import {
   FaSignal,
   FaClosedCaptioning,
   FaGlobe,
+  FaPalette,
+  FaBullhorn,
 } from 'react-icons/fa'
 import api from '../api/axios' // Import your central axios instance
+import { DatabaseBackup } from 'lucide-react'
 
 // ================= IT Courses =================
 const itCourses = [
@@ -118,7 +121,7 @@ const itCourses = [
   {
     title: 'Mobile App Development',
     desc: 'Build modern apps for Android & iOS',
-    icon: <FaLaptopCode />,
+    icon: <FaMobileAlt />,
     category: 'IT',
     rating: 4.6,
     reviews: 780,
@@ -160,7 +163,7 @@ const nonItCourses = [
   {
     title: 'Digital Marketing',
     desc: 'Master SEO, social media, and online campaigns',
-    icon: <FaMobileAlt />,
+    icon: <FaBullhorn />,
     category: 'Non-IT',
     rating: 4.7,
     reviews: 1100,
@@ -236,7 +239,7 @@ const nonItCourses = [
   {
     title: 'Graphic Design',
     desc: 'Master modern design tools & branding',
-    icon: <FaMobileAlt />,
+    icon: <FaPalette />,
     category: 'Non-IT',
     rating: 4.7,
     reviews: 640,
@@ -335,6 +338,7 @@ const DigitalCourses = () => {
     <div className='digital-courses-container compact'>
       {/* Header */}
       <section className='course-section compact'>
+      
         <h2>Our Training Programs</h2>
         <p className='subtitle'>
           Choose from IT and Non-IT programs designed to upgrade your skills

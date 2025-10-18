@@ -376,19 +376,17 @@ export default function Context() {
           {/* Testimonial 1 */}
           <div className='testimonial-card' style={{ animationDelay: '0.1s' }}>
             <div className='testimonial-image'>
-              <img src='/success.jpeg' alt='Manikraj' />
+              <img src='https://i.postimg.cc/FKrqsthG/IMG-20251018-131705.jpg' alt='Manikraj' />
               <div className='quote-icon'>"</div>
             </div>
             <div className='testimonial-content'>
               <p className='testimonial-text'>
-                The training program completely transformed my career path. I
-                went from a fresh graduate to a employed software engineer in
-                just 3 months!
+                Manikraj, CEO of Eden Software Consulting, brings visionary leadership and deep industry expertise to every project his team undertakes
               </p>
               <div className='testimonial-author'>
                 <span className='testimonial-name'>Manikraj</span>
                 <span className='testimonial-role'>
-                  Software Developer at TechSolutions
+                  CEO
                 </span>
               </div>
               <div className='testimonial-rating'>
@@ -406,7 +404,7 @@ export default function Context() {
           {/* Testimonial 2 */}
           <div className='testimonial-card' style={{ animationDelay: '0.2s' }}>
             <div className='testimonial-image'>
-              <img src='/success1.png' alt='Vindhya' />
+              <img src='https://i.postimg.cc/L8bfhLpL/IMG-20251018-132027.jpg' alt='Vindhya' />
               <div className='quote-icon'>"</div>
             </div>
             <div className='testimonial-content'>
@@ -418,7 +416,7 @@ export default function Context() {
               <div className='testimonial-author'>
                 <span className='testimonial-name'>Vindhya</span>
                 <span className='testimonial-role'>
-                  HR Director at InnovateTech
+                  HR Director
                 </span>
               </div>
               <div className='testimonial-rating'>
@@ -437,21 +435,51 @@ export default function Context() {
           <div className='testimonial-card' style={{ animationDelay: '0.3s' }}>
             <div className='testimonial-image'>
               <img
-                src='https://img.freepik.com/premium-photo/hyper-realistic-happiest-indian-handsome-man-chex-shirt-hands-up-isolated-yellow-background_862994-259364.jpg?semt=ais_hybrid&w=740&q=80'
+                src='https://i.postimg.cc/L5Sqds3s/IMG-20251018-122137.jpg'
                 alt='Arjun Kapoor'
               />
               <div className='quote-icon'>"</div>
             </div>
             <div className='testimonial-content'>
               <p className='testimonial-text'>
-                Their payroll services have simplified our contractor management
-                significantly. Now we can focus on our core business without
-                administrative headaches.
+                With the expert guidance of our AI/ML trainer, Sri Devi, students were able to master complex concepts and build real-world projects with confidence.
               </p>
               <div className='testimonial-author'>
-                <span className='testimonial-name'>Arjun Kapoor</span>
+                <span className='testimonial-name'>Sridevi</span>
                 <span className='testimonial-role'>
-                  CEO at StartUp Ventures
+                  AIML
+                </span>
+              </div>
+              <div className='testimonial-rating'>
+                {Array(4)
+                  .fill()
+                  .map((_, i) => (
+                    <span key={i} className='star'>
+                      ★
+                    </span>
+                  ))}
+                <span className='star'>☆</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Testimonial 4 */}
+          <div className='testimonial-card' style={{ animationDelay: '0.3s' }}>
+            <div className='testimonial-image'>
+              <img
+                src='https://i.postimg.cc/CKDLFg13/IMG-20251018-122331.jpg'
+                alt='Arjun Kapoor'
+              />
+              <div className='quote-icon'>"</div>
+            </div>
+            <div className='testimonial-content'>
+              <p className='testimonial-text'>
+                With the expert guidance of our Data Analytics trainer,students developed strong skills in data analysis, visualization, and tools like Excel and SQL.
+              </p>
+              <div className='testimonial-author'>
+                <span className='testimonial-name'>Swetha</span>
+                <span className='testimonial-role'>
+                  Data Analytics
                 </span>
               </div>
               <div className='testimonial-rating'>

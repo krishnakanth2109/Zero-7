@@ -722,7 +722,7 @@
 
 .testimonial-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
   gap: clamp(20px, 3vw, 30px);
   margin-top: clamp(30px, 4vw, 40px);
 }

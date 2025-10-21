@@ -60,7 +60,7 @@ const AdminManageOffer = () => {
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-full">
       <div className="bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl shadow-lg p-6 mb-8 flex items-center space-x-4 text-white">
-        <div className="bg-white bg-opacity-20 p-3 rounded-full"><Gift size={28} /></div>
+        <div className=" bg-opacity-20 p-3 rounded-full"><Gift size={28} /></div>
         <div>
           <h3 className="text-2xl sm:text-3xl font-bold">Manage Homepage Offer</h3>
           <p className="text-teal-100 text-sm">Update the special offer section displayed on the public homepage.</p>
@@ -91,15 +91,15 @@ const AdminManageOffer = () => {
             {/* Your existing form fields */}
             <div>
               <label htmlFor="heading" className="block text-sm font-medium text-gray-700 mb-1">Heading</label>
-              <input type="text" name="heading" id="heading" value={formData.heading} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required />
+              <input type="text" name="heading" id="heading" value={formData.heading} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"  />
             </div>
             <div>
               <label htmlFor="paragraph" className="block text-sm font-medium text-gray-700 mb-1">Paragraph</label>
-              <textarea name="paragraph" id="paragraph" rows="5" value={formData.paragraph} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required></textarea>
+              <textarea name="paragraph" id="paragraph" rows="5" value={formData.paragraph} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" ></textarea>
             </div>
             <div>
               <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-              <input type="url" name="imageUrl" id="imageUrl" value={formData.imageUrl} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required />
+              <input type="url" name="imageUrl" id="imageUrl" value={formData.imageUrl} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" />
             </div>
             <div className="flex items-center justify-between">
               <button type="submit" disabled={isSubmitting} className="inline-flex items-center justify-center px-6 py-2 border border-transparent text-base font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:bg-gray-400">

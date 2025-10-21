@@ -109,7 +109,7 @@ const NewBatches = () => {
           timings: selectedCourseObj?.timing || '',
           duration: selectedCourseObj?.duration || '',
         }
-        
+
         // Use the axios instance to post to your new backend endpoint
         await api.post('/batch-enrollments', payload)
 
@@ -224,31 +224,39 @@ const NewBatches = () => {
           {isLoading ? (
             <p>Loading batches...</p>
           ) : (
-            <table className='batches-table'>
+            <table
+              className='batches-table'
+              style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center' }}
+            >
               <thead>
                 <tr>
-                  <th>Course</th>
-                  <th>Date</th>
-                  <th>Duration</th>
-                  <th>Register for Demo</th>
+                  <th style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>Course</th>
+                  <th style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>Date</th>
+                  <th style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>Duration</th>
+                  <th style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>Register for Demo</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedCourses.length > 0 ? (
                   paginatedCourses.map((course) => (
                     <tr key={course._id}>
-                      <td>{course.course}</td>
-                      <td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>
+                        {course.course}
+                      </td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>
                         {new Date(course.date).toLocaleDateString('En-IN', {
                           year: 'numeric',
                           month: 'short',
                         })}
                       </td>
-                      <td>{course.duration || 'N/A'}</td>
-                      <td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>
+                        {course.duration || 'N/A'}
+                      </td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>
                         <button
                           className='register-btn'
-                          onClick={() => handleRegister(course.course)}>
+                          onClick={() => handleRegister(course.course)}
+                        >
                           Register Now
                         </button>
                       </td>
@@ -256,13 +264,18 @@ const NewBatches = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan='4' className='no-results'>
+                    <td
+                      colSpan='4'
+                      className='no-results'
+                      style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}
+                    >
                       No courses found matching your search.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+
           )}
           {filteredCourses.length > 0 && (
             <Pagination

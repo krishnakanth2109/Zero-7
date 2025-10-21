@@ -5,8 +5,9 @@ import {
   FaExclamationTriangle,
   FaTimesCircle,
 } from 'react-icons/fa'
-import { Bell, Trash2 } from 'lucide-react' 
+import { Bell, Trash2 } from 'lucide-react'
 import api from '../api/axios'
+import Cookie from 'js-cookie' // <<< 1. IMPORT js-cookie
 
 // Style mapping for different notification types
 const NOTIFICATION_STYLES = {
@@ -36,6 +37,20 @@ const RecentActivity = () => {
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [userRole, setUserRole] = useState('') 
+
+ 
+  useEffect(() => {
+    try {
+      const userData = Cookie.get('user')
+      if (userData) {
+        const parsedUser = JSON.parse(userData)
+        setUserRole(parsedUser.role || '') 
+      }
+    } catch (e) {
+      console.error('Failed to parse user cookie', e)
+    }
+  }, []) 
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -68,9 +83,8 @@ const RecentActivity = () => {
     setNotifications(notifications.filter((notif) => notif._id !== id))
 
     try {
-      const notif= await api.delete(`/notifications/${id}`)
-      console.log(notif.data);
-      
+      const notif = await api.delete(`/notifications/${id}`)
+      console.log(notif.data)
     } catch (err) {
       console.error('Failed to delete notification:', err)
       setError('Could not delete the notification. Please refresh.')
@@ -124,7 +138,6 @@ const RecentActivity = () => {
                   notification.unread ? styles.unreadBg : 'bg-white'
                 } hover:shadow-md hover:bg-gray-50`}>
                 <div className='flex-shrink-0 text-2xl mt-1'>{styles.icon}</div>
-                {/* <<< MODIFIED LINE: Added pr-8 to create space for the button */}
                 <div className='flex-grow pr-8'>
                   <div className='flex justify-between items-start mb-1'>
                     <span
@@ -140,11 +153,15 @@ const RecentActivity = () => {
                   <p className='text-sm text-gray-600 mb-2'>
                     {notification.message}
                   </p>
-                  <a
-                    href={notification.link}
-                    className='text-sm font-semibold text-blue-600 hover:underline'>
-                    View Details
-                  </a>
+
+               
+                  {userRole === 'Admin' && notification.link && (
+                    <a
+                      href={notification.link}
+                      className='text-sm font-semibold text-blue-600 hover:underline'>
+                      View Details
+                    </a>
+                  )}
                 </div>
 
                 <button

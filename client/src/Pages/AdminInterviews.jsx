@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import api from '../api/axios'
 import { Calendar, momentLocalizer } from 'react-big-calendar'
@@ -324,6 +323,121 @@ const InterviewTracker = () => {
     setShowCandidateDetailsModal(true)
   }
 
+  // --- New function to handle mail generation and opening ---
+  const handleSendMail = (mailType, candidate, interviewDetails) => {
+    const interviewDate = new Date(interviewDetails.date);
+    const formattedDate = interviewDate.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+    const formattedTime = interviewDate.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    let subject = '';
+    let body = '';
+
+    const commonDetails = `
+Interview Details:
+━━━━━━━━━━━━━━━━━
+📅 Date: ${formattedDate}
+🕐 Time: ${formattedTime}
+💼 Position: ${interviewDetails.jobRole}
+🏢 Company: ${interviewDetails.companyName}
+📊 Interview Level: ${interviewDetails.interviewLevel}
+`;
+
+    switch (mailType) {
+      case 'schedule':
+        subject = `Interview Confirmation - ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`;
+        body = `Dear ${candidate.candidateName},
+
+We are pleased to confirm your interview for the ${interviewDetails.jobRole} position at ${interviewDetails.companyName}.
+${commonDetails}
+Please ensure you:
+• Keep your resume and relevant documents handy
+• Prepare questions you'd like to ask about the role
+
+If you need to reschedule or have any questions, please let us know as soon as possible.
+
+We look forward to speaking with you!
+
+Best regards,
+Zero7 Technologies
+Recruitment Team`;
+        break;
+      case 'selected':
+        subject = `Congratulations! - Offer for ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`;
+        body = `Dear ${candidate.candidateName},
+
+We are thrilled to inform you that you have been selected for the ${interviewDetails.jobRole} position at ${interviewDetails.companyName}!
+
+We were very impressed with your skills and experience during the interview process. We believe you will be a great asset to our team.
+
+We will be in touch shortly with a formal offer letter and details regarding your compensation and benefits.
+
+In the meantime, if you have any questions, please feel free to reach out.
+
+Congratulations once again!
+
+Best regards,
+Zero7 Technologies
+Recruitment Team`;
+        break;
+      case 'reschedule':
+        subject = `Reschedule Request - Interview for ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`;
+        body = `Dear ${candidate.candidateName},
+
+We would like to inform you that your interview for the ${interviewDetails.jobRole} position at ${interviewDetails.companyName} needs to be rescheduled.
+
+We apologize for any inconvenience this may cause. Please let us know your availability for a new interview slot. We are flexible and will do our best to accommodate your schedule.
+
+Proposed New Details (Tentative):
+${commonDetails}
+Please reply to this email with your preferred times or if you have any questions.
+
+Thank you for your understanding.
+
+Best regards,
+Zero7 Technologies
+Recruitment Team`;
+        break;
+      case 'rejected':
+        subject = `Update on your application for ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`;
+        body = `Dear ${candidate.candidateName},
+
+Thank you for your interest in the ${interviewDetails.jobRole} position at ${interviewDetails.companyName} and for taking the time to interview with us.
+
+We appreciate you sharing your experience and qualifications. We had a large number of highly qualified applicants, and after careful consideration, we have decided to move forward with other candidates whose qualifications more closely matched the specific requirements of this role at this time.
+
+This was a very competitive search, and we wish you the best in your job search and future endeavors.
+
+Best regards,
+Zero7 Technologies
+Recruitment Team`;
+        break;
+      default:
+        subject = `Regarding your application at ${interviewDetails.companyName}`;
+        body = `Dear ${candidate.candidateName},
+
+Regarding your application for the ${interviewDetails.jobRole} position at ${interviewDetails.companyName}.
+
+Best regards,
+Zero7 Technologies
+Recruitment Team`;
+    }
+
+    const encodedSubject = encodeURIComponent(subject);
+    const encodedBody = encodeURIComponent(body);
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${candidate.candidateEmail}&su=${encodedSubject}&body=${encodedBody}`;
+    window.open(gmailUrl, '_blank');
+  };
+
+
   if (loading) {
     return (
       <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center'>
@@ -339,7 +453,7 @@ const InterviewTracker = () => {
     <div className='min-h-screen w-[80vw] bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-7xl mx-auto'>
         {/* Header */}
-        <div className='text-center mb-12'>
+        <div className='text-center mb-12 relative'> {/* Added relative for alarm positioning */}
           <h1 className='text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent'>
             Interview Tracker
           </h1>
@@ -347,51 +461,12 @@ const InterviewTracker = () => {
             Manage candidate interviews, track status, and schedule meetings in
             one place
           </p>
-        </div>
-
-        {/* Stats Cards */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
-          {[
-            'Scheduled',
-            'Completed',
-            'Pending Feedback',
-            'Offer Extended',
-            'placed',
-          ].map((status) => (
-            <div
-              key={status}
-              className='bg-white rounded-2xl shadow-lg p-6 border-l-4 border-indigo-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm font-medium text-gray-600'>{status}</p>
-                  <p className='text-2xl font-bold text-gray-900 mt-1'>
-                    {
-                      interviewData.filter((item) => item.status === status)
-                        .length
-                    }
-                  </p>
-                </div>
-                <div
-                  className={`w-3 h-3 rounded-full ${getStatusDot(
-                    status,
-                  )}`}></div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Action Buttons Container */}
-        <div className='flex justify-between items-center mb-8'>
-          <h2 className='text-2xl font-bold text-gray-800'>
-            Interview Schedule
-          </h2>
-          <div className='flex space-x-4 items-center'>
-            {/* Notification Bell Icon */}
-            {upcomingAlerts.length > 0 && (
-              <div className='relative'>
+           {/* Notification Bell Icon - Repositioned and enhanced */}
+           {upcomingAlerts.length > 0 && (
+              <div className='absolute top-0 right-0 mt-2 mr-2 z-50'> {/* Adjusted positioning */}
                 <button
                   onClick={() => setShowAlertsDropdown(!showAlertsDropdown)}
-                  className='relative p-3 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 animate-bounce'>
+                  className='relative p-3 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 animate-ring-pulse'> {/* Custom animation */}
                   <svg
                     className='w-6 h-6'
                     fill='none'
@@ -468,7 +543,45 @@ const InterviewTracker = () => {
                 )}
               </div>
             )}
+        </div>
 
+        {/* Stats Cards */}
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
+          {[
+            'Scheduled',
+            'Completed',
+            'Pending Feedback',
+            'Offer Extended',
+            'placed',
+          ].map((status) => (
+            <div
+              key={status}
+              className='bg-white rounded-2xl shadow-lg p-6 border-l-4 border-indigo-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='text-sm font-medium text-gray-600'>{status}</p>
+                  <p className='text-2xl font-bold text-gray-900 mt-1'>
+                    {
+                      interviewData.filter((item) => item.status === status)
+                        .length
+                    }
+                  </p>
+                </div>
+                <div
+                  className={`w-3 h-3 rounded-full ${getStatusDot(
+                    status,
+                  )}`}></div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Action Buttons Container */}
+        <div className='flex justify-between items-center mb-8'>
+          <h2 className='text-2xl font-bold text-gray-800'>
+            Interview Schedule
+          </h2>
+          <div className='flex space-x-4 items-center'>
             {/* Today Interviews Button */}
             <button
               onClick={() => setShowUpcomingModal(true)}
@@ -1038,48 +1151,43 @@ const InterviewTracker = () => {
                 </p>
               </div>
               <div className='p-6 border-t border-gray-200 flex justify-end'>
-                <button
+              <button
                   onClick={() => {
-                    const interviewDate = new Date(selectedCandidateDetails.date);
-                    const formattedDate = interviewDate.toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
+                    Swal.fire({
+                      title: `Which mail do you want to send to "${selectedCandidateDetails.candidateName}"?`,
+                      html: `
+          <div class="grid grid-cols-2 gap-4 mt-4">
+    <button id="scheduleMail" class="swal2-styled swal2-confirm bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">📅 Schedule Interview Mail</button>
+    <button id="selectedMail" class="swal2-styled swal2-confirm bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">✅ Selected Mail</button>
+    <button id="rescheduleMail" class="swal2-styled swal2-confirm bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">🔄 Reschedule Mail</button>
+    <button id="rejectedMail" class="swal2-styled swal2-confirm bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">❌ Rejected Mail</button>
+</div>
+                      `,
+                      showCancelButton: true,
+                      showConfirmButton: false, // Hide the default confirm button
+                      focusConfirm: false,
+                      preConfirm: () => {
+                        // This won't be called as we're not using the default confirm button
+                      },
+                      didOpen: () => {
+                        document.getElementById('scheduleMail').addEventListener('click', () => {
+                          handleSendMail('schedule', selectedCandidateDetails, selectedCandidateDetails);
+                          Swal.close();
+                        });
+                        document.getElementById('selectedMail').addEventListener('click', () => {
+                          handleSendMail('selected', selectedCandidateDetails, selectedCandidateDetails);
+                          Swal.close();
+                        });
+                        document.getElementById('rescheduleMail').addEventListener('click', () => {
+                          handleSendMail('reschedule', selectedCandidateDetails, selectedCandidateDetails);
+                          Swal.close();
+                        });
+                        document.getElementById('rejectedMail').addEventListener('click', () => {
+                          handleSendMail('rejected', selectedCandidateDetails, selectedCandidateDetails);
+                          Swal.close();
+                        });
+                      }
                     });
-                    const formattedTime = interviewDate.toLocaleTimeString('en-US', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: true,
-                    });
-
-                    const subject = encodeURIComponent(`Interview Confirmation - ${selectedCandidateDetails.jobRole} Position at ${selectedCandidateDetails.companyName}`);
-                    const body = encodeURIComponent(`Dear ${selectedCandidateDetails.candidateName},
-
-We are pleased to confirm your interview for the ${selectedCandidateDetails.jobRole} position at ${selectedCandidateDetails.companyName}.
-
-Interview Details:
-━━━━━━━━━━━━━━━━━
-📅 Date: ${formattedDate}
-🕐 Time: ${formattedTime}
-💼 Position: ${selectedCandidateDetails.jobRole}
-🏢 Company: ${selectedCandidateDetails.companyName}
-📊 Interview Level: ${selectedCandidateDetails.interviewLevel}
-
-Please ensure you:
-• Keep your resume and relevant documents handy
-• Prepare questions you'd like to ask about the role
-
-If you need to reschedule or have any questions, please let us know as soon as possible.
-
-We look forward to speaking with you!
-
-Best regards,
-Zero7 Technologies
-Recruitment Team`);
-
-                    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${selectedCandidateDetails.candidateEmail}&su=${subject}&body=${body}`;
-                    window.open(gmailUrl, '_blank');
                   }}
                   className='px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center'>
                   <svg

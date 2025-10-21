@@ -18,6 +18,7 @@
     "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
+    "docx-parser": "^0.2.1",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
@@ -27,8 +28,10 @@
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^7.0.6",
     "nodemon": "^3.1.10",
+    "pdf-parse": "^1.1.1",
     "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "textract": "^2.5.0"
   },
   "devDependencies": {
     "@types/socket.io": "^3.0.1"

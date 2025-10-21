@@ -1,78 +1,80 @@
 // File: src/Pages/NewBatches.jsx
 
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-import Pagination from '../Components/Pagination'
-import api from '../api/axios' // Import your central api instance
-import './NewBatches.css'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import Pagination from '../Components/Pagination';
+import api from '../api/axios';
+import './NewBatches.css';
 
-const API_URL = process.env.REACT_APP_API_URL
+const API_URL = process.env.REACT_APP_API_URL;
 
 const NewBatches = () => {
-  const [showRegistration, setShowRegistration] = useState(false)
-  const [selectedCourse, setSelectedCourse] = useState('')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [coursesData, setCoursesData] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(5)
+  const [showRegistration, setShowRegistration] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [coursesData, setCoursesData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // This still fetches the list of available batches correctly
-        const response = await axios.get(`${API_URL}/batches`)
-        setCoursesData(response.data)
+        const response = await axios.get(`${API_URL}/batches`);
+        setCoursesData(response.data);
       } catch (error) {
-        console.error('Failed to fetch new batches:', error)
+        console.error('Failed to fetch new batches:', error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-    fetchCourses()
-  }, [])
+    };
+    fetchCourses();
+  }, []);
 
-  const courses = coursesData.map((course) => course.course)
+  const courses = coursesData.map((course) => course.course);
 
   const filteredCourses = coursesData.filter((course) => {
-    const searchLower = searchTerm.toLowerCase()
+    const searchLower = searchTerm.toLowerCase();
     return (
       (course.course && course.course.toLowerCase().includes(searchLower)) ||
       (course.date && course.date.toLowerCase().includes(searchLower)) ||
       (course.timing && course.timing.toLowerCase().includes(searchLower)) ||
       (course.duration && course.duration.toLowerCase().includes(searchLower)) ||
       (course.trainer && course.trainer.toLowerCase().includes(searchLower))
-    )
-  })
+    );
+  });
 
   const handleRegister = (courseName) => {
-    setSelectedCourse(courseName)
-    setShowRegistration(true)
-  }
+    setSelectedCourse(courseName);
+    setShowRegistration(true);
+  };
 
-  const handleCloseRegistration = () => setShowRegistration(false)
+  const handleCloseRegistration = () => {
+    setShowRegistration(false);
+  };
+
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value)
-    setCurrentPage(1)
-  }
-  const clearSearch = () => {
-    setSearchTerm('')
-    setCurrentPage(1)
-  }
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
 
-  // Pagination handlers
+  const clearSearch = () => {
+    setSearchTerm('');
+    setCurrentPage(1);
+  };
+
   const handlePageChange = (page) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   const handleItemsPerPageChange = (items) => {
-    setItemsPerPage(items)
-    setCurrentPage(1)
-  }
+    setItemsPerPage(items);
+    setCurrentPage(1);
+  };
 
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedCourses = filteredCourses.slice(startIndex, endIndex)
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCourses = filteredCourses.slice(startIndex, endIndex);
 
   const RegistrationModal = ({ isOpen, onClose, initialCourse }) => {
     const [formData, setFormData] = useState({
@@ -82,62 +84,73 @@ const NewBatches = () => {
       selectedCourse: initialCourse || '',
       programType: '',
       message: '',
-    })
-    const [submitted, setSubmitted] = useState(false)
-    const [isSubmitting, setIsSubmitting] = useState(false) // State for loading feedback
+    });
+    const [submitted, setSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    if (!isOpen) return null
+    // Reset form state when the modal is reopened with a new course
+    useEffect(() => {
+        if (isOpen) {
+            setFormData(prev => ({ ...prev, selectedCourse: initialCourse }));
+            setSubmitted(false); // Reset submitted state
+        }
+    }, [isOpen, initialCourse]);
+
+
+    if (!isOpen) return null;
 
     const handleInputChange = (e) => {
-      setFormData({ ...formData, [e.target.name]: e.target.value })
-    }
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
-    // --- THIS IS THE UPDATED SUBMISSION LOGIC ---
     const handleSubmit = async (e) => {
-      e.preventDefault()
+      e.preventDefault();
       if (!formData.programType) {
-        alert('Please select an Enrollment Type before submitting.')
-        return
+        alert('Please select an Enrollment Type before submitting.');
+        return;
       }
-      setIsSubmitting(true)
+      setIsSubmitting(true);
       try {
-        const selectedCourseObj = coursesData.find((c) => c.course === formData.selectedCourse)
+        const selectedCourseObj = coursesData.find((c) => c.course === formData.selectedCourse);
         const payload = {
           ...formData,
           trainer: selectedCourseObj?.trainer || '',
           date: selectedCourseObj?.date || '',
           timings: selectedCourseObj?.timing || '',
           duration: selectedCourseObj?.duration || '',
-        }
+        };
         
-        // Use the axios instance to post to your new backend endpoint
-        await api.post('/batch-enrollments', payload)
-
-        setSubmitted(true) // Show the success message
+        await api.post('/batch-enrollments', payload);
+        setSubmitted(true);
       } catch (err) {
-        console.error("Registration failed:", err)
-        const errorMessage = err.response?.data?.message || 'Something went wrong. Please try again.'
-        alert(`Error: ${errorMessage}`)
+        console.error("Registration failed:", err);
+        const errorMessage = err.response?.data?.message || 'Something went wrong. Please try again.';
+        alert(`Error: ${errorMessage}`);
       } finally {
-        setIsSubmitting(false)
+        setIsSubmitting(false);
       }
-    }
-    // ---------------------------------------------
+    };
 
     return (
       <div className='modal-overlay' onClick={onClose}>
         <div className='modal-content' onClick={(e) => e.stopPropagation()}>
-          <button className='close-button' onClick={onClose}>
-            ×
-          </button>
+          {/* --- FIX #2: The close button is now outside the conditional render --- */}
+          {/* It will be visible on both the form and the success message */}
+          <button className='close-button' onClick={onClose}>×</button>
+
           {submitted ? (
             <div className='success-message'>
               <h2>Thank You!</h2>
               <p>
+                {/* --- FIX #1: Added a space before the strong tag for correct alignment --- */}
                 Your registration for the demo of{' '}
                 <strong>{formData.selectedCourse}</strong> has been received.
               </p>
               <p>We will contact you shortly at {formData.email}.</p>
+              {/* Added a button to explicitly close the modal */}
+              <button onClick={onClose} className="submit-button" style={{marginTop: '20px'}}>
+                Close
+              </button>
             </div>
           ) : (
             <>
@@ -161,9 +174,7 @@ const NewBatches = () => {
                   <select name='selectedCourse' value={formData.selectedCourse} onChange={handleInputChange} required>
                     <option value=''>-- Select a Course --</option>
                     {courses.map((courseName, index) => (
-                      <option key={index} value={courseName}>
-                        {courseName}
-                      </option>
+                      <option key={index} value={courseName}>{courseName}</option>
                     ))}
                   </select>
                 </div>
@@ -191,8 +202,8 @@ const NewBatches = () => {
           )}
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <>
@@ -210,9 +221,7 @@ const NewBatches = () => {
               className='search-input'
             />
             {searchTerm && (
-              <button className='clear-search' onClick={clearSearch}>
-                ×
-              </button>
+              <button className='clear-search' onClick={clearSearch}>×</button>
             )}
           </div>
           <div className='search-results-count'>
@@ -239,9 +248,10 @@ const NewBatches = () => {
                     <tr key={course._id}>
                       <td>{course.course}</td>
                       <td>
-                        {new Date(course.date).toLocaleDateString('En-IN', {
+                        {new Date(course.date).toLocaleDateString('en-IN', {
                           year: 'numeric',
                           month: 'short',
+                          day: 'numeric'
                         })}
                       </td>
                       <td>{course.duration || 'N/A'}</td>
@@ -282,7 +292,7 @@ const NewBatches = () => {
         initialCourse={selectedCourse}
       />
     </>
-  )
-}
+  );
+};
 
-export default NewBatches
+export default NewBatches;

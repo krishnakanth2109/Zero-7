@@ -170,7 +170,7 @@ const CurrentHirings = () => {
 
       <section className='hero-section'>
         <img
-          src='/current hiring.jpg'
+          src='https://i.pinimg.com/1200x/71/b2/ef/71b2effc8fbeb1944b5c48466181e35f.jpg'
           alt='Hiring Banner'
           className='hero-image'
         />

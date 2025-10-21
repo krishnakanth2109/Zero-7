@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import api from '../api/axios' // Assuming this path is correct for your setup
+import * as XLSX from 'xlsx'
 import {
-  FaUserTie,
-  FaBuilding,
-  FaBriefcase,
-  FaCalendarAlt,
   FaCheckCircle,
   FaChevronLeft,
   FaChevronRight,
+  FaDownload,
 } from 'react-icons/fa' // Importing icons
 
 const PlacedCandidates = () => {
   const [placedCandidates, setPlacedCandidates] = useState([])
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(8) // Show 8 cards per page for better grid layout
+  const [itemsPerPage, setItemsPerPage] = useState(10) // Show 10 rows per page for table layout
 
   const fetchPlacedCandidates = async () => {
     try {
@@ -52,6 +50,37 @@ const PlacedCandidates = () => {
     setCurrentPage(1) // Reset to first page when changing items per page
   }
 
+  const exportToExcel = () => {
+    // Prepare data for export
+    const exportData = placedCandidates.map((candidate) => ({
+      'Candidate Name': candidate.candidateName,
+      Company: candidate.companyName,
+      'Job Role': candidate.jobRole,
+      Level: candidate.interviewLevel,
+      'Date Placed': new Date(candidate.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      }),
+      Status: 'PLACED',
+    }))
+
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData)
+
+    // Create workbook
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Placed Candidates')
+
+    // Generate file name with current date
+    const fileName = `placed_candidates_${
+      new Date().toISOString().split('T')[0]
+    }.xlsx`
+
+    // Save file
+    XLSX.writeFile(wb, fileName)
+  }
+
   if (loading) {
     return (
       <div className='flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100'>
@@ -75,9 +104,17 @@ const PlacedCandidates = () => {
             Placed Candidates
           </h1>
         </div>
-        <div className='flex items-center bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold text-lg shadow-sm'>
-          <span className='mr-2'>Total Placed:</span>
-          <span className='text-2xl'>{placedCandidates.length}</span>
+        <div className='flex items-center gap-4'>
+          <button
+            onClick={exportToExcel}
+            className='flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-blue-500 text-white transition duration-200'>
+            <FaDownload className='mr-2' />
+            Export
+          </button>
+          <div className='flex items-center bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold text-lg shadow-sm'>
+            <span className='mr-2'>Total Placed:</span>
+            <span className='text-2xl'>{placedCandidates.length}</span>
+          </div>
         </div>
       </header>
 
@@ -91,53 +128,86 @@ const PlacedCandidates = () => {
           </div>
         ) : (
           <>
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8'>
-              {currentCandidates.map((candidate) => (
-                <div
-                  key={candidate._id}
-                  className='bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 border border-green-200'>
-                  <div className='p-6'>
-                    <div className='flex items-center mb-4'>
-                      <FaUserTie className='text-indigo-500 text-xl mr-3' />
-                      <h3 className='text-md font-bold text-gray-800'>
-                        {candidate.candidateName}
-                      </h3>
-                    </div>
-                    <div className='space-y-3'>
-                      <p className='flex items-center text-gray-700'>
-                        <FaBuilding className='text-purple-400 mr-3' />
-                        <span className='font-semibold'>Company:</span>{' '}
-                        {candidate.companyName}
-                      </p>
-                      <p className='flex items-center text-gray-700'>
-                        <FaBriefcase className='text-teal-400 mr-3' />
-                        <span className='font-semibold'>Job Role:</span>{' '}
-                        {candidate.jobRole}
-                      </p>
-                      <p className='flex items-center text-gray-700'>
-                        <FaCheckCircle className='text-green-500 mr-3' />
-                        <span className='font-semibold'>Level:</span>{' '}
-                        {candidate.interviewLevel}
-                      </p>
-                      <p className='flex items-center text-gray-700'>
-                        <FaCalendarAlt className='text-orange-400 mr-3' />
-                        <span className='font-semibold'>Date Placed:</span>{' '}
-                        {new Date(candidate.date).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                  <div className='bg-green-50 px-6 py-3 rounded-b-xl border-t border-green-100'>
-                    <p className='text-green-700 text-sm font-medium'>
-                      Status:{' '}
-                      <span className='font-bold uppercase'>Placed</span>
-                    </p>
-                  </div>
-                </div>
-              ))}
+            <div className='overflow-x-auto mb-8'>
+              <table className='min-w-full bg-white rounded-xl shadow-lg border border-gray-200'>
+                <thead>
+                  <tr className='bg-gray-50 border-b border-gray-200'>
+                    <th className='py-4 px-6 text-left text-sm font-semibold text-gray-700'>
+                      <div className='flex items-center'>Candidate Name</div>
+                    </th>
+                    <th className='py-4 px-6 text-left text-sm font-semibold text-gray-700'>
+                      <div className='flex items-center'>Company</div>
+                    </th>
+                    <th className='py-4 px-6 text-left text-sm font-semibold text-gray-700'>
+                      <div className='flex items-center'>Job Role</div>
+                    </th>
+                    <th className='py-4 px-6 text-left text-sm font-semibold text-gray-700'>
+                      <div className='flex items-center'>Salary</div>
+                    </th>
+                    <th className='py-4 px-6 text-left text-sm font-semibold text-gray-700'>
+                      <div className='flex items-center'>Level</div>
+                    </th>
+                    <th className='py-4 px-6 text-left text-sm font-semibold text-gray-700'>
+                      <div className='flex items-center'>Date Placed</div>
+                    </th>
+                    <th className='py-4 px-6 text-left text-sm font-semibold text-gray-700'>
+                      Status
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className='divide-y divide-gray-200'>
+                  {currentCandidates.map((candidate, index) => (
+                    <tr
+                      key={candidate._id}
+                      className={`hover:bg-gray-50 transition-colors duration-200 ${
+                        index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                      }`}>
+                      <td className='py-4 px-6'>
+                        <div className='text-sm font-semibold text-gray-800'>
+                          {candidate.candidateName}
+                        </div>
+                      </td>
+                      <td className='py-4 px-6'>
+                        <div className='text-sm text-gray-700'>
+                          {candidate.companyName}
+                        </div>
+                      </td>
+                      <td className='py-4 px-6'>
+                        <div className='text-sm text-gray-700'>
+                          {candidate.jobRole}
+                        </div>
+                      </td>
+                      <td className='py-4 px-6'>
+                        <div className='text-sm text-gray-700'>
+                          {candidate.salary}
+                        </div>
+                      </td>
+                      <td className='py-4 px-6'>
+                        <div className='text-sm text-gray-700'>
+                          {candidate.interviewLevel}
+                        </div>
+                      </td>
+                      <td className='py-4 px-6'>
+                        <div className='text-sm text-gray-700'>
+                          {new Date(candidate.date).toLocaleDateString(
+                            'en-US',
+                            {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            },
+                          )}
+                        </div>
+                      </td>
+                      <td className='py-4 px-6'>
+                        <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'>
+                          PLACED
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
             {/* Pagination */}
@@ -152,10 +222,10 @@ const PlacedCandidates = () => {
                         value={itemsPerPage}
                         onChange={handleItemsPerPageChange}
                         className='border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'>
-                        <option value={4}>4</option>
-                        <option value={8}>8</option>
-                        <option value={12}>12</option>
-                        <option value={20}>20</option>
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
                       </select>
                       <span>per page</span>
                     </div>

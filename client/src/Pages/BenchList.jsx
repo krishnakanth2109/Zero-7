@@ -15,6 +15,7 @@ const BenchList = () => {
   const [candidates, setCandidates] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
+  const [placed, setPlaced] = useState([])
 
   // State for the "Request Info" popup form
   const [requestFormData, setRequestFormData] = useState({
@@ -134,6 +135,15 @@ const BenchList = () => {
   const endIndex = startIndex + itemsPerPage
   const paginatedCandidates = candidates.slice(startIndex, endIndex)
 
+  const fetchPlaced = async () => {
+    const response = await api.get('/interview')
+    const placedCandidates = response.data.filter(
+      (interview) => interview.status?.toLowerCase() === 'placed',
+    )
+    console.log(placedCandidates)
+    setPlaced(placedCandidates)
+  }
+
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
@@ -144,6 +154,7 @@ const BenchList = () => {
       }
     }
     fetchCandidates()
+    fetchPlaced()
     // Animated stats counter effect
     let c = 0,
       cl = 0,
@@ -196,6 +207,17 @@ const BenchList = () => {
 
   return (
     <div className='bench-page'>
+      <div className='bg-gray-100 w-screen p-2 overflow-none text-blue-500 ticker'>
+        <p>
+          🔔 A New Candidate Placed:{' '}
+          <strong>
+            {placed.length > 0
+              ? `${placed[0].candidateName} In ${placed[0].companyName} `
+              : ''}
+          </strong>
+        </p>
+      </div>
+
       <section className='hero-section'>
         <img
           src='./bench-banner.jpg'
@@ -210,6 +232,13 @@ const BenchList = () => {
           </p>
         </div>
       </section>
+      <div className='bg-gray-100 w-screen p-2 overflow-none text-blue-500 ticker'>
+        {placed.slice(0, 5).map((can) => (
+          <span className='mr-12' key={can._id}>
+            🔔 New Candidate Placed: {can.candidateName} - {can.companyName}
+          </span>
+        ))}
+      </div>
 
       <section className='stats-section'>
         <div className='bg-[linear-gradient(45deg,#0f8afe,#00bfff)] rounded-xl flex-1 p-6 shadow-xl min-w-[200px]'>

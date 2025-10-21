@@ -78,6 +78,14 @@ section {
   margin-bottom: 30px;
 }
 
+.ticker {
+  animation: scroll 15s linear infinite;
+  white-space: nowrap;
+}
+.ticker:hover {
+  animation-play-state: paused;
+}
+
 .btn-gradient {
   background: linear-gradient(45deg, #0f62fe, #00bfff);
   border: none;

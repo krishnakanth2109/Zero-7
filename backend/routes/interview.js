@@ -74,6 +74,7 @@ router.get('/', async (req, res) => {
           candidateEmail: '$candidateInfo.email',
           companyName: '$companyInfo.name',
           jobRole: '$jobInfo.role',
+          salary: '$jobInfo.salary',
         },
       },
       { $sort: { date: -1 } },

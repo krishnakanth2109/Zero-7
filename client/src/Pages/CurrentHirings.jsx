@@ -12,7 +12,8 @@ import {
   FileText,
   DollarSign,
   Clock,
-  Building, // Icon for Industry
+  Building,
+  IndianRupee, // Icon for Industry
 } from 'lucide-react'
 import './CurrentHirings.css'
 
@@ -342,7 +343,7 @@ const CurrentHirings = () => {
                                 </div>
 
                                 <div className='input-group'>
-                                  <DollarSign size={16} />
+                                 <IndianRupee size={17}/>
                                   <input
                                     type='text'
                                     name='currentSalary'
@@ -355,7 +356,7 @@ const CurrentHirings = () => {
                                 </div>
 
                                 <div className='input-group'>
-                                  <DollarSign size={16} />
+                                   <IndianRupee size={17}/>
                                   <input
                                     type='text'
                                     name='expectedSalary'

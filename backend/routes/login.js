@@ -4,14 +4,14 @@ import jwtToken from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import dotenv from 'dotenv'
-import {
-  prepareSuccessLoginData,
-  prepareFailedLoginData,
-  prepareForSuccessfulPasswordChange,
-  prepareOtpData,
-  renderEmailTemplate,
-} from '../utils/emailTemplates.js'
-import transporter from '../utils/mail.js'
+// import {
+//   prepareSuccessLoginData,
+//   prepareFailedLoginData,
+//   prepareForSuccessfulPasswordChange,
+//   prepareOtpData,
+//   renderEmailTemplate,
+// } from '../utils/emailTemplates.js'
+// import transporter from '../utils/mail.js'
 import { request } from 'http'
 dotenv.config()
 
@@ -108,16 +108,16 @@ router.post('/forgot-password', async (request, response) => {
     await user.save()
     const username = user.name
     const validMin = 10
-    const templateData = prepareOtpData(request, otp, username, validMin)
-    const htmlContent = renderEmailTemplate('otpVerification', templateData)
-    const mailOptions = {
-      from: process.env.AUTH_MAIL,
-      to: user.email,
-      subject: 'Otp - Reset Password',
-      text: 'Otp - Reset Password ',
-      html: htmlContent,
-    }
-    await transporter.sendMail(mailOptions)
+    // const templateData = prepareOtpData(request, otp, username, validMin)
+    // const htmlContent = renderEmailTemplate('otpVerification', templateData)
+    // const mailOptions = {
+    //   from: process.env.AUTH_MAIL,
+    //   to: user.email,
+    //   subject: 'Otp - Reset Password',
+    //   text: 'Otp - Reset Password ',
+    //   html: htmlContent,
+    // }
+    // await transporter.sendMail(mailOptions)
     response.send({ message: 'Email Has been Sent' })
   }
 })
@@ -155,23 +155,23 @@ router.post('/reset-password', async (request, response) => {
       user.passwordResetExpires = undefined
       const username = user.email
       const login = 'https://zero7technologies.com/admin'
-      const templateData = prepareForSuccessfulPasswordChange(
-        request,
-        username,
-        login,
-      )
-      const htmlContent = renderEmailTemplate(
-        'passwordResetSuccess',
-        templateData,
-      )
+      // const templateData = prepareForSuccessfulPasswordChange(
+      //   request,
+      //   username,
+      //   login,
+      // )
+      // const htmlContent = renderEmailTemplate(
+      //   'passwordResetSuccess',
+      //   templateData,
+      // )
       await user.save()
-      const mailOptions = {
-        from: process.env.AUTH_MAIL,
-        to: user.email,
-        subject: 'Reset Password Successful ✅',
-        text: 'Reset Password ',
-        html: htmlContent,
-      }
+      // const mailOptions = {
+      //   from: process.env.AUTH_MAIL,
+      //   to: user.email,
+      //   subject: 'Reset Password Successful ✅',
+      //   text: 'Reset Password ',
+      //   html: htmlContent,
+      // }
       // await transporter.sendMail(mailOptions)
       response.send({ message: 'Password Change Successful ✅' })
     }

@@ -3,11 +3,11 @@
 import express from 'express'
 import RequestInfo from '../models/RequestInfo.js'
 import Candidate from '../models/Candidate.js'
-import transporter from '../utils/mail.js'
-import {
-  renderEmailTemplate,
-  prepareCandidateDetailsForRequester,
-} from '../utils/emailTemplates.js'
+// import transporter from '../utils/mail.js'
+// import {
+//   renderEmailTemplate,
+//   prepareCandidateDetailsForRequester,
+// } from '../utils/emailTemplates.js'
 import Notification from '../models/notifications.js' // <-- CORRECTED: Import path is singular
 
 const router = express.Router()

@@ -4,11 +4,11 @@ import express from 'express'
 import Candidate from '../models/Candidate.js'
 import User from '../models/User.js'
 import Notification from '../models/notifications.js' // <-- CORRECTED: Import path is singular
-import {
-  prepareCandidateAdd,
-  renderEmailTemplate,
-} from '../utils/emailTemplates.js'
-import transporter from '../utils/mail.js'
+// import {
+//   prepareCandidateAdd,
+//   renderEmailTemplate,
+// } from '../utils/emailTemplates.js'
+// import transporter from '../utils/mail.js'
 
 const router = express.Router()
 

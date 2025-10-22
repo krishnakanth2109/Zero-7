@@ -7,11 +7,11 @@ import Job from '../models/jobs.js'
 import Company from '../models/Companies.js'
 import User from '../models/User.js'
 import Notification from '../models/notifications.js' // <-- CORRECTED PATH
-import {
-  renderEmailTemplate,
-  prepareCandidateInterview,
-} from '../utils/emailTemplates.js'
-import transporter from '../utils/mail.js'
+// import {
+//   renderEmailTemplate,
+//   prepareCandidateInterview,
+// } from '../utils/emailTemplates.js'
+// import transporter from '../utils/mail.js'
 import jobs from '../models/jobs.js'
 
 const router = express.Router()

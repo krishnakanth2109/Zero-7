@@ -275,7 +275,7 @@ router.post('/', async (req, res) => {
     const io = req.app.get('io')
     const message = `${
       userName || 'A user'
-    } scheduled a new L${interviewLevel} interview that needs your approval.`
+    } scheduled a new ${interviewLevel} interview that needs your approval.`
     const notification = new Notification({
       title: 'Interview Approval Required',
       message,
@@ -370,7 +370,7 @@ router.patch('/:id', async (req, res) => {
 router.get('/search', async (req, res) => {
   try {
     const [candidates, companies, jobs] = await Promise.all([
-      Candidate.find({}, { _id: 1, name: 1 }),
+      Candidate.find({ status: 'approved' }, { _id: 1, name: 1 }),
       Company.find({}, { _id: 1, name: 1 }),
     ])
     res.status(200).json({ candidates, companies })

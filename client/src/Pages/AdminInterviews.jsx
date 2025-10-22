@@ -325,21 +325,21 @@ const InterviewTracker = () => {
 
   // --- New function to handle mail generation and opening ---
   const handleSendMail = (mailType, candidate, interviewDetails) => {
-    const interviewDate = new Date(interviewDetails.date);
+    const interviewDate = new Date(interviewDetails.date)
     const formattedDate = interviewDate.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    });
+    })
     const formattedTime = interviewDate.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true,
-    });
+    })
 
-    let subject = '';
-    let body = '';
+    let subject = ''
+    let body = ''
 
     const commonDetails = `
 Interview Details:
@@ -349,11 +349,11 @@ Interview Details:
 💼 Position: ${interviewDetails.jobRole}
 🏢 Company: ${interviewDetails.companyName}
 📊 Interview Level: ${interviewDetails.interviewLevel}
-`;
+`
 
     switch (mailType) {
       case 'schedule':
-        subject = `Interview Confirmation - ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`;
+        subject = `Interview Confirmation - ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`
         body = `Dear ${candidate.candidateName},
 
 We are pleased to confirm your interview for the ${interviewDetails.jobRole} position at ${interviewDetails.companyName}.
@@ -368,10 +368,10 @@ We look forward to speaking with you!
 
 Best regards,
 Zero7 Technologies
-Recruitment Team`;
-        break;
+Recruitment Team`
+        break
       case 'selected':
-        subject = `Congratulations! - Offer for ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`;
+        subject = `Congratulations! - Offer for ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`
         body = `Dear ${candidate.candidateName},
 
 We are thrilled to inform you that you have been selected for the ${interviewDetails.jobRole} position at ${interviewDetails.companyName}!
@@ -386,10 +386,10 @@ Congratulations once again!
 
 Best regards,
 Zero7 Technologies
-Recruitment Team`;
-        break;
+Recruitment Team`
+        break
       case 'reschedule':
-        subject = `Reschedule Request - Interview for ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`;
+        subject = `Reschedule Request - Interview for ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`
         body = `Dear ${candidate.candidateName},
 
 We would like to inform you that your interview for the ${interviewDetails.jobRole} position at ${interviewDetails.companyName} needs to be rescheduled.
@@ -404,10 +404,10 @@ Thank you for your understanding.
 
 Best regards,
 Zero7 Technologies
-Recruitment Team`;
-        break;
+Recruitment Team`
+        break
       case 'rejected':
-        subject = `Update on your application for ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`;
+        subject = `Update on your application for ${interviewDetails.jobRole} Position at ${interviewDetails.companyName}`
         body = `Dear ${candidate.candidateName},
 
 Thank you for your interest in the ${interviewDetails.jobRole} position at ${interviewDetails.companyName} and for taking the time to interview with us.
@@ -418,25 +418,24 @@ This was a very competitive search, and we wish you the best in your job search 
 
 Best regards,
 Zero7 Technologies
-Recruitment Team`;
-        break;
+Recruitment Team`
+        break
       default:
-        subject = `Regarding your application at ${interviewDetails.companyName}`;
+        subject = `Regarding your application at ${interviewDetails.companyName}`
         body = `Dear ${candidate.candidateName},
 
 Regarding your application for the ${interviewDetails.jobRole} position at ${interviewDetails.companyName}.
 
 Best regards,
 Zero7 Technologies
-Recruitment Team`;
+Recruitment Team`
     }
 
-    const encodedSubject = encodeURIComponent(subject);
-    const encodedBody = encodeURIComponent(body);
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${candidate.candidateEmail}&su=${encodedSubject}&body=${encodedBody}`;
-    window.open(gmailUrl, '_blank');
-  };
-
+    const encodedSubject = encodeURIComponent(subject)
+    const encodedBody = encodeURIComponent(body)
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${candidate.candidateEmail}&su=${encodedSubject}&body=${encodedBody}`
+    window.open(gmailUrl, '_blank')
+  }
 
   if (loading) {
     return (
@@ -453,7 +452,9 @@ Recruitment Team`;
     <div className='min-h-screen w-[80vw] bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-7xl mx-auto'>
         {/* Header */}
-        <div className='text-center mb-12 relative'> {/* Added relative for alarm positioning */}
+        <div className='text-center mb-12 relative'>
+          {' '}
+          {/* Added relative for alarm positioning */}
           <h1 className='text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent'>
             Interview Tracker
           </h1>
@@ -461,88 +462,91 @@ Recruitment Team`;
             Manage candidate interviews, track status, and schedule meetings in
             one place
           </p>
-           {/* Notification Bell Icon - Repositioned and enhanced */}
-           {upcomingAlerts.length > 0 && (
-              <div className='absolute top-0 right-0 mt-2 mr-2 z-50'> {/* Adjusted positioning */}
-                <button
-                  onClick={() => setShowAlertsDropdown(!showAlertsDropdown)}
-                  className='relative p-3 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 animate-ring-pulse'> {/* Custom animation */}
-                  <svg
-                    className='w-6 h-6'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                    xmlns='http://www.w3.org/2000/svg'>
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      d='M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'></path>
-                  </svg>
-                  <span className='absolute -top-1 -right-1 bg-yellow-400 text-red-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse'>
-                    {upcomingAlerts.length}
-                  </span>
-                </button>
-
-                {/* Alerts Dropdown */}
-                {showAlertsDropdown && (
-                  <div className='absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-96 overflow-y-auto'>
-                    <div className='p-4 border-b border-gray-200 bg-gradient-to-r from-red-50 to-orange-50'>
-                      <h4 className='font-bold text-gray-800 flex items-center'>
-                        <svg
-                          className='w-5 h-5 mr-2 text-red-500'
-                          fill='currentColor'
-                          viewBox='0 0 20 20'>
-                          <path d='M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z'></path>
-                        </svg>
-                        Upcoming Interviews (Next 15 min)
-                      </h4>
-                    </div>
-                    <div className='divide-y divide-gray-100'>
-                      {upcomingAlerts.map((interview) => {
-                        const now = new Date()
-                        const minutesLeft = Math.ceil(
-                          (new Date(interview.date) - now) / 60000,
-                        )
-                        return (
-                          <div
-                            key={interview._id}
-                            className='p-4 hover:bg-gray-50 transition-colors duration-150'>
-                            <div className='flex items-start justify-between'>
-                              <div className='flex-1'>
-                                <p className='font-semibold text-gray-900'>
-                                  {interview.candidateName}
-                                </p>
-                                <p className='text-sm text-gray-600 mt-1'>
-                                  {interview.jobRole}
-                                </p>
-                                <p className='text-sm text-gray-500'>
-                                  {interview.companyName}
-                                </p>
-                                <p className='text-xs text-gray-400 mt-1'>
-                                  {new Date(interview.date).toLocaleTimeString(
-                                    [],
-                                    {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                    },
-                                  )}
-                                </p>
-                              </div>
-                              <div className='ml-3 flex-shrink-0'>
-                                <span className='inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800'>
-                                  {minutesLeft} min
-                                </span>
-                              </div>
+          {/* Notification Bell Icon - Repositioned and enhanced */}
+          {upcomingAlerts.length > 0 && (
+            <div className='absolute top-0 right-0 mt-2 mr-2 z-50'>
+              {' '}
+              {/* Adjusted positioning */}
+              <button
+                onClick={() => setShowAlertsDropdown(!showAlertsDropdown)}
+                className='relative p-3 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 animate-ring-pulse'>
+                {' '}
+                {/* Custom animation */}
+                <svg
+                  className='w-6 h-6'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                  xmlns='http://www.w3.org/2000/svg'>
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    d='M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'></path>
+                </svg>
+                <span className='absolute -top-1 -right-1 bg-yellow-400 text-red-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse'>
+                  {upcomingAlerts.length}
+                </span>
+              </button>
+              {/* Alerts Dropdown */}
+              {showAlertsDropdown && (
+                <div className='absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-96 overflow-y-auto'>
+                  <div className='p-4 border-b border-gray-200 bg-gradient-to-r from-red-50 to-orange-50'>
+                    <h4 className='font-bold text-gray-800 flex items-center'>
+                      <svg
+                        className='w-5 h-5 mr-2 text-red-500'
+                        fill='currentColor'
+                        viewBox='0 0 20 20'>
+                        <path d='M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z'></path>
+                      </svg>
+                      Upcoming Interviews (Next 15 min)
+                    </h4>
+                  </div>
+                  <div className='divide-y divide-gray-100'>
+                    {upcomingAlerts.map((interview) => {
+                      const now = new Date()
+                      const minutesLeft = Math.ceil(
+                        (new Date(interview.date) - now) / 60000,
+                      )
+                      return (
+                        <div
+                          key={interview._id}
+                          className='p-4 hover:bg-gray-50 transition-colors duration-150'>
+                          <div className='flex items-start justify-between'>
+                            <div className='flex-1'>
+                              <p className='font-semibold text-gray-900'>
+                                {interview.candidateName}
+                              </p>
+                              <p className='text-sm text-gray-600 mt-1'>
+                                {interview.jobRole}
+                              </p>
+                              <p className='text-sm text-gray-500'>
+                                {interview.companyName}
+                              </p>
+                              <p className='text-xs text-gray-400 mt-1'>
+                                {new Date(interview.date).toLocaleTimeString(
+                                  [],
+                                  {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  },
+                                )}
+                              </p>
+                            </div>
+                            <div className='ml-3 flex-shrink-0'>
+                              <span className='inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800'>
+                                {minutesLeft} min
+                              </span>
                             </div>
                           </div>
-                        )
-                      })}
-                    </div>
+                        </div>
+                      )
+                    })}
                   </div>
-                )}
-              </div>
-            )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Stats Cards */}
@@ -1151,7 +1155,7 @@ Recruitment Team`;
                 </p>
               </div>
               <div className='p-6 border-t border-gray-200 flex justify-end'>
-              <button
+                <button
                   onClick={() => {
                     Swal.fire({
                       title: `Which mail do you want to send to "${selectedCandidateDetails.candidateName}"?`,
@@ -1170,24 +1174,48 @@ Recruitment Team`;
                         // This won't be called as we're not using the default confirm button
                       },
                       didOpen: () => {
-                        document.getElementById('scheduleMail').addEventListener('click', () => {
-                          handleSendMail('schedule', selectedCandidateDetails, selectedCandidateDetails);
-                          Swal.close();
-                        });
-                        document.getElementById('selectedMail').addEventListener('click', () => {
-                          handleSendMail('selected', selectedCandidateDetails, selectedCandidateDetails);
-                          Swal.close();
-                        });
-                        document.getElementById('rescheduleMail').addEventListener('click', () => {
-                          handleSendMail('reschedule', selectedCandidateDetails, selectedCandidateDetails);
-                          Swal.close();
-                        });
-                        document.getElementById('rejectedMail').addEventListener('click', () => {
-                          handleSendMail('rejected', selectedCandidateDetails, selectedCandidateDetails);
-                          Swal.close();
-                        });
-                      }
-                    });
+                        document
+                          .getElementById('scheduleMail')
+                          .addEventListener('click', () => {
+                            handleSendMail(
+                              'schedule',
+                              selectedCandidateDetails,
+                              selectedCandidateDetails,
+                            )
+                            Swal.close()
+                          })
+                        document
+                          .getElementById('selectedMail')
+                          .addEventListener('click', () => {
+                            handleSendMail(
+                              'selected',
+                              selectedCandidateDetails,
+                              selectedCandidateDetails,
+                            )
+                            Swal.close()
+                          })
+                        document
+                          .getElementById('rescheduleMail')
+                          .addEventListener('click', () => {
+                            handleSendMail(
+                              'reschedule',
+                              selectedCandidateDetails,
+                              selectedCandidateDetails,
+                            )
+                            Swal.close()
+                          })
+                        document
+                          .getElementById('rejectedMail')
+                          .addEventListener('click', () => {
+                            handleSendMail(
+                              'rejected',
+                              selectedCandidateDetails,
+                              selectedCandidateDetails,
+                            )
+                            Swal.close()
+                          })
+                      },
+                    })
                   }}
                   className='px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center'>
                   <svg

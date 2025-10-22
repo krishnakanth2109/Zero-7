@@ -51,7 +51,7 @@ const AdminHeader = ({ toggleSidebar, isOpen }) => {
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [notificationRef])
 
   const handleLogout = () => {
     Cookie.remove('token')

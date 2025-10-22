@@ -145,9 +145,6 @@ const PlacedCandidates = () => {
                       <div className='flex items-center'>Salary</div>
                     </th>
                     <th className='py-4 px-6 text-left text-sm font-semibold text-gray-700'>
-                      <div className='flex items-center'>Level</div>
-                    </th>
-                    <th className='py-4 px-6 text-left text-sm font-semibold text-gray-700'>
                       <div className='flex items-center'>Date Placed</div>
                     </th>
                     <th className='py-4 px-6 text-left text-sm font-semibold text-gray-700'>
@@ -180,11 +177,6 @@ const PlacedCandidates = () => {
                       <td className='py-4 px-6'>
                         <div className='text-sm text-gray-700'>
                           {candidate.salary}
-                        </div>
-                      </td>
-                      <td className='py-4 px-6'>
-                        <div className='text-sm text-gray-700'>
-                          {candidate.interviewLevel}
                         </div>
                       </td>
                       <td className='py-4 px-6'>

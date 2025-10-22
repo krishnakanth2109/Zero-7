@@ -209,10 +209,10 @@ const BenchList = () => {
     <div className='bench-page'>
       <div className='bg-gray-100 w-screen p-2 overflow-none text-blue-500 ticker'>
         <p>
-          🔔 A New Candidate Placed:{' '}
+          🎉 Congratulations:{' '}
           <strong>
             {placed.length > 0
-              ? `${placed[0].candidateName} In ${placed[0].companyName} `
+              ? `${placed[0].candidateName} is placed as ${placed[0].jobRole} `
               : ''}
           </strong>
         </p>
@@ -235,7 +235,7 @@ const BenchList = () => {
       <div className='bg-gray-100 w-screen p-2 overflow-none text-blue-500 ticker'>
         {placed.slice(0, 5).map((can) => (
           <span className='mr-12' key={can._id}>
-            🔔 New Candidate Placed: {can.candidateName} - {can.companyName}
+            🎉 Congratulations: {can.candidateName} is placed as {can.jobRole}
           </span>
         ))}
       </div>

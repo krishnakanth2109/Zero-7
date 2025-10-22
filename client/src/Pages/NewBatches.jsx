@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import Pagination from '../Components/Pagination'
-import api from '../api/axios' // Import your central api instance
+import api from '../api/axios'
 import './NewBatches.css'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -20,7 +20,6 @@ const NewBatches = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // This still fetches the list of available batches correctly
         const response = await axios.get(`${API_URL}/batches`)
         setCoursesData(response.data)
       } catch (error) {
@@ -40,7 +39,8 @@ const NewBatches = () => {
       (course.course && course.course.toLowerCase().includes(searchLower)) ||
       (course.date && course.date.toLowerCase().includes(searchLower)) ||
       (course.timing && course.timing.toLowerCase().includes(searchLower)) ||
-      (course.duration && course.duration.toLowerCase().includes(searchLower)) ||
+      (course.duration &&
+        course.duration.toLowerCase().includes(searchLower)) ||
       (course.trainer && course.trainer.toLowerCase().includes(searchLower))
     )
   })
@@ -50,17 +50,20 @@ const NewBatches = () => {
     setShowRegistration(true)
   }
 
-  const handleCloseRegistration = () => setShowRegistration(false)
+  const handleCloseRegistration = () => {
+    setShowRegistration(false)
+  }
+
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value)
     setCurrentPage(1)
   }
+
   const clearSearch = () => {
     setSearchTerm('')
     setCurrentPage(1)
   }
 
-  // Pagination handlers
   const handlePageChange = (page) => {
     setCurrentPage(page)
   }
@@ -84,7 +87,15 @@ const NewBatches = () => {
       message: '',
     })
     const [submitted, setSubmitted] = useState(false)
-    const [isSubmitting, setIsSubmitting] = useState(false) // State for loading feedback
+    const [isSubmitting, setIsSubmitting] = useState(false)
+
+    // Reset form state when the modal is reopened with a new course
+    useEffect(() => {
+      if (isOpen) {
+        setFormData((prev) => ({ ...prev, selectedCourse: initialCourse }))
+        setSubmitted(false) // Reset submitted state
+      }
+    }, [isOpen, initialCourse])
 
     if (!isOpen) return null
 
@@ -92,7 +103,6 @@ const NewBatches = () => {
       setFormData({ ...formData, [e.target.name]: e.target.value })
     }
 
-    // --- THIS IS THE UPDATED SUBMISSION LOGIC ---
     const handleSubmit = async (e) => {
       e.preventDefault()
       if (!formData.programType) {
@@ -101,7 +111,9 @@ const NewBatches = () => {
       }
       setIsSubmitting(true)
       try {
-        const selectedCourseObj = coursesData.find((c) => c.course === formData.selectedCourse)
+        const selectedCourseObj = coursesData.find(
+          (c) => c.course === formData.selectedCourse,
+        )
         const payload = {
           ...formData,
           trainer: selectedCourseObj?.trainer || '',
@@ -115,29 +127,41 @@ const NewBatches = () => {
 
         setSubmitted(true) // Show the success message
       } catch (err) {
-        console.error("Registration failed:", err)
-        const errorMessage = err.response?.data?.message || 'Something went wrong. Please try again.'
+        console.error('Registration failed:', err)
+        const errorMessage =
+          err.response?.data?.message ||
+          'Something went wrong. Please try again.'
         alert(`Error: ${errorMessage}`)
       } finally {
         setIsSubmitting(false)
       }
     }
-    // ---------------------------------------------
 
     return (
       <div className='modal-overlay' onClick={onClose}>
         <div className='modal-content' onClick={(e) => e.stopPropagation()}>
+          {/* --- FIX #2: The close button is now outside the conditional render --- */}
+          {/* It will be visible on both the form and the success message */}
           <button className='close-button' onClick={onClose}>
             ×
           </button>
+
           {submitted ? (
             <div className='success-message'>
               <h2>Thank You!</h2>
               <p>
+                {/* --- FIX #1: Added a space before the strong tag for correct alignment --- */}
                 Your registration for the demo of{' '}
                 <strong>{formData.selectedCourse}</strong> has been received.
               </p>
               <p>We will contact you shortly at {formData.email}.</p>
+              {/* Added a button to explicitly close the modal */}
+              <button
+                onClick={onClose}
+                className='submit-button'
+                style={{ marginTop: '20px' }}>
+                Close
+              </button>
             </div>
           ) : (
             <>
@@ -146,19 +170,41 @@ const NewBatches = () => {
               <form onSubmit={handleSubmit} className='registration-form'>
                 <div className='form-group'>
                   <label>Full Name *</label>
-                  <input type='text' name='name' value={formData.name} onChange={handleInputChange} required />
+                  <input
+                    type='text'
+                    name='name'
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
                 <div className='form-group'>
                   <label>Email Address *</label>
-                  <input type='email' name='email' value={formData.email} onChange={handleInputChange} required />
+                  <input
+                    type='email'
+                    name='email'
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
                 <div className='form-group'>
                   <label>Phone Number *</label>
-                  <input type='tel' name='phone' value={formData.phone} onChange={handleInputChange} required />
+                  <input
+                    type='tel'
+                    name='phone'
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
                 <div className='form-group'>
                   <label>Select Course *</label>
-                  <select name='selectedCourse' value={formData.selectedCourse} onChange={handleInputChange} required>
+                  <select
+                    name='selectedCourse'
+                    value={formData.selectedCourse}
+                    onChange={handleInputChange}
+                    required>
                     <option value=''>-- Select a Course --</option>
                     {courses.map((courseName, index) => (
                       <option key={index} value={courseName}>
@@ -170,7 +216,11 @@ const NewBatches = () => {
                 {formData.selectedCourse && (
                   <div className='form-group'>
                     <label>Enrollment Type *</label>
-                    <select name='programType' value={formData.programType} onChange={handleInputChange} required>
+                    <select
+                      name='programType'
+                      value={formData.programType}
+                      onChange={handleInputChange}
+                      required>
                       <option value=''>-- Select Type --</option>
                       <option value='Training'>Training</option>
                       <option value='Internship'>Internship</option>
@@ -181,9 +231,16 @@ const NewBatches = () => {
                 )}
                 <div className='form-group'>
                   <label>Message (Optional)</label>
-                  <textarea name='message' value={formData.message} onChange={handleInputChange} rows='3'></textarea>
+                  <textarea
+                    name='message'
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    rows='3'></textarea>
                 </div>
-                <button type='submit' className='submit-button' disabled={isSubmitting}>
+                <button
+                  type='submit'
+                  className='submit-button'
+                  disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting...' : 'Register for Demo'}
                 </button>
               </form>
@@ -226,37 +283,88 @@ const NewBatches = () => {
           ) : (
             <table
               className='batches-table'
-              style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center' }}
-            >
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                textAlign: 'center',
+              }}>
               <thead>
                 <tr>
-                  <th style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>Course</th>
-                  <th style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>Date</th>
-                  <th style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>Duration</th>
-                  <th style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>Register for Demo</th>
+                  <th
+                    style={{
+                      textAlign: 'center',
+                      verticalAlign: 'middle',
+                      padding: '10px',
+                    }}>
+                    Course
+                  </th>
+                  <th
+                    style={{
+                      textAlign: 'center',
+                      verticalAlign: 'middle',
+                      padding: '10px',
+                    }}>
+                    Date
+                  </th>
+                  <th
+                    style={{
+                      textAlign: 'center',
+                      verticalAlign: 'middle',
+                      padding: '10px',
+                    }}>
+                    Duration
+                  </th>
+                  <th
+                    style={{
+                      textAlign: 'center',
+                      verticalAlign: 'middle',
+                      padding: '10px',
+                    }}>
+                    Register for Demo
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedCourses.length > 0 ? (
                   paginatedCourses.map((course) => (
                     <tr key={course._id}>
-                      <td style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>
+                      <td
+                        style={{
+                          textAlign: 'center',
+                          verticalAlign: 'middle',
+                          padding: '10px',
+                        }}>
                         {course.course}
                       </td>
-                      <td style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>
+                      <td
+                        style={{
+                          textAlign: 'center',
+                          verticalAlign: 'middle',
+                          padding: '10px',
+                        }}>
                         {new Date(course.date).toLocaleDateString('En-IN', {
                           year: 'numeric',
                           month: 'short',
+                          day: 'numeric',
                         })}
                       </td>
-                      <td style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>
+                      <td
+                        style={{
+                          textAlign: 'center',
+                          verticalAlign: 'middle',
+                          padding: '10px',
+                        }}>
                         {course.duration || 'N/A'}
                       </td>
-                      <td style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}>
+                      <td
+                        style={{
+                          textAlign: 'center',
+                          verticalAlign: 'middle',
+                          padding: '10px',
+                        }}>
                         <button
                           className='register-btn'
-                          onClick={() => handleRegister(course.course)}
-                        >
+                          onClick={() => handleRegister(course.course)}>
                           Register Now
                         </button>
                       </td>
@@ -267,15 +375,17 @@ const NewBatches = () => {
                     <td
                       colSpan='4'
                       className='no-results'
-                      style={{ textAlign: 'center', verticalAlign: 'middle', padding: '10px' }}
-                    >
+                      style={{
+                        textAlign: 'center',
+                        verticalAlign: 'middle',
+                        padding: '10px',
+                      }}>
                       No courses found matching your search.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
-
           )}
           {filteredCourses.length > 0 && (
             <Pagination

@@ -22,7 +22,7 @@ const AdminUserPage = () => {
   const [error, setError] = useState('')
   const [showResetModal, setShowResetModal] = useState(false)
   const [resetForm, setResetForm] = useState({
-    email: '',
+    email: '', // Email is kept for display, but logic uses ID
     password: '',
     confirmPassword: '',
   })
@@ -64,11 +64,6 @@ const AdminUserPage = () => {
     }
   }, [user.email, showResetModal])
 
-  const handleEdit = () => {
-    // Navigate to edit page or open edit modal
-    console.log('Edit user:', user._id)
-  }
-
   const openResetModal = () => {
     setShowResetModal(true)
     setResetError('')
@@ -96,10 +91,7 @@ const AdminUserPage = () => {
   }
 
   const validateResetForm = () => {
-    if (!resetForm.email) {
-      setResetError('Email is required')
-      return false
-    }
+    // Email check removed because we use ID now, but kept in form for UI clarity
     if (!resetForm.password) {
       setResetError('New password is required')
       return false
@@ -115,6 +107,7 @@ const AdminUserPage = () => {
     return true
   }
 
+  // --- FIXED FUNCTION START ---
   const handleResetPassword = async (e) => {
     e.preventDefault()
 
@@ -124,9 +117,9 @@ const AdminUserPage = () => {
       setResetLoading(true)
       setResetError('')
 
-      // API call to reset password
-      await api.post(`/user/reset-password`, {
-        email: resetForm.email,
+      // CHANGED: Instead of /user/reset-password, we use PATCH /user/:id
+      // This forces an update on the specific user ID, bypassing self-check logic.
+      await api.patch(`/user/${id}`, {
         password: resetForm.password,
       })
 
@@ -135,11 +128,13 @@ const AdminUserPage = () => {
         closeResetModal()
       }, 2000)
     } catch (err) {
-      setResetError(err.response?.data?.message || 'Failed to reset password')
+      console.error(err)
+      setResetError(err.response?.data?.message || 'Failed to reset password. Ensure you have Admin permissions.')
     } finally {
       setResetLoading(false)
     }
   }
+  // --- FIXED FUNCTION END ---
 
   const openEditNameModal = () => {
     setShowEditNameModal(true)
@@ -177,8 +172,8 @@ const AdminUserPage = () => {
       const response = await api.patch(`/user/${id}`, {
         name: editNameForm.name.trim(),
       })
-      console.log(response.data)
-      Cookie.set('user', JSON.stringify(response.data))
+      // Only update cookie if editing own profile (optional check)
+      // Cookie.set('user', JSON.stringify(response.data)) 
 
       // Update local user state
       setUser((prev) => ({ ...prev, name: editNameForm.name.trim() }))
@@ -200,6 +195,8 @@ const AdminUserPage = () => {
         return 'bg-red-100 text-red-800 border-red-200'
       case 'recruiter':
         return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'manager': // Added manager case
+        return 'bg-purple-100 text-purple-800 border-purple-200'
       case 'hr':
         return 'bg-green-100 text-green-800 border-green-200'
       default:
@@ -220,7 +217,7 @@ const AdminUserPage = () => {
       <div className='bg-red-50 border border-red-200 rounded-lg p-6 text-center'>
         <div className='text-red-600 text-lg font-semibold'>{error}</div>
         <button
-          onClick={() => navigate('/admin/dashboard')}
+          onClick={() => navigate('/admin/users')} // Changed to likely route
           className='mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors'>
           Back to Users
         </button>
@@ -399,7 +396,7 @@ const AdminUserPage = () => {
 
               {/* Reset Form */}
               <form onSubmit={handleResetPassword} className='space-y-4'>
-                {/* Email Field */}
+                {/* Email Field - Read Only for visual confirmation */}
                 <div>
                   <label className='block text-sm font-medium text-gray-700 mb-2'>
                     Email Address
@@ -409,10 +406,8 @@ const AdminUserPage = () => {
                       type='email'
                       name='email'
                       value={resetForm.email}
-                      onChange={handleResetFormChange}
-                      className='w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors'
-                      placeholder='Enter email address'
-                      required
+                      disabled
+                      className='w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed'
                     />
                   </div>
                 </div>

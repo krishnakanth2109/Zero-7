@@ -1,4 +1,17 @@
 /* General Styles */
+.home-root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Remove any top margin/padding from first child */
+.home-root > *:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
 .about-page {
   font-family: 'Poppins', sans-serif;
   color: #1a1a1a;
@@ -16,6 +29,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0;
+  padding: 0;
 }
 
 .video-hero::before {
@@ -69,13 +84,13 @@
 /* Responsive Video Adjustments */
 @media (max-width: 1024px) {
   .video-hero {
-    min-height: 60vh;
+    min-height: 45vh;
     height: auto;
   }
 
   .hero-video {
     height: auto;
-    max-height: 80vh;
+    max-height: 60vh;
     object-fit: contain;
   }
 
@@ -86,11 +101,11 @@
 
 @media (max-width: 768px) {
   .video-hero {
-    min-height: 50vh;
+    min-height: 35vh;
   }
 
   .hero-video {
-    max-height: 65vh;
+    max-height: 45vh;
   }
 
   .hero-text-overlay h1 {
@@ -104,11 +119,11 @@
 
 @media (max-width: 480px) {
   .video-hero {
-    min-height: 45vh;
+    min-height: 30vh;
   }
 
   .hero-video {
-    max-height: 55vh;
+    max-height: 40vh;
   }
 
   .hero-text-overlay h1 {
@@ -449,6 +464,17 @@
   width: 100%;
   overflow: hidden;
   position: relative;
+  margin: 0;
+  padding: 0.5rem 0;
+  line-height: 1.5;
+}
+
+/* Mobile responsive ticker */
+@media (max-width: 768px) {
+  .ticker {
+    padding: 0.4rem 0;
+    font-size: 0.9rem;
+  }
 }
 
 /* ONLY the text scrolls */
@@ -545,4 +571,153 @@
     max-width: 300px;
   }
 }
+/* Home.css */
 
+/* --- Ticker Animation --- */
+.ticker-container {
+  width: 100%;
+  overflow: hidden; /* Hides the scrollbar */
+  white-space: nowrap;
+  position: relative;
+  /* Ensure no extra height/gaps */
+  line-height: 1.5; 
+}
+
+.ticker-text {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll-left 20s linear infinite; 
+  padding-left: 100%;
+}
+
+.ticker-container:hover .ticker-text {
+  animation-play-state: paused;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* --- Form Popup Styles --- */
+/* --- Form Popup --- */
+.form-popup {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 2000;
+}
+.form-container {
+  background: white; padding: 2rem; border-radius: 8px;
+  width: 90%; max-width: 400px; position: relative;
+}
+.form-close-x {
+  position: absolute; top: 10px; right: 15px;
+  background: none; border: none; font-size: 1.5rem; cursor: pointer;
+}
+.form-container input, .form-container textarea {
+  width: 100%; padding: 10px; margin: 10px 0;
+  border: 1px solid #ddd; border-radius: 4px;
+}
+.submit-btn {
+  background: #007bff; color: white; padding: 10px; border: none;
+  width: 100%; cursor: pointer; border-radius: 4px;
+}
+.close-btn {
+  background: #ccc; color: black; padding: 10px; border: none;
+  width: 100%; cursor: pointer; border-radius: 4px; margin-top: 10px;
+}
+/* Home.css */
+
+/* --- Ticker Animation --- */
+.ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  background-color: #ffffff;
+  white-space: nowrap;
+  position: relative;
+  z-index: 10;
+}
+
+.ticker-content {
+  display: inline-block;
+  white-space: nowrap;
+  /* Removed padding-left to fix the delay issue */
+  will-change: transform;
+  /* 20s speed - adjust if you want it faster or slower */
+  animation: ticker-scroll 20s linear infinite;
+}
+
+/* Pause on hover */
+.ticker-wrap:hover .ticker-content {
+  animation-play-state: paused !important;
+  cursor: pointer;
+}
+
+@keyframes ticker-scroll {
+  0% {
+    /* Starts immediately at the right edge of the viewport */
+    transform: translate3d(100vw, 0, 0);
+  }
+  100% {
+    /* Ends when the text is fully off the left side */
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+
+/* --- Form Popup (Unchanged) --- */
+.form-popup {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 2000;
+}
+.form-container {
+  background: white; padding: 2rem; border-radius: 8px;
+  width: 90%; max-width: 400px; position: relative;
+}
+.form-close-x {
+  position: absolute; top: 10px; right: 15px;
+  background: none; border: none; font-size: 1.5rem; cursor: pointer;
+}
+.form-container input, .form-container textarea {
+  width: 100%; padding: 10px; margin: 10px 0;
+  border: 1px solid #ddd; border-radius: 4px;
+}
+.submit-btn {
+  background: #007bff; color: white; padding: 10px; border: none;
+  width: 100%; cursor: pointer; border-radius: 4px;
+}
+.close-btn {
+  background: #ccc; color: black; padding: 10px; border: none;
+  width: 100%; cursor: pointer; border-radius: 4px; margin-top: 10px;
+}
+video {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: block;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(100%);  /* start fully outside screen */
+  }
+  100% {
+    transform: translateX(-100%); /* move fully to left */
+  }
+}
+
+.ticker-content {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll-left 25s linear infinite;
+  padding-right: 100vw; /* force long spacing so it starts at beginning */
+}

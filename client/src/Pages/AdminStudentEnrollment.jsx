@@ -1,7 +1,9 @@
+// File: src/Pages/AdminCandidateEnrollment.jsx
+
 import React, { useEffect, useState } from "react";
 import api from "../api/axios"; // Use your central axios instance
 import * as XLSX from "xlsx"; // Import the xlsx library
-import { Trash2 } from "lucide-react";
+import { Trash2, Download } from "lucide-react"; 
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
@@ -32,9 +34,7 @@ const AdminCandidateEnrollment = () => {
   }, []);
 
   const handleExportToExcel = () => {
-    // Remove internal fields like _id and __v before exporting
     const dataToExport = enrollments.map(({ _id, __v, ...rest }) => rest);
-
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Enrollments");
@@ -60,7 +60,6 @@ const AdminCandidateEnrollment = () => {
     }
   };
 
-  // Ensure selectAll state syncs if user manually selects/deselects all
   useEffect(() => {
     if (enrollments.length > 0 && selectedEnrollments.length === enrollments.length) {
       setSelectAll(true);
@@ -82,7 +81,6 @@ const AdminCandidateEnrollment = () => {
       if (result.isConfirmed) {
         try {
           await api.delete(`/candidate-enrollment/${id}`);
-          // Update state locally to avoid full reload if preferred, or just re-fetch
           setEnrollments(enrollments.filter(enrollment => enrollment._id !== id));
           setSelectedEnrollments(selectedEnrollments.filter(itemId => itemId !== id));
           MySwal.fire('Deleted!', 'The enrollment has been deleted.', 'success');
@@ -106,11 +104,10 @@ const AdminCandidateEnrollment = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          // Using Promise.all to delete individually if no bulk endpoint exists
           await Promise.all(
             selectedEnrollments.map((id) => api.delete(`/candidate-enrollment/${id}`))
           );
-          fetchEnrollments(); // Re-fetch to ensure sync
+          fetchEnrollments();
           setSelectedEnrollments([]);
           setSelectAll(false);
           MySwal.fire('Deleted!', 'The selected enrollments have been deleted.', 'success');
@@ -123,112 +120,128 @@ const AdminCandidateEnrollment = () => {
   };
 
   return (
-    // Main container with padding and a light background
-    <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
-      {/* Header section with flex layout to space out title and button */}
-      <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+    // FIX: Changed width to w-[80vw] to ensure it fits next to the sidebar without overflow issues
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 w-[80vw] box-border">
+      
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 w-full">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 tracking-tight uppercase">
           Candidate Enrollments
         </h2>
-        <div className="flex gap-3">
+        
+        {/* Buttons Container */}
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto sm:justify-end">
             {selectedEnrollments.length > 0 && (
                 <button
                     onClick={handleDeleteSelected}
-                    className="flex items-center px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition-transform transform hover:scale-105"
+                    className="flex items-center justify-center px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition-all duration-200"
                 >
                     <Trash2 size={18} className="mr-2" />
-                    Delete Selected ({selectedEnrollments.length})
+                    Delete ({selectedEnrollments.length})
                 </button>
             )}
-            {/* Export Button with blue theme, hover effects, and transitions */}
+            
             <button
               onClick={handleExportToExcel}
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-transform transform hover:scale-105"
+              className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-all duration-200"
             >
+              <Download size={18} className="mr-2" />
               Export to Excel
             </button>
         </div>
       </div>
 
-      {/* Conditional Rendering for Loading and Error States */}
-      {loading && <p className="text-center text-gray-500">Loading enrollments...</p>}
-      {error && <div className="p-4 text-center bg-red-100 text-red-700 rounded-lg">{error}</div>}
+      {/* Loading & Error States */}
+      {loading && (
+        <div className="flex justify-center items-center py-10">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-2 text-gray-600">Loading data...</span>
+        </div>
+      )}
+      {error && <div className="p-4 text-center bg-red-100 text-red-700 rounded-lg border border-red-200">{error}</div>}
 
-      {/* Table section, rendered when not loading and no error */}
+      {/* Table Section */}
       {!loading && !error && (
-        // Wrapper to handle table overflow on small screens and add a shadow/border
-        <div className="overflow-x-auto relative shadow-md sm:rounded-lg bg-white">
-          <table className="w-full text-sm text-left text-gray-500">
-            {/* Table Header */}
-            <thead className="text-xs text-white uppercase bg-blue-500">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                    <input
-                        type="checkbox"
-                        checked={selectAll}
-                        onChange={handleSelectAll}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                </th>
-                <th scope="col" className="px-6 py-3">Name</th>
-                <th scope="col" className="px-6 py-3">Contact</th>
-                <th scope="col" className="px-6 py-3">Email</th>
-                <th scope="col" className="px-6 py-3">Location</th>
-                <th scope="col" className="px-6 py-3">Role</th>
-                <th scope="col" className="px-6 py-3">Skills</th>
-                <th scope="col" className="px-6 py-3">Actions</th>
-              </tr>
-            </thead>
-            {/* Table Body */}
-            <tbody>
-              {enrollments.length > 0 ? (
-                enrollments.map((enrollment) => (
-                  // Table Row with alternating background colors (zebra striping) and a bottom border
-                  <tr
-                    key={enrollment._id}
-                    className={`border-b ${
-                        selectedEnrollments.includes(enrollment._id)
-                          ? "bg-blue-50"
-                          : "odd:bg-white even:bg-gray-50 hover:bg-gray-100"
-                      }`}
-                  >
-                    <td className="px-6 py-4">
-                        <input
-                            type="checkbox"
-                            checked={selectedEnrollments.includes(enrollment._id)}
-                            onChange={(e) => handleSelectRow(e, enrollment._id)}
-                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                    </td>
-                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                      {enrollment.name}
-                    </td>
-                    <td className="px-6 py-4">{enrollment.contact}</td>
-                    <td className="px-6 py-4">{enrollment.email}</td>
-                    <td className="px-6 py-4">{enrollment.location}</td>
-                    <td className="px-6 py-4">{enrollment.role}</td>
-                    <td className="px-6 py-4">{enrollment.skills}</td>
-                    <td className="px-6 py-4">
-                        <button
-                            onClick={() => handleDelete(enrollment._id)}
-                            className="text-red-600 hover:text-red-900 transition-colors duration-200"
-                            title="Delete"
-                        >
-                            <Trash2 size={18} />
-                        </button>
+        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden w-full">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-sm text-left text-gray-500">
+              <thead className="text-xs text-white uppercase bg-blue-600">
+                <tr>
+                  <th scope="col" className="px-6 py-4 w-4">
+                      <input
+                          type="checkbox"
+                          checked={selectAll}
+                          onChange={handleSelectAll}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                      />
+                  </th>
+                  <th scope="col" className="px-6 py-4">S.No</th> {/* Added S.No Column Header */}
+                  <th scope="col" className="px-6 py-4">Name</th>
+                  <th scope="col" className="px-6 py-4">Contact</th>
+                  <th scope="col" className="px-6 py-4">Email</th>
+                  <th scope="col" className="px-6 py-4">Location</th>
+                  <th scope="col" className="px-6 py-4">Role</th>
+                  <th scope="col" className="px-6 py-4">Skills</th>
+                  <th scope="col" className="px-6 py-4 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {enrollments.length > 0 ? (
+                  enrollments.map((enrollment, index) => (
+                    <tr
+                      key={enrollment._id}
+                      className={`transition-colors duration-150 ${
+                          selectedEnrollments.includes(enrollment._id)
+                            ? "bg-blue-50"
+                            : "hover:bg-gray-50"
+                        }`}
+                    >
+                      <td className="px-6 py-4">
+                          <input
+                              type="checkbox"
+                              checked={selectedEnrollments.includes(enrollment._id)}
+                              onChange={(e) => handleSelectRow(e, enrollment._id)}
+                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                          />
+                      </td>
+                      {/* Added S.No Data Cell */}
+                      <td className="px-6 py-4 font-medium text-gray-700">
+                        {index + 1}
+                      </td>
+                      <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                        {enrollment.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">{enrollment.contact}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{enrollment.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{enrollment.location}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{enrollment.role}</td>
+                      <td className="px-6 py-4 max-w-xs truncate" title={enrollment.skills}>
+                        {enrollment.skills}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                          <button
+                              onClick={() => handleDelete(enrollment._id)}
+                              className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors duration-200"
+                              title="Delete Enrollment"
+                          >
+                              <Trash2 size={20} />
+                          </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="9" className="px-6 py-10 text-center text-gray-500">
+                      <div className="flex flex-col items-center justify-center">
+                        <p className="text-lg font-medium">No enrollments found</p>
+                        <p className="text-sm">New candidate submissions will appear here.</p>
+                      </div>
                     </td>
                   </tr>
-                ))
-              ) : (
-                // Message shown when there are no enrollments
-                <tr>
-                  <td colSpan="8" className="px-6 py-10 text-center text-gray-500">
-                    No new enrollments found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

@@ -22,13 +22,12 @@ router.post('/register', async (request, response) => {
       });
     }
     
-    // ✅ FIXED: Don't hash here - let the pre-save hook handle it
     const newUser = new Users({
       name,
       email,
       role,
       employeeId,
-      password, // Just pass the plain password
+      password, // Pre-save hook will hash this
     });
     
     await newUser.save();
@@ -44,7 +43,6 @@ router.post('/register', async (request, response) => {
 // @desc    Authenticate user and get token
 // @access  Public
 router.post('/login', async (request, response) => {
-  // ✅ FIXED: Changed from 'identifier' to 'email' to match frontend
   const { email, password } = request.body;
 
   if (!email || !password) {
@@ -52,7 +50,6 @@ router.post('/login', async (request, response) => {
   }
 
   try {
-    // ✅ FIXED: Search by email OR employeeId (treating email field as identifier)
     const user = await Users.findOne({
       $or: [{ email }, { employeeId: email }],
     }).select('+password'); 
@@ -61,14 +58,12 @@ router.post('/login', async (request, response) => {
       return response.status(401).json({ message: 'Invalid credentials. Please try again.' });
     }
 
-    // Compare password using the model's method
     const isPasswordMatch = await user.matchPassword(password);
 
     if (!isPasswordMatch) {
       return response.status(401).json({ message: 'Invalid credentials. Please try again.' });
     }
 
-    // ✅ FIXED: Changed 'payload' to 'user' to match frontend expectation
     const userPayload = {
       id: user._id,
       name: user.name,
@@ -79,7 +74,6 @@ router.post('/login', async (request, response) => {
 
     const token = jwtToken.sign(userPayload, process.env.MY_SECRET_KEY, { expiresIn: '1d' });
 
-    // Send response with 'user' key instead of 'payload'
     response.json({ user: userPayload, token });
 
   } catch (error) {
@@ -89,7 +83,7 @@ router.post('/login', async (request, response) => {
 });
 
 // @route   POST /api/user/forgot-password
-// @desc    Send a password reset OTP to the user's email
+// @desc    Send a password reset OTP
 // @access  Public
 router.post('/forgot-password', async (request, response) => {
   const { email } = request.body;
@@ -105,7 +99,6 @@ router.post('/forgot-password', async (request, response) => {
     user.passwordResetExpires = Date.now() + 600000; // 10 minutes
     await user.save();
 
-    // TODO: Integrate email sending service
     console.log(`OTP for ${user.email}: ${otp}`);
     
     response.json({ message: 'An OTP has been sent to your email.' });
@@ -116,7 +109,7 @@ router.post('/forgot-password', async (request, response) => {
 });
 
 // @route   POST /api/user/verify-otp
-// @desc    Verify the provided OTP
+// @desc    Verify OTP
 // @access  Public
 router.post('/verify-otp', async (request, response) => {
   const { email, otp } = request.body;
@@ -132,7 +125,6 @@ router.post('/verify-otp', async (request, response) => {
       return response.status(400).json({ message: 'Invalid or expired OTP.' });
     }
 
-    // ✅ FIXED: Generate a temporary token for password reset
     const resetToken = jwtToken.sign(
       { email: user.email, purpose: 'password-reset' },
       process.env.MY_SECRET_KEY,
@@ -150,13 +142,12 @@ router.post('/verify-otp', async (request, response) => {
 }); 
 
 // @route   POST /api/user/reset-password
-// @desc    Reset the user's password after OTP verification
-// @access  Public (but requires valid reset token)
+// @desc    Reset password (Self-Service)
+// @access  Public (requires OTP token)
 router.post('/reset-password', async (request, response) => {
   const { email, password } = request.body;
   
   try {
-    // ✅ FIXED: Verify the reset token from Authorization header
     const authHeader = request.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return response.status(401).json({ message: 'No authorization token provided.' });
@@ -175,7 +166,6 @@ router.post('/reset-password', async (request, response) => {
       return response.status(401).json({ message: 'Invalid reset token.' });
     }
 
-    // ✅ FIXED: Also verify OTP hasn't expired
     const user = await Users.findOne({ 
       email,
       passwordResetExpires: { $gt: Date.now() }
@@ -185,7 +175,6 @@ router.post('/reset-password', async (request, response) => {
       return response.status(400).json({ message: 'Password reset session expired. Please request a new OTP.' });
     }
     
-    // Update password - the pre-save hook will hash it
     user.password = password;
     user.passwordResetOTP = undefined;
     user.passwordResetExpires = undefined;
@@ -199,7 +188,7 @@ router.post('/reset-password', async (request, response) => {
 });
 
 // @route   GET /api/user/:id
-// @desc    Get a user's details by their ID
+// @desc    Get user details
 // @access  Protected
 router.get('/:id', async (request, response) => {
   try {
@@ -214,27 +203,45 @@ router.get('/:id', async (request, response) => {
   }
 });
 
-// @route   PATCH /api/user/:id
-// @desc    Update a user's details
+// ---------------------------------------------------------
+// [FIXED] PATCH /api/user/:id
+// @desc    Update user details (Including Password for Admins)
 // @access  Protected
+// ---------------------------------------------------------
 router.patch('/:id', async (request, response) => {
   try {
-    delete request.body.password;
+    const { name, email, role, password } = request.body;
 
-    const userUpdate = await Users.findByIdAndUpdate(
-      request.params.id,
-      { $set: request.body },
-      { new: true, runValidators: true },
-    ).select('-password');
-    
-    if (!userUpdate) {
+    // 1. Find the user first
+    const user = await Users.findById(request.params.id);
+    if (!user) {
       return response.status(404).json({ message: 'User not found.' });
     }
 
-    response.json(userUpdate);
+    // 2. Update fields if provided
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (role) user.role = role;
+
+    // 3. Handle Password Update (If sent by Admin)
+    if (password && password.trim().length > 0) {
+      // Just set the plain text password. 
+      // The User model's 'pre-save' hook will automatically hash it.
+      user.password = password;
+    }
+
+    // 4. Save using user.save() to trigger hooks/validation
+    await user.save();
+
+    // 5. Return updated user without password
+    const updatedUser = user.toObject();
+    delete updatedUser.password;
+
+    response.json(updatedUser);
+
   } catch (err) {
     console.error("Update User Error:", err);
-    response.status(500).json({ message: 'Server error' });
+    response.status(500).json({ message: 'Server error updating user.' });
   }
 });
 

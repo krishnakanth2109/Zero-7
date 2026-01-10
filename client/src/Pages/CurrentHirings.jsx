@@ -10,7 +10,7 @@ import Pagination from '../Components/Pagination'
 import {
   Briefcase, User, Phone, Mail, MapPin, FileText,
   Clock, IndianRupee, ArrowDownCircle, Search, CheckCircle, X,
-  ChevronRight, Sparkles
+  Sparkles
 } from 'lucide-react'
 import './CurrentHirings.css'
 
@@ -86,7 +86,9 @@ const CurrentHirings = () => {
       try {
         setIsLoading(true)
         const response = await api.get('/jobs')
-        const sortedJobs = response.data.sort(
+        // Filter for active jobs and sort by date
+        const activeJobs = response.data.filter(job => job.status !== 'in active');
+        const sortedJobs = activeJobs.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
         )
         setJobPositions(sortedJobs)
@@ -104,92 +106,50 @@ const CurrentHirings = () => {
   const handleApplyClick = (job) => { setSelectedJob(job); setShowModal(true); }
   const handleCloseModal = () => { setShowModal(false); setTimeout(() => setSelectedJob(null), 300); }
 
-  // const handleApplyChange = (e) => { const { name, value } = e.target;
-
-  // let newValue = value;
-
-  // if (name === 'name' || name === 'location') {
-  //   // Allows letters and spaces (regex: ^[a-zA-Z\s]*$)
-  //   if (!/^[a-zA-Z\s]*$/.test(value)) {
-  //     return; // Do not update state if invalid character is typed
-  //   }
-  // }
-
-  // if (name === 'contact') {
-  //   // Allows only digits (regex: /^\d*$/)
-  //   if (!/^\d*$/.test(value)) {
-  //     return;
-  //   }
-   
-  //   if (value.length > 10) {
-  //     newValue = value.slice(0, 10); 
-  //   }
-  // }
-
-  // if (name === 'experience' || name === 'currentSalary' || name === 'expectedSalary') {
-  //   if (!/^\d*\.?\d*$/.test(value)) {
-  //     return;
-  //   }
-  // }
-
-  // setApplyData((prev) => ({ ...prev, [name]: value })); }
   const handleApplyChange = (e) => {
-  const { name, value } = e.target;
-  let newValue = value; 
-
-  // 1. Validation for Name (Letters and Spaces only)
-  if (name === 'name') {
-    // Allows letters and spaces only
-    if (!/^[a-zA-Z\s]*$/.test(value)) {
-      return; 
-    }
-  }
-
-  // 2. Validation for Contact Number (Exactly 10 Digits only)
-  if (name === 'contact') {
-    // Allows only digits to be typed
-    if (!/^\d*$/.test(value)) {
-      return; 
-    }
-    // Enforce max length of 10 digits
-    if (value.length > 10) {
-      newValue = value.slice(0, 10); // Truncate value to 10 characters
-    }
-  }
-
-  // 3. Validation for Experience (Numbers, Decimal, and letters like 'yrs', 'years')
-  if (name === 'experience') {
-    // Allows: numbers, decimal points, letters (a-z, A-Z), and spaces. 
-    // This supports inputs like '5', '5.5', '5.5 years', or '5 yrs'.
-    if (!/^[a-zA-Z0-9\s.\-]*$/.test(value)) { 
-      return; 
-    }
-  }
-
-  // 4. Validation for Location (Letters, Spaces, Commas, Hyphens, and Numbers for addresses)
-  // Location is typically flexible, so we use a permissive check to allow
-  // letters, spaces, commas, and numbers for city names, pin codes, etc.
-  if (name === 'location') {
-    if (!/^[a-zA-Z0-9\s,\-\/]*$/.test(value)) {
-      return; 
-    }
-  }
-
-  // 5. Validation for Salary Fields (Numbers and optional one decimal point/comma)
-  if (name === 'currentSalary' || name === 'expectedSalary') {
-    // Allows digits, period/dot, and comma. 
-    // This allows formats like 30000, 3.5, or 3,50,000.
-    if (!/^\d*[,.\d]*$/.test(value)) {
-      return; 
-    }
-  }
+    const { name, value } = e.target;
+    let newValue = value; 
   
-  // 6. All other fields (email, resume) are handled by the browser's input type checks (type="email", type="url")
-  // and do not need real-time character input restriction.
-
-  // Final update to state
-  setApplyData((prev) => ({ ...prev, [name]: newValue }));
-};
+    // 1. Validation for Name (Letters and Spaces only)
+    if (name === 'name') {
+      if (!/^[a-zA-Z\s]*$/.test(value)) {
+        return; 
+      }
+    }
+  
+    // 2. Validation for Contact Number (Exactly 10 Digits only)
+    if (name === 'contact') {
+      if (!/^\d*$/.test(value)) {
+        return; 
+      }
+      if (value.length > 10) {
+        newValue = value.slice(0, 10);
+      }
+    }
+  
+    // 3. Validation for Experience
+    if (name === 'experience') {
+      if (!/^[a-zA-Z0-9\s.\-]*$/.test(value)) { 
+        return; 
+      }
+    }
+  
+    // 4. Validation for Location
+    if (name === 'location') {
+      if (!/^[a-zA-Z0-9\s,\-\/]*$/.test(value)) {
+        return; 
+      }
+    }
+  
+    // 5. Validation for Salary Fields
+    if (name === 'currentSalary' || name === 'expectedSalary') {
+      if (!/^\d*[,.\d]*$/.test(value)) {
+        return; 
+      }
+    }
+    
+    setApplyData((prev) => ({ ...prev, [name]: newValue }));
+  };
   
 
   const handleApplySubmit = async (e) => {
@@ -204,6 +164,7 @@ const CurrentHirings = () => {
   }
 
   const daysAgo = (dateString) => {
+    if (!dateString) return 'Recently';
     const posted = new Date(dateString)
     const diffDays = Math.floor((new Date() - posted) / (1000 * 60 * 60 * 24))
     if (diffDays === 0) return 'Today'
@@ -384,7 +345,8 @@ const CurrentHirings = () => {
                       <td>{job.location}</td>
                       <td className="align-right">
                         <button 
-                          className="action-btn btn-apply"
+                          // FIXED: Removed "text-blue" and replaced with explicit colors
+                          className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
                           onClick={() => handleApplyClick(job)}
                         >
                           Apply

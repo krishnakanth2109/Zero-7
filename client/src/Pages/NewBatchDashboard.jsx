@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import * as XLSX from 'xlsx'
-import { FiEdit, FiTrash2 } from 'react-icons/fi' // Added FiTrash2
+import { FiEdit, FiTrash2 } from 'react-icons/fi'
 import { X } from 'lucide-react'
 import api from '../api/axios'
 
@@ -14,7 +14,8 @@ export default function NewBatchDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [editPopup, setEditPopup] = useState(false)
   const [batch, setBatch] = useState(null)
-  // --- MODIFICATION: State for selected rows ---
+  
+  // State for selected rows
   const [selectedBatches, setSelectedBatches] = useState([])
 
   const [newBatch, setNewBatch] = useState({
@@ -25,6 +26,11 @@ export default function NewBatchDashboard() {
     mode: '',
     trainer: '',
   })
+
+  // Helper to get today's date in YYYY-MM-DD format for the 'min' attribute
+  const getTodayDate = () => {
+    return new Date().toISOString().split('T')[0];
+  }
 
   const fetchBatches = async () => {
     setIsLoading(true)
@@ -51,8 +57,38 @@ export default function NewBatchDashboard() {
     setBatch({ ...batch, [e.target.name]: e.target.value })
   }
 
+  // --- VALIDATION FUNCTION ---
+  const validateBatchDates = (demoDate, batchStartDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize today to midnight for accurate comparison
+
+    const start = new Date(batchStartDate);
+    
+    // Check if Batch Start Date is in the past
+    if (start < today) {
+      return "Batch Start Date cannot be in the past.";
+    }
+
+    if (demoDate) {
+      const demo = new Date(demoDate);
+      
+      // Check if Demo Date is in the past
+      if (demo < today) {
+        return "Demo Date cannot be in the past.";
+      }
+
+      // Check if Batch starts before Demo
+      if (start < demo) {
+        return "Batch Start Date cannot be before the Demo Date.";
+      }
+    }
+    return null; // No errors
+  };
+
   const handleAddBatch = async (e) => {
     e.preventDefault()
+    
+    // 1. Basic Field Validation
     if (
       !newBatch.course ||
       !newBatch.batchStartDate ||
@@ -63,6 +99,14 @@ export default function NewBatchDashboard() {
       alert('Please fill all required fields.')
       return
     }
+
+    // 2. Date/Time Validation
+    const dateError = validateBatchDates(newBatch.demoDate, newBatch.batchStartDate);
+    if (dateError) {
+      alert(dateError);
+      return;
+    }
+
     try {
       const response = await axios.post(`${API_URL}/batches`, newBatch)
       setBatches([response.data, ...batches])
@@ -93,7 +137,6 @@ export default function NewBatchDashboard() {
     }
   }
 
-  // --- MODIFICATION: Handler for deleting selected batches ---
   const handleDeleteSelectedBatches = async () => {
     if (
       window.confirm(
@@ -101,13 +144,11 @@ export default function NewBatchDashboard() {
       )
     ) {
       try {
-        // This assumes your backend can handle an array of IDs in the request body
-        // Or you can loop and send delete requests one by one
         await Promise.all(
           selectedBatches.map((id) => axios.delete(`${API_URL}/batches/${id}`)),
         )
         alert('Selected batches deleted successfully!')
-        fetchBatches() // Refreshes the list and clears selection
+        fetchBatches() 
       } catch (error) {
         console.error('Failed to delete selected batches:', error)
         alert('Error deleting selected batches.')
@@ -115,7 +156,6 @@ export default function NewBatchDashboard() {
     }
   }
 
-  // --- MODIFICATION: Handlers for row selection ---
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       const allBatchIds = batches.map((b) => b._id)
@@ -216,6 +256,14 @@ export default function NewBatchDashboard() {
 
   const handleSubmitEdit = async (e) => {
     e.preventDefault()
+
+    // Edit Validation
+    const dateError = validateBatchDates(batch.demoDate, batch.batchStartDate);
+    if (dateError) {
+      alert(dateError);
+      return;
+    }
+
     try {
       await api.patch(`/batches/${batch._id}`, batch)
       setEditPopup(false)
@@ -240,14 +288,34 @@ export default function NewBatchDashboard() {
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <input type='text' name='course' placeholder='Course Name *' value={newBatch.course} onChange={handleChange} required className='p-3 border rounded-md' />
             <input type='text' name='trainer' placeholder='Trainer Name *' value={newBatch.trainer} onChange={handleChange} required className='p-3 border rounded-md' />
+            
             <div className='relative'>
               <label className='absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600'>Demo Date (Optional)</label>
-              <input type='date' name='demoDate' value={newBatch.demoDate} onChange={handleChange} className='p-3 border rounded-md w-full' />
+              {/* Added min={getTodayDate()} to disable past dates */}
+              <input 
+                type='date' 
+                name='demoDate' 
+                value={newBatch.demoDate} 
+                onChange={handleChange} 
+                min={getTodayDate()} 
+                className='p-3 border rounded-md w-full' 
+              />
             </div>
+            
             <div className='relative'>
               <label className='absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600'>Batch Start Date *</label>
-              <input type='date' name='batchStartDate' value={newBatch.batchStartDate} onChange={handleChange} required className='p-3 border rounded-md w-full' />
+              {/* Added min={getTodayDate()} to disable past dates */}
+              <input 
+                type='date' 
+                name='batchStartDate' 
+                value={newBatch.batchStartDate} 
+                onChange={handleChange} 
+                required 
+                min={getTodayDate()}
+                className='p-3 border rounded-md w-full' 
+              />
             </div>
+            
             <input type='text' name='duration' placeholder='Duration (e.g., 6 Weeks) *' value={newBatch.duration} onChange={handleChange} required className='p-3 border rounded-md' />
             <input type='text' name='mode' placeholder='Mode (e.g., Online) *' value={newBatch.mode} onChange={handleChange} required className='p-3 border rounded-md' />
           </div>
@@ -267,8 +335,14 @@ export default function NewBatchDashboard() {
             <form onSubmit={handleSubmitEdit} className='space-y-4'>
                 <input name='course' value={batch.course} onChange={handleEditChange} required className='p-2 w-full border rounded-lg' />
                 <input name='trainer' value={batch.trainer} onChange={handleEditChange} required className='p-2 w-full border rounded-lg' />
-                <div className='relative'><label className='absolute -top-2 left-2 bg-white px-1 text-xs'>Demo Date</label><input name='demoDate' type='date' value={batch.demoDate} onChange={handleEditChange} className='p-2 w-full border rounded-lg'/></div>
-                <div className='relative'><label className='absolute -top-2 left-2 bg-white px-1 text-xs'>Batch Start Date *</label><input name='batchStartDate' type='date' value={batch.batchStartDate} onChange={handleEditChange} required className='p-2 w-full border rounded-lg'/></div>
+                <div className='relative'>
+                    <label className='absolute -top-2 left-2 bg-white px-1 text-xs'>Demo Date</label>
+                    <input name='demoDate' type='date' value={batch.demoDate} onChange={handleEditChange} min={getTodayDate()} className='p-2 w-full border rounded-lg'/>
+                </div>
+                <div className='relative'>
+                    <label className='absolute -top-2 left-2 bg-white px-1 text-xs'>Batch Start Date *</label>
+                    <input name='batchStartDate' type='date' value={batch.batchStartDate} onChange={handleEditChange} required min={getTodayDate()} className='p-2 w-full border rounded-lg'/>
+                </div>
                 <input name='duration' value={batch.duration} onChange={handleEditChange} required placeholder="Duration" className='p-2 w-full border rounded-lg' />
                 <input name='mode' value={batch.mode} onChange={handleEditChange} required placeholder="Mode" className='p-2 w-full border rounded-lg' />
                 <div className='flex justify-end space-x-4 mt-6'>
@@ -284,7 +358,6 @@ export default function NewBatchDashboard() {
         <div className='flex flex-col sm:flex-row justify-between items-center mb-4'>
           <h3 className='text-2xl font-bold text-indigo-700 mb-4 sm:mb-0'>📋 All Batches</h3>
           <div className='flex gap-3'>
-            {/* --- MODIFICATION: Delete Selected Button --- */}
             {selectedBatches.length > 0 && (
               <button
                 onClick={handleDeleteSelectedBatches}
@@ -303,7 +376,6 @@ export default function NewBatchDashboard() {
             <table className='min-w-full divide-y divide-gray-200'>
               <thead className='bg-gray-100'>
                 <tr>
-                  {/* --- MODIFICATION: Select All Checkbox --- */}
                   <th className='px-4 py-3'>
                     <input
                       type='checkbox'
@@ -327,7 +399,6 @@ export default function NewBatchDashboard() {
               <tbody className='bg-white divide-y divide-gray-200'>
                 {batches.length > 0 ? (batches.map((batch) => (
                   <tr key={batch._id} className={`hover:bg-gray-50 ${selectedBatches.includes(batch._id) ? 'bg-indigo-50' : ''}`}>
-                    {/* --- MODIFICATION: Individual Row Checkbox --- */}
                     <td className='px-4 py-3'>
                       <input
                         type='checkbox'

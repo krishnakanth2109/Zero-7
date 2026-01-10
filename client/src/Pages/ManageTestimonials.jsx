@@ -1,10 +1,12 @@
+// File: src/Pages/ManageTestimonials.jsx
+
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios'; // Ensure this points to your axios instance
 import AdminSidebar from '../Components/AdminSidebar';
 import { 
   Plus, Edit2, Trash2, CheckCircle, XCircle, Star, Image as ImageIcon 
 } from 'lucide-react';
-import './ManageTestimonials.css';
+import './ManageTestimonials.css'; // Make sure this CSS file is imported
 
 const ManageTestimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
@@ -28,6 +30,7 @@ const ManageTestimonials = () => {
 
   const fetchTestimonials = async () => {
     try {
+      setLoading(true);
       const { data } = await api.get('/testimonials');
       setTestimonials(data);
     } catch (error) {
@@ -101,18 +104,19 @@ const ManageTestimonials = () => {
       await api.put(`/testimonials/${item._id}`, { isActive: updatedStatus });
     } catch (error) {
       console.error('Error updating status:', error);
-      fetchTestimonials();
+      fetchTestimonials(); // Revert on error
     }
   };
 
   return (
     <div className="flex h-screen bg-gray-50">
+      {/* Sidebar is kept separate from the scrollable content area */}
       <AdminSidebar isOpen={true} />
       
       <div className="flex-1 overflow-auto p-8">
         <div className="manage-testimonials-container">
           
-          {/* --- UI MATCH: Blue Gradient Banner --- */}
+          {/* Header Banner */}
           <div className="banner-card">
             <div className="banner-content">
               <h1>MANAGE <br/> TESTIMONIALS</h1>
@@ -120,7 +124,7 @@ const ManageTestimonials = () => {
             </div>
             {!showForm && (
               <button className="btn-add-story" onClick={() => setShowForm(true)}>
-                <Plus size={18} /> Add New Story
+                <Plus size={18} className="mr-2"/> Add New Story
               </button>
             )}
           </div>
@@ -135,33 +139,80 @@ const ManageTestimonials = () => {
                 <div className="form-grid">
                   <div className="form-group">
                     <label>Candidate Name</label>
-                    <input type="text" name="name" value={formData.name} onChange={handleInputChange} required placeholder="e.g. John Doe" />
+                    <input 
+                      type="text" 
+                      name="name" 
+                      value={formData.name} 
+                      onChange={handleInputChange} 
+                      required 
+                      placeholder="e.g. John Doe" 
+                      className="form-input"
+                    />
                   </div>
                   <div className="form-group">
                     <label>Role / Job Title</label>
-                    <input type="text" name="role" value={formData.role} onChange={handleInputChange} required placeholder="e.g. Java Developer" />
+                    <input 
+                      type="text" 
+                      name="role" 
+                      value={formData.role} 
+                      onChange={handleInputChange} 
+                      required 
+                      placeholder="e.g. Java Developer" 
+                      className="form-input"
+                    />
                   </div>
                   <div className="form-group">
                     <label>Image URL (Optional)</label>
-                    <input type="text" name="image" value={formData.image} onChange={handleInputChange} placeholder="https://..." />
+                    <input 
+                      type="text" 
+                      name="image" 
+                      value={formData.image} 
+                      onChange={handleInputChange} 
+                      placeholder="https://example.com/photo.jpg" 
+                      className="form-input"
+                    />
                   </div>
                   <div className="form-group">
                     <label>Rating</label>
-                    <select name="rating" value={formData.rating} onChange={handleInputChange}>
+                    <select 
+                      name="rating" 
+                      value={formData.rating} 
+                      onChange={handleInputChange}
+                      className="form-select"
+                    >
                       {[1,2,3,4,5].map(r => <option key={r} value={r}>{r} Stars</option>)}
                     </select>
                   </div>
+                  
+                  {/* Full Width Textarea */}
                   <div className="form-group full-width">
                     <label>Message</label>
-                    <textarea name="message" rows="3" value={formData.message} onChange={handleInputChange} required placeholder="Enter the success story..." />
+                    <textarea 
+                      name="message" 
+                      rows="4" 
+                      value={formData.message} 
+                      onChange={handleInputChange} 
+                      required 
+                      placeholder="Enter the success story..." 
+                      className="form-textarea"
+                    />
                   </div>
-                  <div className="form-group">
-                    <label className="checkbox-label">
-                      <input type="checkbox" name="isActive" checked={formData.isActive} onChange={handleInputChange} />
-                      <span>Visible on Website</span>
+
+                  {/* Checkbox */}
+                  <div className="form-group full-width checkbox-group">
+                    <label className="checkbox-container">
+                      <input 
+                        type="checkbox" 
+                        name="isActive" 
+                        checked={formData.isActive} 
+                        onChange={handleInputChange} 
+                      />
+                      <span className="checkmark"></span>
+                      <span className="checkbox-label-text">Visible on Website</span>
                     </label>
                   </div>
                 </div>
+
                 <div className="form-actions">
                   <button type="button" className="btn-cancel" onClick={resetForm}>Cancel</button>
                   <button type="submit" className="btn-save">{isEditing ? 'Update' : 'Save'}</button>
@@ -175,25 +226,25 @@ const ManageTestimonials = () => {
             <table className="custom-table">
               <thead>
                 <tr>
-                  <th>USER</th>
-                  <th>MESSAGE</th>
-                  <th>RATING</th>
-                  <th>STATUS</th>
-                  <th>ACTIONS</th>
+                  <th style={{ width: '25%' }}>USER</th>
+                  <th style={{ width: '40%' }}>MESSAGE</th>
+                  <th style={{ width: '10%' }}>RATING</th>
+                  <th style={{ width: '10%' }}>STATUS</th>
+                  <th style={{ width: '15%' }}>ACTIONS</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan="5" className="text-center p-8">Loading...</td></tr>
+                  <tr><td colSpan="5" className="text-center p-8 text-gray-500">Loading...</td></tr>
                 ) : testimonials.length === 0 ? (
-                  <tr><td colSpan="5" className="text-center p-8">No testimonials found.</td></tr>
+                  <tr><td colSpan="5" className="text-center p-8 text-gray-500">No testimonials found.</td></tr>
                 ) : (
                   testimonials.map((t) => (
                     <tr key={t._id}>
                       <td>
                         <div className="user-cell">
                           {t.image ? (
-                            <img src={t.image} alt={t.name} className="user-avatar" />
+                            <img src={t.image} alt={t.name} className="user-avatar" onError={(e) => {e.target.onerror = null; e.target.src="https://via.placeholder.com/40"}} />
                           ) : (
                             <div className="user-avatar-placeholder"><ImageIcon size={18} /></div>
                           )}
@@ -203,7 +254,9 @@ const ManageTestimonials = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="message-cell" title={t.message}>{t.message}</td>
+                      <td>
+                        <div className="message-cell" title={t.message}>{t.message}</div>
+                      </td>
                       <td>
                         <div className="flex text-yellow-400">
                           {[...Array(parseInt(t.rating) || 5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
@@ -215,9 +268,13 @@ const ManageTestimonials = () => {
                         </span>
                       </td>
                       <td>
-                        <div className="flex gap-2">
-                          <button className="action-btn toggle" onClick={() => toggleStatus(t)} title={t.isActive ? "Hide" : "Show"}>
-                            {t.isActive ? <CheckCircle size={18} /> : <XCircle size={18} className="text-gray-400"/>}
+                        <div className="flex items-center gap-2">
+                          <button 
+                            className={`action-btn ${t.isActive ? 'toggle-active' : 'toggle-inactive'}`} 
+                            onClick={() => toggleStatus(t)} 
+                            title={t.isActive ? "Hide" : "Show"}
+                          >
+                            {t.isActive ? <CheckCircle size={18} /> : <XCircle size={18} />}
                           </button>
                           <button className="action-btn edit" onClick={() => handleEdit(t)} title="Edit">
                             <Edit2 size={18} />
@@ -238,4 +295,5 @@ const ManageTestimonials = () => {
     </div>
   );
 };
+
 export default ManageTestimonials;

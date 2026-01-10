@@ -1,3 +1,5 @@
+// File: src/Components/AdminSidebar.jsx
+
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -25,7 +27,7 @@ import {
   Users,
   Briefcase,
   FolderOpen,
-  Quote, // <--- IMPORTED QUOTE ICON
+  Quote, 
 } from 'lucide-react'
 import Cookie from 'js-cookie'
 import './AdminSidebar.css'
@@ -41,10 +43,13 @@ export default function AdminSidebar({ isOpen }) {
   const [openJobsCompanies, setOpenJobsCompanies] = useState(false)
   const [openRequests, setOpenRequests] = useState(false)
   const [openServices, setOpenServices] = useState(false)
+  
+  // Notification count (mock)
   const [newRequestCount, setNewRequestCount] = useState(0)
 
+  // Get User Role
   const user = Cookie.get('user') ? JSON.parse(Cookie.get('user')) : null
-  const role = user?.role
+  const role = user?.role?.toLowerCase() || '' // Ensure case-insensitive comparison
 
   const isActive = (path) => location.pathname === path
   const isSubmenuActive = (paths) => paths.some(path => location.pathname.includes(path))
@@ -55,14 +60,15 @@ export default function AdminSidebar({ isOpen }) {
     navigate('/admin')
   }
 
+  // --- 1. SHARED/COMMON LINKS ---
   const commonLinks = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   ]
 
-  const allLinks = [
+  // --- 2. ADMIN LINKS (Full Access) ---
+  const adminLinks = [
     ...commonLinks,
-    
-    // Interviews Dropdown
+    // Interviews
     {
       type: 'dropdown',
       key: 'interviews',
@@ -75,8 +81,7 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/interviews/approvals', label: 'Interviews Approvals', icon: Hourglass },
       ]
     },
-
-    // Bench Management Dropdown
+    // Bench Management
     {
       type: 'dropdown',
       key: 'bench-management',
@@ -89,8 +94,7 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/candidateList', label: 'Bench Approvals', icon: Hourglass },
       ]
     },
-
-    // Candidates Dropdown
+    // Candidates
     {
       type: 'dropdown',
       key: 'candidates',
@@ -105,8 +109,7 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/digital-courses-enrollment', label: 'Digital Courses Enrollment', icon: GraduationCap },
       ]
     },
-
-    // Jobs & Companies Dropdown
+    // Jobs & Companies
     {
       type: 'dropdown',
       key: 'jobs-companies',
@@ -119,8 +122,7 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/companies', label: 'Manage Companies', icon: Building },
       ]
     },
-
-    // Requests Dropdown
+    // Requests
     {
       type: 'dropdown',
       key: 'requests',
@@ -133,21 +135,16 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/view-requests', label: 'View Requests', icon: AudioLines, isNotification: true },
       ]
     },
-
-    // Other single links
+    // Single Links
     { path: '/admin/manage-recruiters', label: 'Add Recruiter', icon: UserSearch },
     { path: '/admin/manage-managers', label: 'Add Managers', icon: UserCog },
     { path: '/admin/manage-blogs', label: 'Manage Blogs', icon: Shield },
-    
-    // --- ADDED MANAGE TESTIMONIALS LINK ---
     { path: '/admin/manage-testimonials', label: 'Manage Testimonials', icon: Quote },
-
     { path: '/admin/new-batch-dashboard', label: 'New Batches', icon: FileUser },
     { path: '/admin/forms', label: 'College Connect Form', icon: Layers },
     { path: '/admin/manage-offer', label: 'Manage Offer', icon: Gift },
     { path: '/admin/batch-enrollments', label: 'Batch Enrollments', icon: ClipboardList },
-
-    // Services Dropdown
+    // Services
     {
       type: 'dropdown',
       key: 'services',
@@ -160,23 +157,154 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/non-it-programs', label: 'Non IT Services' },
       ]
     },
-
-     { path: '/admin/contact-inquiries', label: 'Contact Inquiries', icon: MessageSquare },
+    { path: '/admin/contact-inquiries', label: 'Contact Inquiries', icon: MessageSquare },
   ]
 
-  // (Keeping manager and recruiter links same as you provided, 
-  // you can add the testimonial link there too if they need access)
-  const managerLinks = [ ...commonLinks /* ... your existing manager config */ ];
-  const recruiterLinks = [ ...commonLinks /* ... your existing recruiter config */ ];
+  // --- 3. MANAGER LINKS (Sub-Admin Access) ---
+  const managerLinks = [
+    ...commonLinks,
+    // Interviews
+    {
+      type: 'dropdown',
+      key: 'interviews',
+      label: 'Interviews',
+      icon: FileUser,
+      state: openInterviews,
+      setState: setOpenInterviews,
+      submenu: [
+        { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
+        { path: '/admin/interviews/approvals', label: 'Interviews Approvals', icon: Hourglass },
+      ]
+    },
+    // Bench Management
+    {
+      type: 'dropdown',
+      key: 'bench-management',
+      label: 'Bench Management',
+      icon: AlignHorizontalJustifyStart,
+      state: openBenchManagement,
+      setState: setOpenBenchManagement,
+      submenu: [
+        { path: '/admin/manage-candidates', label: 'Manage Bench List', icon: AlignHorizontalJustifyStart },
+        { path: '/admin/candidateList', label: 'Bench Approvals', icon: Hourglass },
+      ]
+    },
+    // Candidates
+    {
+      type: 'dropdown',
+      key: 'candidates',
+      label: 'Candidates',
+      icon: Users,
+      state: openCandidates,
+      setState: setOpenCandidates,
+      submenu: [
+        { path: '/admin/studentenrollment', label: 'Candidate Enrollment', icon: Store },
+        { path: '/admin/applications', label: 'View Applications', icon: Layers },
+        { path: '/admin/placedcandidates', label: 'Placed Candidates', icon: CircleUser },
+      ]
+    },
+    // Jobs
+    {
+      type: 'dropdown',
+      key: 'jobs-companies',
+      label: 'Jobs & Companies',
+      icon: Briefcase,
+      state: openJobsCompanies,
+      setState: setOpenJobsCompanies,
+      submenu: [
+        { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
+        { path: '/admin/companies', label: 'Manage Companies', icon: Building },
+      ]
+    },
+    // Requests
+    {
+      type: 'dropdown',
+      key: 'requests',
+      label: 'Requests',
+      icon: FolderOpen,
+      state: openRequests,
+      setState: setOpenRequests,
+      submenu: [
+        { path: '/admin/payroll-requests', label: 'Payroll Requests', icon: Receipt },
+        { path: '/admin/view-requests', label: 'View Requests', icon: AudioLines },
+      ]
+    },
+    // Manager Specific Single Links
+    { path: '/admin/manage-recruiters', label: 'Add Recruiter', icon: UserSearch }, // Managers can usually add recruiters
+    { path: '/admin/manage-blogs', label: 'Manage Blogs', icon: Shield },
+    { path: '/admin/manage-testimonials', label: 'Manage Testimonials', icon: Quote },
+    { path: '/admin/new-batch-dashboard', label: 'New Batches', icon: FileUser },
+  ]
 
-  // Simplified link selection for brevity in this response
-  // (In your actual file, keep the full arrays you wrote)
-  
+  // --- 4. RECRUITER LINKS (Limited Access) ---
+  const recruiterLinks = [
+    ...commonLinks,
+    // Interviews (Usually just view/schedule, maybe not approval depending on logic)
+    {
+      type: 'dropdown',
+      key: 'interviews',
+      label: 'Interviews',
+      icon: FileUser,
+      state: openInterviews,
+      setState: setOpenInterviews,
+      submenu: [
+        { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
+      ]
+    },
+    // Bench (Manage list only)
+    {
+      type: 'dropdown',
+      key: 'bench-management',
+      label: 'Bench Management',
+      icon: AlignHorizontalJustifyStart,
+      state: openBenchManagement,
+      setState: setOpenBenchManagement,
+      submenu: [
+        { path: '/admin/manage-candidates', label: 'Manage Bench List', icon: AlignHorizontalJustifyStart },
+      ]
+    },
+    // Candidates
+    {
+      type: 'dropdown',
+      key: 'candidates',
+      label: 'Candidates',
+      icon: Users,
+      state: openCandidates,
+      setState: setOpenCandidates,
+      submenu: [
+        { path: '/admin/studentenrollment', label: 'Candidate Enrollment', icon: Store },
+        { path: '/admin/applications', label: 'View Applications', icon: Layers },
+        { path: '/admin/placedcandidates', label: 'Placed Candidates', icon: CircleUser },
+      ]
+    },
+    // Jobs
+    {
+      type: 'dropdown',
+      key: 'jobs-companies',
+      label: 'Jobs & Companies',
+      icon: Briefcase,
+      state: openJobsCompanies,
+      setState: setOpenJobsCompanies,
+      submenu: [
+        { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
+        { path: '/admin/companies', label: 'Manage Companies', icon: Building },
+      ]
+    },
+  ]
+
+  // --- 5. DETERMINE WHICH LINKS TO RENDER ---
   let linksToRender = []
-  if (role === 'admin') linksToRender = allLinks
-  else if (role === 'manager') linksToRender = managerLinks // Ensure this array is defined in your file
-  else if (role === 'recruiter') linksToRender = recruiterLinks // Ensure this array is defined
-  else linksToRender = commonLinks
+  
+  if (role === 'admin') {
+    linksToRender = adminLinks
+  } else if (role === 'manager') {
+    linksToRender = managerLinks
+  } else if (role === 'recruiter') {
+    linksToRender = recruiterLinks
+  } else {
+    // Fallback for unknown roles or unauthenticated (though likely redirected by router)
+    linksToRender = commonLinks
+  }
 
   return (
     <aside className={`admin-sidebar overflow-y-auto ${!isOpen ? 'collapsed' : ''}`}>
@@ -193,6 +321,7 @@ export default function AdminSidebar({ isOpen }) {
         <nav>
           {linksToRender.map((link, index) => {
             if (link.type === 'dropdown') {
+              // Calculate if submenu is active
               const submenuPaths = link.submenu.map(item => item.path)
               const isDropdownActive = isSubmenuActive(submenuPaths)
               
@@ -231,6 +360,7 @@ export default function AdminSidebar({ isOpen }) {
               )
             }
 
+            // Render Single Link
             return (
               <Link
                 key={link.path}
@@ -247,6 +377,7 @@ export default function AdminSidebar({ isOpen }) {
               </Link>
             )
           })}
+          
           <button
             className='logout-btn'
             onClick={handleLogout}

@@ -366,81 +366,6 @@ export default function Context() {
             </ul>
           </div>
         </div>
-
-        {/* Career Consultation Button + Popup */}
-        {/* <div className='career-consultation'>
-          <h3>Ready to Transform Your Career?</h3>
-          <p>Schedule a free consultation with our career experts</p>
-          <button
-            className='btn-primary btn-large'
-            onClick={() => setShowForm(true)}>
-            <FaRocket /> Schedule Free Career Consultation
-          </button>
-        </div> */}
-
-        {/* ✅ Success Notification */}
-        {/* {showSuccess && (
-          <div className='success-message'>
-            🎉 Your consultation request has been submitted successfully! Our
-            team will contact you soon.
-          </div>
-        )} */}
-
-        {/* Popup Form */}
-        {/* {showForm && (
-          <div className='popup-form-overlay'>
-            <div className='popup-form'>
-              <h2>Free Career Consultation</h2>
-              <form onSubmit={handleSubmit}>
-                <input
-                  type='text'
-                  name='name'
-                  placeholder='Your Name'
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  type='tel'
-                  name='number'
-                  placeholder='Your Number'
-                  value={formData.number}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  type='email'
-                  name='email'
-                  placeholder='Your Email'
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-                <textarea
-                  name='purpose'
-                  placeholder='Purpose of Consultation'
-                  value={formData.purpose}
-                  onChange={handleChange}
-                  required></textarea>
-
-                <div className='form-actions'>
-                  <button
-                    type='submit'
-                    className='btn-primary'
-                    disabled={loading}>
-                    {loading ? 'Submitting...' : 'Submit'}
-                  </button>
-                  <button
-                    type='button'
-                    className='btn-secondary'
-                    onClick={() => setShowForm(false)}>
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )} */}
       </div>
 
       {/* Testimonials */}
@@ -467,15 +392,6 @@ export default function Context() {
                   CEO
                 </span>
               </div>
-              <div className='testimonial-rating'>
-                {Array(5)
-                  .fill()
-                  .map((_, i) => (
-                    <span key={i} className='star'>
-                      ★
-                    </span>
-                  ))}
-              </div>
             </div>
           </div>
 
@@ -496,15 +412,6 @@ export default function Context() {
                 <span className='testimonial-role'>
                   HR Director
                 </span>
-              </div>
-              <div className='testimonial-rating'>
-                {Array(5)
-                  .fill()
-                  .map((_, i) => (
-                    <span key={i} className='star'>
-                      ★
-                    </span>
-                  ))}
               </div>
             </div>
           </div>
@@ -528,16 +435,6 @@ export default function Context() {
                   AIML
                 </span>
               </div>
-              <div className='testimonial-rating'>
-                {Array(4)
-                  .fill()
-                  .map((_, i) => (
-                    <span key={i} className='star'>
-                      ★
-                    </span>
-                  ))}
-                <span className='star'>☆</span>
-              </div>
             </div>
           </div>
 
@@ -559,16 +456,6 @@ export default function Context() {
                 <span className='testimonial-role'>
                   Data Analytics
                 </span>
-              </div>
-              <div className='testimonial-rating'>
-                {Array(4)
-                  .fill()
-                  .map((_, i) => (
-                    <span key={i} className='star'>
-                      ★
-                    </span>
-                  ))}
-                <span className='star'>☆</span>
               </div>
             </div>
           </div>

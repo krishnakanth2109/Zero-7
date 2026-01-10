@@ -1,4 +1,5 @@
 // File: src/Pages/AdminManageCandidates.jsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Edit, Trash2, Download, Upload, PlusCircle, X, Loader2, Users, XCircle, ChevronLeft, ChevronRight,
@@ -12,7 +13,7 @@ import './AdminManageCandidates.css';
 
 const MySwal = withReactContent(Swal);
 
-// --- Validation Function (Defined outside for cleanliness) ---
+// --- Validation Function ---
 const validateForm = (data) => {
   const errors = {};
   const namePattern = /^[A-Za-z\s]+$/;
@@ -90,7 +91,7 @@ export default function AdminManageCandidates() {
     email: '',
     phone: '',
   });
-  const [errors, setErrors] = useState({}); // NEW STATE FOR VALIDATION ERRORS
+  const [errors, setErrors] = useState({});
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -99,7 +100,7 @@ export default function AdminManageCandidates() {
   const [deletingId, setDeletingId] = useState(null);
   const [importing, setImporting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const fileInputRef = useRef(null);
@@ -148,7 +149,6 @@ export default function AdminManageCandidates() {
     }
 
     setFormData({ ...formData, [name]: value });
-    // Clear error on change for immediate user feedback
     setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
@@ -156,7 +156,6 @@ export default function AdminManageCandidates() {
   const handleBlur = (e) => {
     const { name } = e.target;
     const validationErrors = validateForm(formData);
-    // Only set the error for the field that was blurred
     setErrors(prev => ({ ...prev, [name]: validationErrors[name] || '' }));
   };
 
@@ -175,7 +174,7 @@ export default function AdminManageCandidates() {
       email: '',
       phone: '',
     });
-    setErrors({}); // Clear errors when opening
+    setErrors({});
     setShowModal(true);
   };
 
@@ -192,14 +191,14 @@ export default function AdminManageCandidates() {
       phone: candidate.phone,
     });
     setEditingId(candidate._id);
-    setErrors({}); // Clear errors when opening
+    setErrors({});
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setSubmitting(false);
-    setErrors({}); // Clear errors on close
+    setErrors({});
   };
 
   // Add/Edit submit
@@ -210,7 +209,7 @@ export default function AdminManageCandidates() {
 
     if (Object.keys(validationErrors).length > 0) {
         console.log('Form validation failed:', validationErrors);
-        return; // STOP submission on error
+        return;
     }
 
     setSubmitting(true);
@@ -389,7 +388,6 @@ export default function AdminManageCandidates() {
 
   return (
     <div className="candidates-page">
-      {/* ADDED: Inline styles for max-width and margin to reduce size and align UI */}
       <div className="candidates-container" style={{ maxWidth: '1200px', margin: '0 auto', width: '95%' }}>
         {/* HEADER */}
         <div className="page-header">
@@ -438,12 +436,12 @@ export default function AdminManageCandidates() {
           </div>
 
           {/* TABLE */}
-          {/* ADDED: overflowX: auto to prevent table from breaking out of the card */}
           <div className="table-responsive" style={{ overflowX: 'auto' }}>
             <table className="data-table">
               <thead>
                 <tr>
                   <th><input type="checkbox" checked={selectAll} onChange={handleSelectAll} /></th>
+                  <th>S.No</th> {/* ADDED: S.No Column */}
                   <th>Candidate ID</th>
                   <th>Name</th>
                   <th>Surname</th>
@@ -456,7 +454,7 @@ export default function AdminManageCandidates() {
                 </tr>
               </thead>
               <tbody>
-                {currentCandidates.map((c) => (
+                {currentCandidates.map((c, index) => (
                   <tr key={c._id} className={selectedCandidates.includes(c._id) ? 'selected-row' : ''}>
                     <td>
                       <input
@@ -465,6 +463,7 @@ export default function AdminManageCandidates() {
                         onChange={(e) => handleSelectCandidate(e, c._id)}
                       />
                     </td>
+                    <td>{startIndex + index + 1}</td> {/* ADDED: Calculated S.No */}
                     <td>{c.candidateId || 'N/A'}</td>
                     <td>{c.name}</td>
                     <td>{c.surname || 'N/A'}</td>
@@ -535,7 +534,7 @@ export default function AdminManageCandidates() {
                 {editingId ? 'Candidate ID cannot be changed' : 'Candidate ID will be auto-generated'}
               </div>
 
-              {/* 1. Candidate Name */}
+              {/* Form Inputs */}
               <div className="form-group">
                 <input
                   name="name"
@@ -551,7 +550,6 @@ export default function AdminManageCandidates() {
                 {errors.name && <small className="error-text">{errors.name}</small>}
               </div>
               
-              {/* 2. Candidate Surname */}
               <div className="form-group">
                 <input
                   name="surname"
@@ -567,7 +565,6 @@ export default function AdminManageCandidates() {
                 {errors.surname && <small className="error-text">{errors.surname}</small>}
               </div>
 
-              {/* 3. Role */}
               <div className="form-group">
                 <input
                   name="role"
@@ -581,7 +578,6 @@ export default function AdminManageCandidates() {
                 {errors.role && <small className="error-text">{errors.role}</small>}
               </div>
 
-              {/* 4. Skills (comma-separated) */}
               <div className="form-group">
                 <input
                   name="skills"
@@ -595,7 +591,6 @@ export default function AdminManageCandidates() {
                 {errors.skills && <small className="error-text">{errors.skills}</small>}
               </div>
 
-              {/* 5. Experience (Years) */}
               <div className="form-group">
                 <input
                   name="exp"
@@ -613,7 +608,6 @@ export default function AdminManageCandidates() {
                 {errors.exp && <small className="error-text">{errors.exp}</small>}
               </div>
               
-              {/* 6. Location */}
               <div className="form-group">
                 <input
                   name="location"
@@ -627,7 +621,6 @@ export default function AdminManageCandidates() {
                 {errors.location && <small className="error-text">{errors.location}</small>}
               </div>
 
-              {/* 7. Email Address */}
               <div className="form-group">
                 <input
                   name="email"
@@ -643,7 +636,6 @@ export default function AdminManageCandidates() {
                 {errors.email && <small className="error-text">{errors.email}</small>}
               </div>
 
-              {/* 8. Phone Number */}
               <div className="form-group">
                 <input
                   name="phone"
@@ -671,7 +663,7 @@ export default function AdminManageCandidates() {
                   type="submit"
                   disabled={submitting}
                   className="btn btn-primary"
-                  style={{ backgroundColor: '#2563eb', borderColor: '#2563eb' }}   // blue
+                  style={{ backgroundColor: '#2563eb', borderColor: '#2563eb' }}
                 >
                   {submitting ? (
                     <>

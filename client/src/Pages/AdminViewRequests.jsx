@@ -222,32 +222,7 @@ export default function AdminViewRequests() {
     <div className='requests-container'>
       <div className='requests-header'>
         <h3 className='text-xl font-bold'>Candidate Information Requests</h3>
-        <div className='header-stats'>
-          <div className='stat-card'>
-            <span className='text-white font-bold text-xl'>
-              {statusCounts.total}
-            </span>
-            <span className='text-white'>Total</span>
-          </div>
-          <div className='stat-card pending'>
-            <span className='text-white font-bold text-xl'>
-              {statusCounts.pending}
-            </span>
-            <span className='text-white'>Pending</span>
-          </div>
-          <div className='stat-card approved'>
-            <span className='text-white font-bold text-xl'>
-              {statusCounts.approved}
-            </span>
-            <span className='text-white'>Approved</span>
-          </div>
-          <div className='stat-card rejected'>
-            <span className='text-white font-bold text-xl'>
-              {statusCounts.rejected}
-            </span>
-            <span className='text-white'>Rejected</span>
-          </div>
-        </div>
+       
       </div>
 
       {message && (

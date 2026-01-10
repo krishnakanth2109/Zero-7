@@ -24,7 +24,7 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell, // Cell is needed for custom pie chart colors
+  Cell,
 } from 'recharts'
 import RecentActivity from '../Components/RecentActivity'
 
@@ -37,6 +37,10 @@ const capitalize = (s) => {
 export default function AdminDashboard() {
   const [user, setUser] = useState({})
   const [applications, setApplications] = useState([])
+  
+  // State for the dynamic graph data
+  const [trendData, setTrendData] = useState([])
+
   const [stats, setStats] = useState({
     totalCandidates: 0,
     activeJobs: 0,
@@ -59,19 +63,10 @@ export default function AdminDashboard() {
       }
     }
 
-    // Fetches the most recent applications for the table
-    const fetchApplications = async () => {
+    // Main fetch function for all dashboard data
+    const fetchDashboardData = async () => {
       try {
-        const response = await api.get('/applications')
-        setApplications(response.data)
-      } catch (err) {
-        console.error('Failed to fetch applications:', err)
-      }
-    }
-
-    // Fetches all statistics for the top cards
-    const fetchStats = async () => {
-      try {
+        // Fetch all required endpoints in parallel
         const [
           candidatesResponse,
           jobsResponse,
@@ -79,6 +74,7 @@ export default function AdminDashboard() {
           companiesResponse,
           interviewsResponse,
           collegeResponse,
+          applicationsResponse, // Fetch applications here to coordinate graph data
         ] = await Promise.all([
           api.get('/candidates').catch((e) => ({ data: [] })),
           api.get('/jobs').catch((e) => ({ data: [] })),
@@ -86,13 +82,19 @@ export default function AdminDashboard() {
           api.get('/company').catch((e) => ({ data: [] })),
           api.get('/interview/all').catch((e) => ({ data: [] })),
           api.get('/college-connect').catch((e) => ({ data: [] })),
+          api.get('/applications').catch((e) => ({ data: [] })),
         ])
 
+        // 1. Process Stats
         const pendingRequests = requestsResponse.data.filter(
           (req) => req.status === 'pending',
         )
+        
+        // Logic: Check status/level AND ensure approvalStatus is 'approved' to match the list view
         const placedCandidates = interviewsResponse.data.filter(
-          (req) => req.status === 'placed',
+          (req) => 
+            (req.status?.toLowerCase() === 'placed' || req.interviewLevel === 'placed') &&
+            req.approvalStatus === 'approved'
         )
 
         setStats({
@@ -101,9 +103,16 @@ export default function AdminDashboard() {
           benchRequests: pendingRequests.length,
           partnerCompanies: companiesResponse.data.length,
           colleges: collegeResponse.data.length,
-          placements: placedCandidates.length, // Logic: a placement is an approved request
+          placements: placedCandidates.length,
           interviews: interviewsResponse.data.length,
         })
+
+        // 2. Set Applications Table Data
+        setApplications(applicationsResponse.data)
+
+        // 3. Process Graph Data (Application Trends)
+        calculateGraphTrends(applicationsResponse.data, interviewsResponse.data)
+
       } catch (error) {
         console.error('Failed to fetch dashboard stats:', error)
       } finally {
@@ -111,21 +120,54 @@ export default function AdminDashboard() {
       }
     }
 
-    fetchStats()
-    fetchApplications()
+    fetchDashboardData()
   }, [])
 
-  // --- Data and configuration for Charts ---
+  // Function to process raw data into monthly trends for the chart
+  const calculateGraphTrends = (appsData, interviewsData) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentYear = new Date().getFullYear();
+    
+    // Initialize structure
+    const monthlyStats = months.map(m => ({
+      month: m,
+      applications: 0,
+      interviews: 0,
+      hired: 0
+    }));
 
-  // Data for the Area Chart (Application Trends)
-  const applicationsTrend = [
-    { month: 'Jan', applications: 45, interviews: 12, hired: 3 },
-    { month: 'Feb', applications: 52, interviews: 18, hired: 5 },
-    { month: 'Mar', applications: 78, interviews: 25, hired: 8 },
-    { month: 'Apr', applications: 95, interviews: 32, hired: 12 },
-    { month: 'May', applications: 115, interviews: 38, hired: 15 },
-    { month: 'Jun', applications: 128, interviews: 45, hired: 18 },
-  ]
+    // Count Applications per month
+    appsData.forEach(app => {
+      const date = new Date(app.createdAt || app.date);
+      // Optional: Filter for current year only
+      if (date.getFullYear() === currentYear) {
+        monthlyStats[date.getMonth()].applications += 1;
+      }
+    });
+
+    // Count Interviews and Hires per month
+    interviewsData.forEach(int => {
+      const date = new Date(int.date || int.createdAt);
+      if (date.getFullYear() === currentYear) {
+        monthlyStats[date.getMonth()].interviews += 1;
+        
+        // Only count as hired if status is placed AND approved
+        if (
+          (int.status?.toLowerCase() === 'placed' || int.interviewLevel === 'placed') && 
+          int.approvalStatus === 'approved'
+        ) {
+          monthlyStats[date.getMonth()].hired += 1;
+        }
+      }
+    });
+
+    // Determine current month index to slice the array (optional: show only up to current month)
+    const currentMonthIndex = new Date().getMonth();
+    // Showing data up to the current month
+    const relevantData = monthlyStats.slice(0, currentMonthIndex + 1);
+
+    setTrendData(relevantData.length > 0 ? relevantData : monthlyStats);
+  };
 
   // Data for the Pie Chart (Job Status Distribution)
   const pieChartData = [
@@ -262,11 +304,11 @@ export default function AdminDashboard() {
         <div className='bg-white rounded-xl w-full md:w-1/2 p-4'>
           <div className='flex gap-2 text-xl font-bold mb-4'>
             <TrendingUp className='stroke-2 stroke-[#0b325b]' />
-            Application Trends
+            Application Trends (Current Year)
           </div>
           <ResponsiveContainer height={300} width='100%'>
             <BarChart
-              data={applicationsTrend}
+              data={trendData}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id='applications' x1='0' y1='0' x2='0' y2='1'>
@@ -346,7 +388,7 @@ export default function AdminDashboard() {
       </div>
 
 
-            {/* <<< 2. INSERT RECENT ACTIVITY COMPONENT HERE >>> */}
+      {/* <<< 2. INSERT RECENT ACTIVITY COMPONENT HERE >>> */}
       <RecentActivity />
     </div>
   )

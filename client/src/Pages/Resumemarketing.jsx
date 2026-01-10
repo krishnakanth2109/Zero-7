@@ -785,47 +785,7 @@ const Resumemarketing = () => {
         )}
 
         {/* Templates Section */}
-        <section className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">ATS-Optimized Resume Templates</h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Professionally designed templates that maximize ATS compatibility
-            </p>
-          </div>
-          
-          <div className="text-center mb-8">
-            <button 
-              onClick={handleShowTemplates}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              {showTemplates ? "Hide Templates" : "View Recommended Templates"}
-            </button>
-          </div>
-
-          {showTemplates && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {templates.map((template) => (
-                <div key={template.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden">
-                  <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <div className="text-gray-400 text-center">
-                      <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path fillRule="evenodd" d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5h-7.5z" clipRule="evenodd" />
-                      </svg>
-                      <p className="text-sm">Template Preview</p>
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <h4 className="text-xl font-semibold text-gray-800 mb-2">{template.name}</h4>
-                    <p className="text-gray-600 mb-4">{template.description}</p>
-                    <button className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-200">
-                      Use This Template
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+      
       </main>
 
       <style jsx>{`

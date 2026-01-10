@@ -1,3 +1,5 @@
+// File: src/Pages/InterviewTracker.jsx
+
 import React, { useState, useEffect } from 'react'
 import api from '../api/axios'
 import { Calendar, momentLocalizer } from 'react-big-calendar'
@@ -26,9 +28,7 @@ const InterviewTracker = () => {
   const [showCandidateDetailsModal, setShowCandidateDetailsModal] =
     useState(false)
   const [selectedCandidateDetails, setSelectedCandidateDetails] = useState(null)
-  // New state for alerts
-  const [alertedInterviews, setAlertedInterviews] = useState(new Set())
-
+  
   // New state for the upcoming interviews modal
   const [showUpcomingModal, setShowUpcomingModal] = useState(false)
 
@@ -39,10 +39,10 @@ const InterviewTracker = () => {
   const fetchInterviews = async () => {
     try {
       setLoading(true)
+      // Fetches all interviews (including placed ones)
       const response = await api.get('/interview')
       setInterviewData(response.data)
 
-      console.log(response.data)
       const events = response.data.map((interview) => ({
         title: `${interview.candidateName} @ ${interview.companyName}`,
         start: new Date(interview.date),
@@ -68,7 +68,6 @@ const InterviewTracker = () => {
       const response = await api.get(`/interview/user/${id}`)
       setInterviewData(response.data)
 
-      console.log(response.data)
       const events = response.data.map((interview) => ({
         title: `${interview.candidateName} @ ${interview.companyName}`,
         start: new Date(interview.date),
@@ -91,7 +90,6 @@ const InterviewTracker = () => {
   const fetchOptions = async () => {
     try {
       const response = await api.get('/interview/search')
-      console.log(response.data)
       setCandidateOptions(response.data.candidates)
       setCompanyOptions(response.data.companies)
       setJobOptions(response.data.jobs)
@@ -115,7 +113,7 @@ const InterviewTracker = () => {
       const now = new Date()
       const upcoming = interviewData.filter(
         (interview) =>
-          interview.status === 'Scheduled' &&
+          interview.status?.toLowerCase() === 'scheduled' &&
           new Date(interview.date) - now > 0 &&
           new Date(interview.date) - now <= 15 * 60 * 1000,
       )
@@ -142,37 +140,26 @@ const InterviewTracker = () => {
   const [editinterviewtiming, seteditinterviewtiming] = useState()
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'Scheduled':
-        return 'bg-blue-100 text-blue-800 border border-blue-200'
-      case 'Completed':
-        return 'bg-green-100 text-green-800 border border-green-200'
-      case 'Pending Feedback':
-        return 'bg-amber-100 text-amber-800 border border-amber-200'
-      case 'Offer Extended':
-        return 'bg-purple-100 text-purple-800 border border-purple-200'
-      case 'Rejected':
-        return 'bg-red-100 text-red-800 border border-red-200'
-      default:
-        return 'bg-gray-100 text-gray-800 border border-gray-200'
-    }
+    const s = status ? status.toLowerCase() : ''
+    if (s === 'scheduled') return 'bg-blue-100 text-blue-800 border border-blue-200'
+    if (s === 'completed') return 'bg-green-100 text-green-800 border border-green-200'
+    if (s === 'pending feedback') return 'bg-amber-100 text-amber-800 border border-amber-200'
+    if (s === 'offer extended') return 'bg-purple-100 text-purple-800 border border-purple-200'
+    if (s === 'rejected') return 'bg-red-100 text-red-800 border border-red-200'
+    if (s === 'placed') return 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+    
+    return 'bg-gray-100 text-gray-800 border border-gray-200'
   }
 
   const getStatusDot = (status) => {
-    switch (status) {
-      case 'Scheduled':
-        return 'bg-blue-500'
-      case 'Completed':
-        return 'bg-green-500'
-      case 'Pending Feedback':
-        return 'bg-amber-500'
-      case 'Offer Extended':
-        return 'bg-purple-500'
-      case 'Rejected':
-        return 'bg-red-500'
-      default:
-        return 'bg-gray-500'
-    }
+     const s = status ? status.toLowerCase() : ''
+    if (s === 'scheduled') return 'bg-blue-500'
+    if (s === 'completed') return 'bg-green-500'
+    if (s === 'pending feedback') return 'bg-amber-500'
+    if (s === 'offer extended') return 'bg-purple-500'
+    if (s === 'rejected') return 'bg-red-500'
+    if (s === 'placed') return 'bg-emerald-500'
+    return 'bg-gray-500'
   }
 
   const getTodaysInterviews = () => {
@@ -230,10 +217,11 @@ const InterviewTracker = () => {
         interviewLevel: '',
         date: '',
       })
+      userRole === 'Admin' ? fetchInterviews() : fetchUserInterviews(user)
     } catch (error) {
       console.error('Error adding interview:', error)
       alert(
-        'Failed to add interview. ' + (error.response?.data || 'Server Error'),
+        'Failed to add interview. ' + (error.response?.data?.message || 'Server Error'),
       )
     } finally {
       setSubmitting(false)
@@ -283,21 +271,25 @@ const InterviewTracker = () => {
   }
 
   const eventStyleGetter = (event) => {
-    const status = event.resource?.status
+    // Robust status check
+    const status = event.resource?.status?.toLowerCase()
     let backgroundColor = '#3174ad'
 
     switch (status) {
-      case 'Completed':
+      case 'completed':
         backgroundColor = '#10b981'
         break
-      case 'Pending Feedback':
+      case 'pending feedback':
         backgroundColor = '#f59e0b'
         break
-      case 'Offer Extended':
+      case 'offer extended':
         backgroundColor = '#8b5cf6'
         break
-      case 'Rejected':
+      case 'rejected':
         backgroundColor = '#ef4444'
+        break
+      case 'placed':
+        backgroundColor = '#059669' // Emerald for Placed
         break
       default:
         backgroundColor = '#3b82f6'
@@ -323,7 +315,7 @@ const InterviewTracker = () => {
     setShowCandidateDetailsModal(true)
   }
 
-  // --- New function to handle mail generation and opening ---
+  // --- Mail generation function ---
   const handleSendMail = (mailType, candidate, interviewDetails) => {
     const interviewDate = new Date(interviewDetails.date)
     const formattedDate = interviewDate.toLocaleDateString('en-US', {
@@ -453,8 +445,6 @@ Recruitment Team`
       <div className='max-w-7xl mx-auto'>
         {/* Header */}
         <div className='text-center mb-12 relative'>
-          {' '}
-          {/* Added relative for alarm positioning */}
           <h1 className='text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent'>
             Interview Tracker
           </h1>
@@ -462,16 +452,12 @@ Recruitment Team`
             Manage candidate interviews, track status, and schedule meetings in
             one place
           </p>
-          {/* Notification Bell Icon - Repositioned and enhanced */}
+          {/* Notification Bell Icon */}
           {upcomingAlerts.length > 0 && (
             <div className='absolute top-0 right-0 mt-2 mr-2 z-50'>
-              {' '}
-              {/* Adjusted positioning */}
               <button
                 onClick={() => setShowAlertsDropdown(!showAlertsDropdown)}
                 className='relative p-3 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 animate-ring-pulse'>
-                {' '}
-                {/* Custom animation */}
                 <svg
                   className='w-6 h-6'
                   fill='none'
@@ -549,7 +535,7 @@ Recruitment Team`
           )}
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards - UPDATED LOGIC FOR PLACED */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
           {[
             'Scheduled',
@@ -557,18 +543,33 @@ Recruitment Team`
             'Pending Feedback',
             'Offer Extended',
             'placed',
-          ].map((status) => (
+          ].map((status) => {
+            
+            // Logic to calculate count including the specific condition for placements
+            const count = interviewData.filter((item) => {
+              const itemStatus = item.status?.toLowerCase() || '';
+              const itemLevel = item.interviewLevel?.toLowerCase() || '';
+              const targetStatus = status.toLowerCase();
+
+              if (targetStatus === 'placed') {
+                // Matches logic from PlacedCandidates.jsx
+                return itemStatus === 'placed' || itemLevel === 'placed';
+              }
+              return itemStatus === targetStatus;
+            }).length;
+
+            return (
             <div
               key={status}
               className='bg-white rounded-2xl shadow-lg p-6 border-l-4 border-indigo-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1'>
               <div className='flex items-center justify-between'>
                 <div>
-                  <p className='text-sm font-medium text-gray-600'>{status}</p>
+                  {/* Capitalize displayed status */}
+                  <p className='text-sm font-medium text-gray-600'>
+                    {status === 'placed' ? 'Placed' : status}
+                  </p>
                   <p className='text-2xl font-bold text-gray-900 mt-1'>
-                    {
-                      interviewData.filter((item) => item.status === status)
-                        .length
-                    }
+                    {count}
                   </p>
                 </div>
                 <div
@@ -577,7 +578,7 @@ Recruitment Team`
                   )}`}></div>
               </div>
             </div>
-          ))}
+          )})}
         </div>
 
         {/* Action Buttons Container */}
@@ -737,11 +738,10 @@ Recruitment Team`
                   name="date"
                   value={newInterview.date}
                   onChange={handleAddInputChange}
-                  min={new Date().toISOString().slice(0, 16)}   // blocks past date & past time
+                  min={new Date().toISOString().slice(0, 16)}
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white shadow-sm"
                   required
                 />
-
               </div>
 
               <div className='lg:col-span-2 space-y-2'>
@@ -761,6 +761,7 @@ Recruitment Team`
                   <option value='Pending Feedback'>Pending Feedback</option>
                   <option value='Offer Extended'>Offer Extended</option>
                   <option value='Rejected'>Rejected</option>
+                  <option value='placed'>Placed</option>
                 </select>
               </div>
               <div className='lg:col-span-2 space-y-2'>
@@ -783,6 +784,7 @@ Recruitment Team`
                   <option value='L4'>L4</option>
                   <option value='L5'>L5</option>
                   <option value='HR'>HR Round</option>
+                  <option value='placed'>Placed</option>
                 </select>
               </div>
 
@@ -1036,7 +1038,7 @@ Recruitment Team`
                     <option value='L4'>L4</option>
                     <option value='L5'>L5</option>
                     <option value='HR'>HR Round</option>
-                    <option value='PLACED'>PLACED</option>
+                    <option value='placed'>PLACED</option>
                   </select>
 
                   <label

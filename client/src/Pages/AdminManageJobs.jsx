@@ -4,10 +4,12 @@ import './AdminManageJobs.css';
 import * as XLSX from 'xlsx';
 import {
   FilePenLine,
-  FileText,
-  Trash,
+  FileText, // Ensures this is imported
   ChevronLeft,
   ChevronRight,
+  Briefcase,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 
 const AdminManageJobs = () => {
@@ -17,7 +19,7 @@ const AdminManageJobs = () => {
   const [company, setCompany] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedJobs, setSelectedJobs] = useState([]); // State for selected jobs
+  const [selectedJobs, setSelectedJobs] = useState([]); 
 
   const [formState, setFormState] = useState({
     companyId: '',
@@ -34,6 +36,12 @@ const AdminManageJobs = () => {
   const [editPopup, setEditPopup] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // --- STATS CALCULATIONS ---
+  const totalJobs = jobs.length;
+  // Matching "active" and "in active"
+  const activeJobs = jobs.filter(job => job.status === 'active').length;
+  const inactiveJobs = jobs.filter(job => job.status === 'in active' || job.status === 'inactive').length;
 
   const fetchJobs = async () => {
     try {
@@ -247,7 +255,6 @@ const AdminManageJobs = () => {
     setCurrentPage(1);
   };
 
-  // --- NEW HANDLERS FOR SELECTION ---
   const handleSelectJob = (jobId) => {
     setSelectedJobs((prevSelected) => {
       if (prevSelected.includes(jobId)) {
@@ -285,23 +292,58 @@ const AdminManageJobs = () => {
   
   return (
     <div className="admin-manage-jobs w-[80vw]">
-      <div className="bg-[#267edc] rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="bg-white bg-opacity-20 p-3 rounded-full">
-            <FileText />
+      {/* HEADER SECTION */}
+      <div className="bg-[#267edc] rounded-xl shadow-lg p-6 mb-8">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+          
+          {/* Title Section */}
+          <div className="flex items-center space-x-4 w-full lg:w-auto">
+            {/* FIX: Solid white background with blue icon ensures visibility */}
+            <div className="bg-white p-3 rounded-full text-[#267edc] shadow-sm">
+              <FileText size={32} />
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold text-white">
+                Manage Job Postings
+              </h3>
+              <p className="text-blue-100 text-sm">
+                Add, update, or remove job listings
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-3xl font-bold text-white">
-              Manage Job Postings
-            </h3>
-            <p className="text-blue-100 text-sm">
-              Add, update, or remove job listings from the system
-            </p>
+
+          {/* Stats Section */}
+          <div className="flex items-center justify-end gap-4 w-full lg:w-auto overflow-x-auto">
+            
+            {/* Total Jobs */}
+            <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl shadow-md min-w-[140px] h-[100px] transition-transform hover:scale-105">
+              {/* FIX: Explicit blue text color for visibility */}
+              <div className="flex items-center gap-2 text-blue-600 mb-2">
+                <Briefcase size={20} />
+                <span className="text-xs uppercase font-bold tracking-wider">Total</span>
+              </div>
+              <span className="text-3xl font-extrabold text-slate-800">{totalJobs}</span>
+            </div>
+
+            {/* Active Jobs */}
+            <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl shadow-md min-w-[140px] h-[100px] transition-transform hover:scale-105">
+              <div className="flex items-center gap-2 text-emerald-500 mb-2">
+                <CheckCircle size={20} />
+                <span className="text-xs uppercase font-bold tracking-wider">Active</span>
+              </div>
+              <span className="text-3xl font-extrabold text-slate-800">{activeJobs}</span>
+            </div>
+
+            {/* Inactive Jobs */}
+            <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl shadow-md min-w-[140px] h-[100px] transition-transform hover:scale-105">
+              <div className="flex items-center gap-2 text-rose-500 mb-2">
+                <XCircle size={20} />
+                <span className="text-xs uppercase font-bold tracking-wider">Inactive</span>
+              </div>
+              <span className="text-3xl font-extrabold text-slate-800">{inactiveJobs}</span>
+            </div>
+
           </div>
-        </div>
-        <div className="text-right">
-          <p className="text-5xl font-extrabold text-white">{jobs.length}</p>
-          <p className="text-blue-100 text-sm">Total Jobs Posted</p>
         </div>
       </div>
 
@@ -467,24 +509,17 @@ const AdminManageJobs = () => {
             <form onSubmit={handleEditJob} className="space-y-4">
               <div>
                 <label
-                  htmlFor="edit-companyId"
+                  htmlFor="edit-companyName"
                   className="block text-sm font-medium text-gray-700 mb-1">
                   Company
                 </label>
-                <select
-                  id="edit-companyId"
-                  name="companyId"
-                  value={formState.companyId}
-                  onChange={handleCompanySelectChange}
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
-                  <option value="">Select a Company</option>
-                  {company.map((comp) => (
-                    <option key={comp._id} value={comp._id}>
-                      {comp.name}
-                    </option>
-                  ))}
-                </select>
+                <input
+                  type="text"
+                  id="edit-companyName"
+                  value={formState.companyName || ''} 
+                  disabled
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed"
+                />
               </div>
               <div className='space-y-4'>
                 <label htmlFor="edit-role">Job Role</label>
@@ -605,11 +640,6 @@ const AdminManageJobs = () => {
                           onClick={() => handleEditPopup(job)}
                           className="text-indigo-600 hover:text-indigo-900 text-sm">
                           <FilePenLine />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteJob(job._id)}
-                          className="text-rose-600 hover:text-rose-900 text-sm">
-                          <Trash />
                         </button>
                       </td>
                     </tr>

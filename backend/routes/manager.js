@@ -2,14 +2,13 @@
 
 import express from 'express';
 import bcrypt from 'bcrypt';
-import User from '../models/User.js'; // <-- IMPORTANT: We use the unified User model
+import User from '../models/User.js'; 
 
 const router = express.Router();
 
 // GET all users with the 'manager' role
 router.get('/', async (req, res) => {
     try {
-        // Find all documents in the 'Users' collection where the role is 'manager'
         const managers = await User.find({ role: 'manager' });
         res.status(200).json(managers);
     } catch (error) {
@@ -19,10 +18,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST a new user with the 'manager' role
-// Note: This endpoint is slightly different from your frontend component, which calls /register.
-// We are making the backend match the frontend's expectation.
 router.post('/register', async (req, res) => {
-    // The component sends 'employeeID' but the model uses 'employeeId'. We handle this.
     const { name, email, employeeID, password, assigned_Company, phone, age } = req.body;
     try {
         const existingUser = await User.findOne({ $or: [{ email }, { employeeId: employeeID }] });
@@ -30,16 +26,18 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'A user with this email or employee ID already exists.' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // FIX: Removed manual bcrypt hashing here to prevent Double Hashing.
+        // The User model's pre-save hook will handle the hashing.
+        
         const newManager = new User({
             name,
             email,
-            employeeId: employeeID, // Map frontend 'employeeID' to model's 'employeeId'
-            password: hashedPassword,
+            employeeId: employeeID, 
+            password: password, // Send plain text, let the Model hash it
             assigned_Company,
             phone,
             age,
-            role: 'manager' // CRITICAL: Set the role explicitly
+            role: 'manager'
         });
 
         await newManager.save();
@@ -57,7 +55,7 @@ router.put('/:id', async (req, res) => {
     try {
         const updateData = { name, email, employeeId: employeeID, assigned_Company, phone, age };
 
-        // If a new password is provided in the form, hash it and add it to the update
+        // We DO need manual hashing here because findByIdAndUpdate bypasses the pre-save hook
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);
         }

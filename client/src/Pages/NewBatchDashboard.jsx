@@ -17,6 +17,8 @@ export default function NewBatchDashboard() {
   
   // State for selected rows
   const [selectedBatches, setSelectedBatches] = useState([])
+  // State for validation errors
+  const [errors, setErrors] = useState({})
 
   const [newBatch, setNewBatch] = useState({
     course: '',
@@ -30,6 +32,13 @@ export default function NewBatchDashboard() {
   // Helper to get today's date in YYYY-MM-DD format for the 'min' attribute
   const getTodayDate = () => {
     return new Date().toISOString().split('T')[0];
+  }
+
+  // Helper to get max future date (e.g., 5 years from now)
+  const getMaxDate = () => {
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 5);
+    return futureDate.toISOString().split('T')[0];
   }
 
   const fetchBatches = async () => {
@@ -50,40 +59,128 @@ export default function NewBatchDashboard() {
     fetchBatches()
   }, [])
 
-  const handleChange = (e) =>
-    setNewBatch({ ...newBatch, [e.target.name]: e.target.value })
+  // --- VALIDATION FUNCTIONS ---
+  
+  // Validate date format and year (must be 4 digits)
+  const validateDateYear = (dateString, fieldName) => {
+    if (!dateString) return null;
+    
+    // Check if the date string is in YYYY-MM-DD format
+    const dateRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
+    if (!dateRegex.test(dateString)) {
+      return `${fieldName} must be in YYYY-MM-DD format`;
+    }
+    
+    // Parse the date
+    const date = new Date(dateString);
+    
+    // Check if year is exactly 4 digits and valid
+    const yearString = dateString.split('-')[0];
+    
+    // LIMITATION: Year must be exactly 4 digits
+    if (yearString.length !== 4) {
+      return `${fieldName} year must be exactly 4 digits`;
+    }
+    
+    const year = parseInt(yearString);
 
-  const handleEditChange = (e) => {
-    setBatch({ ...batch, [e.target.name]: e.target.value })
-  }
+    // Check if year is within reasonable range (2000-2100)
+    if (year < 2000 || year > 2100) {
+      return `${fieldName} year must be between 2000 and 2100`;
+    }
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return `${fieldName} is not a valid date`;
+    }
+    
+    return null;
+  };
 
-  // --- VALIDATION FUNCTION ---
+  // Main validation function for batch dates
   const validateBatchDates = (demoDate, batchStartDate) => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize today to midnight for accurate comparison
+    today.setHours(0, 0, 0, 0); // Normalize today to midnight
 
-    const start = new Date(batchStartDate);
-    
-    // Check if Batch Start Date is in the past
-    if (start < today) {
-      return "Batch Start Date cannot be in the past.";
-    }
-
+    // Validate demo date year
     if (demoDate) {
+      const demoYearError = validateDateYear(demoDate, 'Demo Date');
+      if (demoYearError) return demoYearError;
+      
       const demo = new Date(demoDate);
       
       // Check if Demo Date is in the past
       if (demo < today) {
         return "Demo Date cannot be in the past.";
       }
+    }
+
+    // Validate batch start date year
+    if (batchStartDate) {
+      const batchYearError = validateDateYear(batchStartDate, 'Batch Start Date');
+      if (batchYearError) return batchYearError;
+      
+      const start = new Date(batchStartDate);
+      
+      // Check if Batch Start Date is in the past
+      if (start < today) {
+        return "Batch Start Date cannot be in the past.";
+      }
 
       // Check if Batch starts before Demo
-      if (start < demo) {
-        return "Batch Start Date cannot be before the Demo Date.";
+      if (demoDate) {
+        const demo = new Date(demoDate);
+        if (start < demo) {
+          return "Batch Start Date cannot be before the Demo Date.";
+        }
+      }
+      
+      // Check if date is too far in the future (optional)
+      const maxDate = new Date();
+      maxDate.setFullYear(maxDate.getFullYear() + 5);
+      if (start > maxDate) {
+        return "Batch Start Date cannot be more than 5 years in the future.";
       }
     }
+    
     return null; // No errors
   };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewBatch({ ...newBatch, [name]: value });
+    
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: '' });
+    }
+    
+    // If it's a date field, validate on change
+    if ((name === 'demoDate' || name === 'batchStartDate') && value) {
+      const error = validateDateYear(value, name === 'demoDate' ? 'Demo Date' : 'Batch Start Date');
+      if (error) {
+        setErrors({ ...errors, [name]: error });
+      }
+    }
+  }
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setBatch({ ...batch, [name]: value });
+    
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: '' });
+    }
+    
+    // If it's a date field, validate on change
+    if ((name === 'demoDate' || name === 'batchStartDate') && value) {
+      const error = validateDateYear(value, name === 'demoDate' ? 'Demo Date' : 'Batch Start Date');
+      if (error) {
+        setErrors({ ...errors, [name]: error });
+      }
+    }
+  }
 
   const handleAddBatch = async (e) => {
     e.preventDefault()
@@ -100,7 +197,21 @@ export default function NewBatchDashboard() {
       return
     }
 
-    // 2. Date/Time Validation
+    // 2. Validate date years (4 digits check)
+    const demoYearError = newBatch.demoDate ? validateDateYear(newBatch.demoDate, 'Demo Date') : null;
+    const batchYearError = validateDateYear(newBatch.batchStartDate, 'Batch Start Date');
+    
+    if (demoYearError) {
+      alert(demoYearError);
+      return;
+    }
+    
+    if (batchYearError) {
+      alert(batchYearError);
+      return;
+    }
+
+    // 3. Date/Time Validation
     const dateError = validateBatchDates(newBatch.demoDate, newBatch.batchStartDate);
     if (dateError) {
       alert(dateError);
@@ -118,6 +229,7 @@ export default function NewBatchDashboard() {
         mode: '',
         trainer: '',
       })
+      setErrors({}); // Clear all errors
       alert('Batch added successfully!')
     } catch (error) {
       console.error('Failed to add batch:', error)
@@ -207,14 +319,48 @@ export default function NewBatchDashboard() {
       const worksheet = workbook.Sheets[sheetName]
       const json = XLSX.utils.sheet_to_json(worksheet)
 
-      const formattedBatches = json.map((row) => ({
-        course: row.Course,
-        demoDate: row['Demo Date'],
-        batchStartDate: row['Batch Start Date'],
-        duration: row.Duration,
-        mode: row.Mode,
-        trainer: row.Trainer,
-      }))
+      // Validate imported data before proceeding
+      const invalidDates = [];
+      const formattedBatches = json.map((row, index) => {
+        // Validate demo date year
+        if (row['Demo Date']) {
+          const demoDateStr = typeof row['Demo Date'] === 'object' 
+            ? row['Demo Date'].toISOString().split('T')[0]
+            : row['Demo Date'];
+          
+          const demoYearError = validateDateYear(demoDateStr, 'Demo Date');
+          if (demoYearError) {
+            invalidDates.push(`Row ${index + 1}: ${demoYearError}`);
+          }
+        }
+        
+        // Validate batch start date year
+        if (row['Batch Start Date']) {
+          const batchDateStr = typeof row['Batch Start Date'] === 'object'
+            ? row['Batch Start Date'].toISOString().split('T')[0]
+            : row['Batch Start Date'];
+          
+          const batchYearError = validateDateYear(batchDateStr, 'Batch Start Date');
+          if (batchYearError) {
+            invalidDates.push(`Row ${index + 1}: ${batchYearError}`);
+          }
+        }
+
+        return {
+          course: row.Course,
+          demoDate: row['Demo Date'],
+          batchStartDate: row['Batch Start Date'],
+          duration: row.Duration,
+          mode: row.Mode,
+          trainer: row.Trainer,
+        }
+      });
+
+      // Show validation errors if any
+      if (invalidDates.length > 0) {
+        alert(`Validation errors in imported file:\n${invalidDates.join('\n')}\n\nPlease fix these errors and try again.`);
+        return;
+      }
 
       if (
         window.confirm(
@@ -238,6 +384,7 @@ export default function NewBatchDashboard() {
   const handleCloseModal = () => {
     setEditPopup(false)
     setBatch(null)
+    setErrors({});
   }
 
   const handlePopup = (batchToEdit) => {
@@ -252,12 +399,27 @@ export default function NewBatchDashboard() {
     }
     setBatch(formattedBatch)
     setEditPopup(true)
+    setErrors({});
   }
 
   const handleSubmitEdit = async (e) => {
     e.preventDefault()
 
-    // Edit Validation
+    // 1. Validate date years (4 digits check)
+    const demoYearError = batch.demoDate ? validateDateYear(batch.demoDate, 'Demo Date') : null;
+    const batchYearError = validateDateYear(batch.batchStartDate, 'Batch Start Date');
+    
+    if (demoYearError) {
+      alert(demoYearError);
+      return;
+    }
+    
+    if (batchYearError) {
+      alert(batchYearError);
+      return;
+    }
+
+    // 2. Edit Validation
     const dateError = validateBatchDates(batch.demoDate, batch.batchStartDate);
     if (dateError) {
       alert(dateError);
@@ -286,25 +448,43 @@ export default function NewBatchDashboard() {
         </h3>
         <form onSubmit={handleAddBatch} className='space-y-5'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <input type='text' name='course' placeholder='Course Name *' value={newBatch.course} onChange={handleChange} required className='p-3 border rounded-md' />
-            <input type='text' name='trainer' placeholder='Trainer Name *' value={newBatch.trainer} onChange={handleChange} required className='p-3 border rounded-md' />
+            <input 
+              type='text' 
+              name='course' 
+              placeholder='Course Name *' 
+              value={newBatch.course} 
+              onChange={handleChange} 
+              required 
+              className='p-3 border rounded-md' 
+            />
+            <input 
+              type='text' 
+              name='trainer' 
+              placeholder='Trainer Name *' 
+              value={newBatch.trainer} 
+              onChange={handleChange} 
+              required 
+              className='p-3 border rounded-md' 
+            />
             
             <div className='relative'>
               <label className='absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600'>Demo Date (Optional)</label>
-              {/* Added min={getTodayDate()} to disable past dates */}
               <input 
                 type='date' 
                 name='demoDate' 
                 value={newBatch.demoDate} 
                 onChange={handleChange} 
-                min={getTodayDate()} 
-                className='p-3 border rounded-md w-full' 
+                min={getTodayDate()}
+                max={getMaxDate()}
+                className={`p-3 border rounded-md w-full ${errors.demoDate ? 'border-red-500' : ''}`}
               />
+              {errors.demoDate && (
+                <p className='text-red-500 text-xs mt-1'>{errors.demoDate}</p>
+              )}
             </div>
             
             <div className='relative'>
               <label className='absolute -top-2 left-2 bg-white px-1 text-xs text-gray-600'>Batch Start Date *</label>
-              {/* Added min={getTodayDate()} to disable past dates */}
               <input 
                 type='date' 
                 name='batchStartDate' 
@@ -312,14 +492,37 @@ export default function NewBatchDashboard() {
                 onChange={handleChange} 
                 required 
                 min={getTodayDate()}
-                className='p-3 border rounded-md w-full' 
+                max={getMaxDate()}
+                className={`p-3 border rounded-md w-full ${errors.batchStartDate ? 'border-red-500' : ''}`}
               />
+              {errors.batchStartDate && (
+                <p className='text-red-500 text-xs mt-1'>{errors.batchStartDate}</p>
+              )}
             </div>
             
-            <input type='text' name='duration' placeholder='Duration (e.g., 6 Weeks) *' value={newBatch.duration} onChange={handleChange} required className='p-3 border rounded-md' />
-            <input type='text' name='mode' placeholder='Mode (e.g., Online) *' value={newBatch.mode} onChange={handleChange} required className='p-3 border rounded-md' />
+            <input 
+              type='text' 
+              name='duration' 
+              placeholder='Duration (e.g., 6 Weeks) *' 
+              value={newBatch.duration} 
+              onChange={handleChange} 
+              required 
+              className='p-3 border rounded-md' 
+            />
+            <input 
+              type='text' 
+              name='mode' 
+              placeholder='Mode (e.g., Online) *' 
+              value={newBatch.mode} 
+              onChange={handleChange} 
+              required 
+              className='p-3 border rounded-md' 
+            />
           </div>
-          <button type='submit' className='w-full bg-indigo-600 text-white p-3 rounded-md hover:bg-indigo-700 font-semibold'>
+          <button 
+            type='submit' 
+            className='w-full bg-indigo-600 text-white p-3 rounded-md hover:bg-indigo-700 font-semibold'
+          >
             Add Batch
           </button>
         </form>
@@ -333,22 +536,71 @@ export default function NewBatchDashboard() {
               <button onClick={handleCloseModal} className='text-gray-500 hover:text-gray-800'><X size={24} /></button>
             </div>
             <form onSubmit={handleSubmitEdit} className='space-y-4'>
-                <input name='course' value={batch.course} onChange={handleEditChange} required className='p-2 w-full border rounded-lg' />
-                <input name='trainer' value={batch.trainer} onChange={handleEditChange} required className='p-2 w-full border rounded-lg' />
-                <div className='relative'>
-                    <label className='absolute -top-2 left-2 bg-white px-1 text-xs'>Demo Date</label>
-                    <input name='demoDate' type='date' value={batch.demoDate} onChange={handleEditChange} min={getTodayDate()} className='p-2 w-full border rounded-lg'/>
-                </div>
-                <div className='relative'>
-                    <label className='absolute -top-2 left-2 bg-white px-1 text-xs'>Batch Start Date *</label>
-                    <input name='batchStartDate' type='date' value={batch.batchStartDate} onChange={handleEditChange} required min={getTodayDate()} className='p-2 w-full border rounded-lg'/>
-                </div>
-                <input name='duration' value={batch.duration} onChange={handleEditChange} required placeholder="Duration" className='p-2 w-full border rounded-lg' />
-                <input name='mode' value={batch.mode} onChange={handleEditChange} required placeholder="Mode" className='p-2 w-full border rounded-lg' />
-                <div className='flex justify-end space-x-4 mt-6'>
-                    <button type='button' className='px-5 py-2 border rounded-lg hover:bg-gray-100' onClick={handleCloseModal}>Cancel</button>
-                    <button type='submit' className='px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700'>Update Batch</button>
-                </div>
+              <input 
+                name='course' 
+                value={batch.course} 
+                onChange={handleEditChange} 
+                required 
+                className='p-2 w-full border rounded-lg' 
+              />
+              <input 
+                name='trainer' 
+                value={batch.trainer} 
+                onChange={handleEditChange} 
+                required 
+                className='p-2 w-full border rounded-lg' 
+              />
+              <div className='relative'>
+                <label className='absolute -top-2 left-2 bg-white px-1 text-xs'>Demo Date</label>
+                <input 
+                  name='demoDate' 
+                  type='date' 
+                  value={batch.demoDate} 
+                  onChange={handleEditChange} 
+                  min={getTodayDate()}
+                  max={getMaxDate()}
+                  className={`p-2 w-full border rounded-lg ${errors.demoDate ? 'border-red-500' : ''}`}
+                />
+                {errors.demoDate && (
+                  <p className='text-red-500 text-xs mt-1'>{errors.demoDate}</p>
+                )}
+              </div>
+              <div className='relative'>
+                <label className='absolute -top-2 left-2 bg-white px-1 text-xs'>Batch Start Date *</label>
+                <input 
+                  name='batchStartDate' 
+                  type='date' 
+                  value={batch.batchStartDate} 
+                  onChange={handleEditChange} 
+                  required 
+                  min={getTodayDate()}
+                  max={getMaxDate()}
+                  className={`p-2 w-full border rounded-lg ${errors.batchStartDate ? 'border-red-500' : ''}`}
+                />
+                {errors.batchStartDate && (
+                  <p className='text-red-500 text-xs mt-1'>{errors.batchStartDate}</p>
+                )}
+              </div>
+              <input 
+                name='duration' 
+                value={batch.duration} 
+                onChange={handleEditChange} 
+                required 
+                placeholder="Duration" 
+                className='p-2 w-full border rounded-lg' 
+              />
+              <input 
+                name='mode' 
+                value={batch.mode} 
+                onChange={handleEditChange} 
+                required 
+                placeholder="Mode" 
+                className='p-2 w-full border rounded-lg' 
+              />
+              <div className='flex justify-end space-x-4 mt-6'>
+                <button type='button' className='px-5 py-2 border rounded-lg hover:bg-gray-100' onClick={handleCloseModal}>Cancel</button>
+                <button type='submit' className='px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700'>Update Batch</button>
+              </div>
             </form>
           </div>
         </div>
@@ -361,7 +613,8 @@ export default function NewBatchDashboard() {
             {selectedBatches.length > 0 && (
               <button
                 onClick={handleDeleteSelectedBatches}
-                className='bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm font-medium flex items-center gap-2'>
+                className='bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm font-medium flex items-center gap-2'
+              >
                 <FiTrash2 />
                 Delete Selected ({selectedBatches.length})
               </button>

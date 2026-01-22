@@ -1,8 +1,10 @@
+// File: src/Pages/BenchList.jsx
+
 import React, { useState, useEffect } from 'react'
-import api from '../api/axios' // Use your central axios instance
+import api from '../api/axios' 
 import Pagination from '../Components/Pagination'
-import { FileText, Search, Users, CheckCircle } from 'lucide-react' // Added Lucide Icons
-import './BenchList.css' // Keep your existing global styles
+import { FileText, Search, Users, CheckCircle } from 'lucide-react'
+import './BenchList.css' 
 
 const BenchList = () => {
   // --- STATE MANAGEMENT ---
@@ -32,6 +34,12 @@ const BenchList = () => {
   })
   const [isEnrolling, setIsEnrolling] = useState(false)
 
+  // --- VALIDATION HELPER ---
+  const isValidEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  }
+
   // --- HANDLERS ---
 
   const handleEnrollmentChange = (e) => {
@@ -51,10 +59,17 @@ const BenchList = () => {
 
   const handleEnrollmentSubmit = async (e) => {
     e.preventDefault()
+    
     if (enrollmentFormData.contact.length !== 10) {
       alert('Validation Error: Contact number must be exactly 10 digits.')
       return
     }
+
+    if (!isValidEmail(enrollmentFormData.email)) {
+      alert('Validation Error: Please enter a valid email address (e.g., example@domain.com).')
+      return
+    }
+
     setIsEnrolling(true)
     try {
       await api.post('/candidate-enrollment', enrollmentFormData)
@@ -75,6 +90,12 @@ const BenchList = () => {
 
   const handleRequestSubmit = async (e) => {
     e.preventDefault()
+
+    if (!isValidEmail(requestFormData.email)) {
+        alert('Validation Error: Please enter a valid email address.')
+        return
+    }
+
     setIsRequesting(true)
     try {
       await api.post('/request-info', { ...requestFormData, candidateName: selectedCandidate.name })
@@ -104,11 +125,13 @@ const BenchList = () => {
       } catch (error) { console.error('Failed to fetch candidates:', error) }
     }
 
+    // --- UPDATED LOGIC HERE ---
     const fetchPlaced = async () => {
       try {
         const response = await api.get('/interview')
+        // STRICT FILTERING: Only show if interviewLevel is 'placed'
         const placedCandidates = response.data.filter(
-          (interview) => interview.interviewLevel === 'placed' || interview.status?.toLowerCase() === 'placed'
+          (interview) => interview.interviewLevel?.toLowerCase() === 'placed'
         )
         setPlaced(placedCandidates)
       } catch (error) { console.log('Error fetching placed candidates', error) }
@@ -116,7 +139,6 @@ const BenchList = () => {
 
     const fetchTestimonials = async () => {
       try {
-        // Fetch public/active testimonials
         const { data } = await api.get('/testimonials/public')
         setTestimonials(data)
       } catch (error) { console.error('Error fetching testimonials', error) }
@@ -144,7 +166,6 @@ const BenchList = () => {
     { q: 'How long does it take to get placed?', a: 'On average, candidates get interview calls within 1-3 weeks depending on demand.' },
   ]
 
-  // --- PROCESS STEPS DATA WITH LUCIDE ICONS ---
   const processSteps = [
     { id: 1, icon: <FileText size={32} />, title: 'Application', text: 'Submit resume & details.' },
     { id: 2, icon: <Search size={32} />, title: 'Screening', text: 'Profile review.' },
@@ -161,6 +182,7 @@ const BenchList = () => {
             width: 100%;
             overflow-x: hidden;
             background-color: #f9fafb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         /* --- Ticker Styles --- */
@@ -201,7 +223,7 @@ const BenchList = () => {
             justify-content: center;
             align-items: center;
         }
-        .view-openings-btn {
+        .view-openings-btn-hero {
             background: #2563eb;
             color: white;
             padding: 12px 24px;
@@ -212,7 +234,7 @@ const BenchList = () => {
             margin-top: 20px;
             transition: background 0.3s;
         }
-        .view-openings-btn:hover { background: #1d4ed8; }
+        .view-openings-btn-hero:hover { background: #1d4ed8; }
 
         /* --- STATS SECTION --- */
         .stats-section {
@@ -273,12 +295,80 @@ const BenchList = () => {
         .stat-content p { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin: 0; }
 
         /* --- CANDIDATES TABLE --- */
-        .candidates-section { padding: 40px 20px; text-align: center; }
-        .candidates-section h2 { color: #1e3a8a; font-size: 2rem; margin-bottom: 20px; font-weight: 800; text-transform: uppercase; }
-        .candidate-table-wrapper { overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 1200px; margin: 0 auto; }
-        .candidate-table { width: 100%; border-collapse: collapse; background: white; min-width: 600px; }
-        .candidate-table thead { background-color: #2563eb; color: white; }
-        .candidate-table th, .candidate-table td { padding: 15px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .candidates-section { padding: 40px 20px; text-align: center; background: white; }
+        .candidates-section h2 { 
+            color: #1a3b8c; 
+            font-size: 2rem; 
+            margin-bottom: 30px; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+        }
+        
+        .candidate-table-wrapper { 
+            overflow-x: auto; 
+            border-radius: 8px; 
+            border: 1px solid #e0e0e0;
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        
+        .candidate-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: white; 
+            min-width: 800px; 
+        }
+        
+        .candidate-table thead { 
+            background-color: #0d6efd; 
+            color: white; 
+        }
+        
+        .candidate-table th { 
+            padding: 18px 15px; 
+            text-align: left; 
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .candidate-table tbody tr {
+            border-bottom: 1px solid #eeeeee;
+        }
+        
+        .candidate-table tbody tr:hover {
+            background-color: #f8faff;
+        }
+
+        .candidate-table td { 
+            padding: 20px 15px; 
+            text-align: left; 
+            color: #333;
+            font-size: 15px;
+            vertical-align: middle;
+        }
+        
+        .candidate-table td:nth-child(2) { color: #555; }
+        .candidate-table td:nth-child(3) { color: #555; max-width: 300px; }
+
+        .btn-request {
+            background-color: #0099ff; 
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-request:hover {
+            background-color: #0088e0;
+        }
 
         /* --- POPUP FORM INPUT ICONS --- */
         .popup-form .form-group {
@@ -293,7 +383,7 @@ const BenchList = () => {
             transform: translateY(-50%);
             color: #6b7280;
             font-size: 14px;
-            pointer-events: none; /* Allows click to pass through to input */
+            pointer-events: none;
             z-index: 10;
         }
 
@@ -306,7 +396,7 @@ const BenchList = () => {
         .popup-form textarea,
         .popup-form select {
             width: 100%;
-            padding: 12px 12px 12px 40px !important; /* Left padding space for icon */
+            padding: 12px 12px 12px 40px !important;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             font-size: 14px;
@@ -338,10 +428,10 @@ const BenchList = () => {
         .author-name { font-size: 1.1rem; font-weight: 700; color: #2563eb; margin: 0 0 5px 0; }
         .author-role { font-size: 0.9rem; color: #6b7280; margin: 0; }
 
-        /* --- UPDATED PROCESS SECTION STYLES (Matching the Image) --- */
+        /* --- HIRING PROCESS SECTION --- */
         .process-section {
           padding: 80px 20px;
-          background-color: #f8fafc; /* Light gray/white background */
+          background-color: #f8fafc;
           text-align: center;
         }
 
@@ -353,17 +443,16 @@ const BenchList = () => {
           margin-top: 50px;
         }
 
-        /* The Card Design */
         .process-card {
           background: white;
-          border-radius: 24px; /* Rounded corners */
+          border-radius: 24px;
           padding: 40px 30px;
           width: 280px;
           height: 320px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); /* Subtle shadow */
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
           transition: all 0.3s ease;
           border: 1px solid #f1f5f9;
           cursor: pointer;
@@ -371,34 +460,31 @@ const BenchList = () => {
 
         .process-card:hover {
           transform: translateY(-10px);
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        /* The Icon Bubble (Light blue circle) */
         .icon-bubble {
           width: 80px;
           height: 80px;
-          background-color: #eff6ff; /* Very light blue */
+          background-color: #eff6ff;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           margin-bottom: 30px;
-          color: #3b82f6; /* Blue icon color */
+          color: #3b82f6;
           font-size: 32px;
         }
 
-        /* Typography matching the image */
         .process-card h3 {
           font-size: 1.5rem;
-          font-weight: 800; /* Bold */
-          color: #111827;   /* Dark almost black */
+          font-weight: 800;
+          color: #111827;
           margin-bottom: 12px;
-          font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
 
         .process-card p {
-          color: #6b7280; /* Gray text */
+          color: #6b7280;
           font-size: 1rem;
           line-height: 1.5;
           margin: 0;
@@ -409,6 +495,7 @@ const BenchList = () => {
             .stats-section { flex-direction: column; align-items: center; padding: 40px 20px; }
             .stat-card { width: 320px; height: 320px; max-width: 100%; margin-bottom: 20px; }
             .stories-title { font-size: 2rem; }
+            .candidate-table td, .candidate-table th { padding: 10px; }
         }
       `}</style>
 
@@ -431,7 +518,7 @@ const BenchList = () => {
         <div className='overlay'>
           <h1>Zero7 Technologies List</h1>
           <p>Building bridges between ambition and opportunity in the new world of work</p>
-          <button className='view-openings-btn' onClick={() => document.querySelector('.candidates-section').scrollIntoView({ behavior: 'smooth' })}>
+          <button className='view-openings-btn-hero' onClick={() => document.querySelector('.candidates-section').scrollIntoView({ behavior: 'smooth' })}>
             View Openings ↓
           </button>
         </div>
@@ -462,21 +549,50 @@ const BenchList = () => {
         </div>
       </section>
 
+      {/* --- MAIN CANDIDATE TABLE SECTION --- */}
       <section className='candidates-section'>
         <h2>AVAILABLE CANDIDATES</h2>
         <div className='candidate-table-wrapper'>
           <table className='candidate-table'>
-            <thead><tr><th>Name</th><th>Role</th><th>Skills</th><th>Exp</th><th>Location</th><th>Action</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Skills</th>
+                <th>Exp</th>
+                <th>Location</th>
+                <th>Action</th>
+              </tr>
+            </thead>
             <tbody>
               {paginatedCandidates.length > 0 ? paginatedCandidates.map(c => (
                 <tr key={c._id}>
-                  <td>{c.name}</td><td>{c.role}</td><td>{c.skills}</td><td>{c.exp} Yrs</td><td>{c.location}</td>
-                  <td><button className='bg-gradient-to-tr from-[#0f62fe] to-[#00bfff] text-white p-2 text-sm rounded-xl' onClick={() => setSelectedCandidate(c)}>Request Info</button></td>
+                  <td>{c.name}</td>
+                  <td>{c.role}</td>
+                  <td>{c.skills}</td>
+                  <td>{c.exp} Yrs</td>
+                  <td>{c.location}</td>
+                  <td>
+                    <button className='btn-request' onClick={() => setSelectedCandidate(c)}>
+                      Request Info
+                    </button>
+                  </td>
                 </tr>
-              )) : <tr><td colSpan='6' align='center'>No candidates available.</td></tr>}
+              )) : (
+                <tr>
+                  <td colSpan='6' align='center' style={{padding: '30px'}}>No candidates available.</td>
+                </tr>
+              )}
             </tbody>
           </table>
-          <Pagination currentPage={currentPage} totalItems={candidates.length} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} itemsPerPageOptions={[5, 10, 20]} />
+          <Pagination 
+            currentPage={currentPage} 
+            totalItems={candidates.length} 
+            itemsPerPage={itemsPerPage} 
+            onPageChange={handlePageChange} 
+            onItemsPerPageChange={handleItemsPerPageChange} 
+            itemsPerPageOptions={[5, 10, 20]} 
+          />
         </div>
         
         {/* --- REQUEST INFO POPUP --- */}
@@ -502,7 +618,7 @@ const BenchList = () => {
 
                  <div className='form-group'>
                     <i className="fa fa-envelope input-icon"></i>
-                    <input type='email' name='email' placeholder='Email' required onChange={handleRequestFormChange} />
+                    <input type='email' name='email' placeholder='Email (e.g. user@domain.com)' required onChange={handleRequestFormChange} />
                  </div>
 
                  <div className='form-group'>
@@ -537,11 +653,12 @@ const BenchList = () => {
       </section>
 
       <section className='extra-section'>
-        <h2>Why Choose Our Bench Program?</h2>
+        <h2>Why Choose Our Bench Program?</h2><br />
         <div className='info-cards'>
-          <div className='flip-card'><div className='flip-card-inner'><div className='flip-card-front'><img src='/faster.jpg' alt='Faster Hiring' /><h3>Faster Hiring</h3></div><div className='flip-card-back'><p>Pre-screened candidates.</p></div></div></div>
-          <div className='flip-card'><div className='flip-card-inner'><div className='flip-card-front'><img src='/trusted.jpg' alt='Trusted Network' /><h3>Trusted Network</h3></div><div className='flip-card-back'><p>Top MNC tie-ups.</p></div></div></div>
-          <div className='flip-card'><div className='flip-card-inner'><div className='flip-card-front'><img src='/support.jpg' alt='Support' /><h3>End-to-End Support</h3></div><div className='flip-card-back'><p>Resume to Placement.</p></div></div></div>
+          <div className='flip-card'><div className='flip-card-inner'><div className='flip-card-front'><img src='/faster.jpg' alt='Faster Hiring' /><h3>Faster Hiring</h3></div><div className='flip-card-back'><p>Carefully evaluated profiles to ensure skills, experience, and job readiness align with employer requirements.</p></div></div></div>
+          <div className='flip-card'><div className='flip-card-inner'><div className='flip-card-front'><img src='/trusted.jpg' alt='Trusted Network' /><h3>Trusted Network</h3></div><div className='flip-card-back'><p>Strong partnerships with leading multinational companies to provide trusted hiring and career opportunities.</p></div></div></div>
+          <div className='flip-card'><div className='flip-card-inner'><div className='flip-card-front'><img src='/support.jpg' alt='Support' /><h3>End-to-End Support</h3></div><div className='flip-card-back'><p>Career-Focused Placement Process
+Structured support to help candidates secure the right job opportunities.</p></div></div></div>
         </div>
       </section>
 
@@ -561,7 +678,7 @@ const BenchList = () => {
                     alt={item.name} 
                     className='story-image' 
                   />
-                  <div className='quote-badge'>❞</div>
+                  <div className='quote-badge'>❝</div>
                 </div>
                 <p className='story-message'>{item.message}</p>
                 <div className='story-author'>
@@ -579,7 +696,7 @@ const BenchList = () => {
         <form onSubmit={handleEnrollmentSubmit} className='enrollment-form'>
           <input name='name' placeholder='Your Name' value={enrollmentFormData.name} onChange={handleEnrollmentChange} required />
           <input name='contact' placeholder='Contact (10 Digits)' value={enrollmentFormData.contact} onChange={handleEnrollmentChange} required maxLength={10} />
-          <input name='email' placeholder='Email' value={enrollmentFormData.email} onChange={handleEnrollmentChange} required />
+          <input name='email' placeholder='Email (e.g. user@domain.com)' value={enrollmentFormData.email} onChange={handleEnrollmentChange} required />
           <input name='location' placeholder='Location' value={enrollmentFormData.location} onChange={handleEnrollmentChange} required />
           <input name='role' placeholder='Role' value={enrollmentFormData.role} onChange={handleEnrollmentChange} required />
           <input name='skills' placeholder='Skills' value={enrollmentFormData.skills} onChange={handleEnrollmentChange} required />
@@ -587,7 +704,7 @@ const BenchList = () => {
         </form>
       </section>
 
-      {/* --- UPDATED PROCESS SECTION MATCHING IMAGE --- */}
+      {/* --- HIRING PROCESS SECTION --- */}
       <section className='process-section'>
         <h2>OUR HIRING PROCESS</h2>
         <div className='process-container'>

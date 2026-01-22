@@ -469,11 +469,11 @@ const About = () => {
                       />
                     </svg>
                   </div>
-                  <p className='ml-16 text-lg leading-6 font-medium text-gray-900'>
+                  <p className='ml-16 ms-5 ps-2 pt-3 text-lg leading-6 font-medium text-gray-900'>
                     Empowerment
                   </p>
                 </dt>
-                <dd className='mt-2 ml-16 text-base text-gray-500'>
+                <dd className='mt-4 ml-16 text-base text-gray-500'>
                   We believe in giving people the tools to take control of their
                   careers.
                 </dd>
@@ -498,11 +498,11 @@ const About = () => {
                       />
                     </svg>
                   </div>
-                  <p className='ml-16 text-lg leading-6 font-medium text-gray-900'>
+                  <p className='ml-16  ms-5 ps-2 pt-3 text-lg leading-6 font-medium text-gray-900'>
                     Integrity
                   </p>
                 </dt>
-                <dd className='mt-2 ml-16 text-base text-gray-500'>
+                <dd className='mt-4 ml-16 text-base text-gray-500'>
                   We operate with honesty and transparency in all our
                   partnerships.
                 </dd>
@@ -527,11 +527,11 @@ const About = () => {
                       />
                     </svg>
                   </div>
-                  <p className='ml-16 text-lg leading-6 font-medium text-gray-900'>
+                  <p className='ml-16  ms-5 ps-2 pt-3 text-lg leading-6 font-medium text-gray-900'>
                     Excellence
                   </p>
                 </dt>
-                <dd className='mt-2 ml-16 text-base text-gray-500'>
+                <dd className='mt-4 ml-16 text-base text-gray-500'>
                   We are committed to delivering high-quality services and
                   results.
                 </dd>
@@ -556,11 +556,11 @@ const About = () => {
                       />
                     </svg>
                   </div>
-                  <p className='ml-16 text-lg leading-6 font-medium text-gray-900'>
+                  <p className='ml-16 ms-5 ps-2 pt-3 text-lg leading-6 font-medium text-gray-900'>
                     Innovation
                   </p>
                 </dt>
-                <dd className='mt-2 ml-16 text-base text-gray-500'>
+                <dd className='mt-4 ml-16 text-base text-gray-500'>
                   We continuously adapt our services to meet the dynamic needs
                   of the job market.
                 </dd>

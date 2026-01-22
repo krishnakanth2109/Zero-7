@@ -37,7 +37,7 @@ const capitalize = (s) => {
 export default function AdminDashboard() {
   const [user, setUser] = useState({})
   const [applications, setApplications] = useState([])
-  
+
   // State for the dynamic graph data
   const [trendData, setTrendData] = useState([])
 
@@ -89,10 +89,10 @@ export default function AdminDashboard() {
         const pendingRequests = requestsResponse.data.filter(
           (req) => req.status === 'pending',
         )
-        
+
         // Logic: Check status/level AND ensure approvalStatus is 'approved' to match the list view
         const placedCandidates = interviewsResponse.data.filter(
-          (req) => 
+          (req) =>
             (req.status?.toLowerCase() === 'placed' || req.interviewLevel === 'placed') &&
             req.approvalStatus === 'approved'
         )
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
   const calculateGraphTrends = (appsData, interviewsData) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const currentYear = new Date().getFullYear();
-    
+
     // Initialize structure
     const monthlyStats = months.map(m => ({
       month: m,
@@ -150,10 +150,10 @@ export default function AdminDashboard() {
       const date = new Date(int.date || int.createdAt);
       if (date.getFullYear() === currentYear) {
         monthlyStats[date.getMonth()].interviews += 1;
-        
+
         // Only count as hired if status is placed AND approved
         if (
-          (int.status?.toLowerCase() === 'placed' || int.interviewLevel === 'placed') && 
+          (int.status?.toLowerCase() === 'placed' || int.interviewLevel === 'placed') &&
           int.approvalStatus === 'approved'
         ) {
           monthlyStats[date.getMonth()].hired += 1;
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
   // Data for the Pie Chart (Job Status Distribution)
   const pieChartData = [
     { name: 'Candidates', value: stats.totalCandidates },
-    { name: 'Active Jobs', value: stats.activeJobs },
+    { name: 'Total Jobs', value: stats.activeJobs },
     { name: 'Placements', value: stats.placements },
     { name: 'Interviews', value: stats.interviews },
   ]
@@ -213,8 +213,8 @@ export default function AdminDashboard() {
           <div className='bg-[#7eade0] p-2 rounded-lg'>{icon}</div>
           {percentage && <p className='text-[#16a34a]'>{percentage}</p>}
         </div>
-        <div>
-          <h1 className='text-3xl font-bold mt-3'>
+        <div  >
+          <h1 className='text-decoration-none text-3xl font-bold mt-3'>
             {loadingStats ? '...' : value}
           </h1>
           <p className='text-lg font-semibold text-[#267edc]'>{title}</p>
@@ -226,17 +226,31 @@ export default function AdminDashboard() {
 
   return (
     <div className='flex flex-col gap-4 overflow-auto'>
-      <div className='admin-main flex-1 rounded-2xl p-6 border-border flex flex-col md:flex-row items-start md:items-center justify-between'>
-        <div>
-          <h1 className='text-3xl font-bold'>
+      <div
+        className="admin-main rounded-2xl p-6 border-border flex items-center justify-center"
+        style={{
+          width: '100%',
+          height: '20vh',
+          minHeight: '20vh',
+          maxHeight: '20vh',
+          maxWidth: '1200px',
+          margin: '0 auto',
+          flex: '0 0 auto',
+        }}
+      >
+        <div className="text-center">
+          <h1 className="text-3xl font-bold">
             Welcome back, {capitalize(user.name) || 'Admin'}!
           </h1>
           <span>Here&apos;s your {user.role} dashboard today.</span>
         </div>
       </div>
 
+
+
       {/* Card Container */}
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2'>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
+
         <StatCard
           title='Total Candidates'
           value={stats.totalCandidates}
@@ -246,7 +260,7 @@ export default function AdminDashboard() {
           path='manage-candidates'
         />
         <StatCard
-          title='Active Jobs'
+          title='Total Jobs'
           value={stats.activeJobs}
           subtext='new this week'
           icon={<Briefcase className='stroke-[#0b325b] stroke-2' />}

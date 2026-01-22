@@ -2,7 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import api from "../api/axios";
-import { GraduationCap, Loader2, ShieldX, Trash2, Download } from "lucide-react";
+import { 
+  GraduationCap, 
+  Loader2, 
+  ShieldX, 
+  Trash2, 
+  Download, 
+  Users 
+} from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
@@ -40,12 +47,10 @@ const AdminDigitalCoursesEnrollment = () => {
     }
   };
 
-  // --- ADDED: Export to Excel functionality ---
   const handleExport = () => {
     const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
     const fileExtension = ".xlsx";
     
-    // We can format the data for a cleaner export if needed
     const formattedData = enrollments.map(e => ({
       "Course Name": e.course,
       "Student Name": e.name,
@@ -62,31 +67,46 @@ const AdminDigitalCoursesEnrollment = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 bg-gray-50 min-h-full">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between text-white">
-        <div className="flex items-center space-x-4">
-          <div className=" bg-opacity-20 p-3 rounded-full">
-            <GraduationCap size={32} />
+    <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans">
+      
+      {/* ============ BLUE HEADER SECTION ============ */}
+      <div className="bg-[#1976d2] rounded-xl shadow-lg p-6 mb-8 flex flex-col md:flex-row items-center justify-between text-white">
+        
+        {/* Left Side: Icon & Text */}
+        <div className="flex items-center space-x-5 w-full md:w-auto mb-6 md:mb-0">
+          <div className="bg-white p-4 rounded-full flex items-center justify-center shadow-md">
+            <GraduationCap className="text-[#1976d2]" size={32} />
           </div>
           <div>
-            <h3 className="text-2xl sm:text-3xl font-bold">Digital Courses Enrollment</h3>
-            <p className="text-blue-200 text-sm">List of students who enrolled for digital courses</p>
+            <h1 className="text-3xl font-bold tracking-tight">Digital Courses Enrollment</h1>
+            <p className="text-blue-100 opacity-90 text-sm font-medium mt-1">
+              List of students who enrolled for digital courses
+            </p>
           </div>
         </div>
-        <div className="text-right">
-          <p className="text-3xl sm:text-5xl font-extrabold">{enrollments.length}</p>
-          <p className="text-blue-200 text-sm">Total Enrollments</p>
+
+        {/* Right Side: Stats Card */}
+        <div className="flex items-center justify-center w-full md:w-auto">
+          <div className="bg-white text-gray-800 rounded-lg py-3 px-8 min-w-[160px] flex flex-col items-center shadow-md transform hover:-translate-y-1 transition-transform duration-300">
+            <div className="flex items-center space-x-2 text-[#1976d2] mb-1">
+              <Users size={16} />
+              <span className="text-xs font-bold uppercase tracking-wider">TOTAL</span>
+            </div>
+            <span className="text-4xl font-extrabold text-gray-900">{enrollments.length}</span>
+          </div>
         </div>
       </div>
+      {/* =========================================== */}
 
       {/* Content Area Card */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        {/* --- ADDED: Export Button --- */}
-        <div className="flex justify-end mb-4">
+      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        
+        {/* Export Button Area */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-semibold text-gray-700">Enrollment List</h2>
           <button
             onClick={handleExport}
-            className="inline-flex items-center px-4 py-2 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 disabled:bg-gray-400"
+            className="inline-flex items-center px-5 py-2.5 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors shadow-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
             disabled={loading || enrollments.length === 0}
           >
             <Download size={18} className="mr-2" />
@@ -94,45 +114,55 @@ const AdminDigitalCoursesEnrollment = () => {
           </button>
         </div>
 
+        {/* Loading State */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-500">
-            <Loader2 className="animate-spin text-blue-500" size={48} />
-            <p className="mt-4">Loading Enrollments...</p>
-          </div>
-        )}
-        {error && (
-          <div className="flex flex-col items-center justify-center py-16 text-red-600">
-            <ShieldX size={48} />
-            <p className="mt-4 font-semibold">{error}</p>
+          <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+            <Loader2 className="animate-spin text-[#1976d2]" size={48} />
+            <p className="mt-4 font-medium">Loading Enrollments...</p>
           </div>
         )}
 
+        {/* Error State */}
+        {error && (
+          <div className="flex flex-col items-center justify-center py-20 text-red-600 bg-red-50 rounded-lg">
+            <ShieldX size={48} />
+            <p className="mt-4 font-bold">{error}</p>
+          </div>
+        )}
+
+        {/* Data Table */}
         {!loading && !error && (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enrolled On</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Course Name</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Student Name</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Contact</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Enrolled On</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {enrollments.length > 0 ? (
                   enrollments.map((student) => (
-                    <tr key={student._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{student.course}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{student.name}</td>
+                    <tr key={student._id} className="hover:bg-blue-50 transition-colors duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{student.course}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{student.name}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{student.email}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{student.contact}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(student.createdAt).toLocaleDateString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {new Date(student.createdAt).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                         <button
                           onClick={() => handleDelete(student._id)}
-                          className="text-red-600 hover:text-red-800 transition-colors"
+                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-all"
                           title="Delete Enrollment"
                         >
                           <Trash2 size={18} />
@@ -142,8 +172,11 @@ const AdminDigitalCoursesEnrollment = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="px-6 py-10 text-center text-gray-500">
-                      No new enrollments found.
+                    <td colSpan="6" className="px-6 py-12 text-center text-gray-400 bg-gray-50">
+                      <div className="flex flex-col items-center">
+                        <GraduationCap size={40} className="mb-2 opacity-50" />
+                        <p>No new enrollments found.</p>
+                      </div>
                     </td>
                   </tr>
                 )}

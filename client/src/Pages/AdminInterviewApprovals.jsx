@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import api from '../api/axios'
-import { CheckCircle, XCircle, Search, Filter, Download } from 'lucide-react' // Added Download icon
+import { CheckCircle, XCircle, Search, Filter, Download } from 'lucide-react'
 
 // Custom Alert Component
 const Alert = ({ message, type, onClose }) => {
@@ -120,14 +120,24 @@ const AdminInterviewApprovals = () => {
 
   // --- Status Badge Styling ---
   const getStatusClasses = (status) => {
-    switch (status) {
-      case 'approved':
-        return 'bg-green-100 text-green-800'
-      case 'rejected':
-        return 'bg-red-100 text-red-800'
-      case 'pending':
-      default:
-        return 'bg-yellow-100 text-yellow-800'
+    // Check if status exists and is a string before calling toLowerCase
+    if (!status || typeof status !== 'string') {
+      return 'bg-gray-100 text-gray-800' // Default style for unknown status
+    }
+
+    const lowerStatus = status.toLowerCase()
+
+    // Map specific statuses to colors
+    if (lowerStatus === 'approved' || lowerStatus === 'placed') {
+      return 'bg-green-100 text-green-800'
+    } else if (lowerStatus === 'rejected') {
+      return 'bg-red-100 text-red-800'
+    } else if (lowerStatus === 'pending') {
+      return 'bg-yellow-100 text-yellow-800'
+    } else if (lowerStatus === 'scheduled') {
+      return 'bg-blue-100 text-blue-800'
+    } else {
+      return 'bg-yellow-100 text-yellow-800' // Default fallback
     }
   }
 
@@ -287,11 +297,13 @@ const AdminInterviewApprovals = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {/* MOVED ICON HERE AND ADDED Z-10 */}
+          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none z-10' />
         </div>
 
         {/* Checkbox Filters for Approval Status */}
         <div className='flex items-center space-x-4'>
-          <label className='flex items-center space-x-2 text-gray-700'>
+          <label className='flex items-center space-x-2 text-gray-700 cursor-pointer'>
             <input
               type='checkbox'
               className='form-checkbox h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500'
@@ -301,7 +313,7 @@ const AdminInterviewApprovals = () => {
             />
             <span>Approved</span>
           </label>
-          <label className='flex items-center space-x-2 text-gray-700'>
+          <label className='flex items-center space-x-2 text-gray-700 cursor-pointer'>
             <input
               type='checkbox'
               className='form-checkbox h-4 w-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500'
@@ -311,7 +323,7 @@ const AdminInterviewApprovals = () => {
             />
             <span>Pending</span>
           </label>
-          <label className='flex items-center space-x-2 text-gray-700'>
+          <label className='flex items-center space-x-2 text-gray-700 cursor-pointer'>
             <input
               type='checkbox'
               className='form-checkbox h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500'
@@ -328,7 +340,7 @@ const AdminInterviewApprovals = () => {
           onClick={handleExport}
           className='flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 mt-4 sm:mt-0'
           title='Export to CSV'>
-          <Download className='h-5 w-5 mr-2' /> Export
+          <Download className='h-4 w-5 mr-2' /> Export
         </button>
       </div>
 
@@ -405,8 +417,10 @@ const AdminInterviewApprovals = () => {
                       className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full shadow-sm ${getStatusClasses(
                         interview.status,
                       )}`}>
-                      {interview.status.charAt(0).toUpperCase() +
-                        interview.status.slice(1)}
+                      {interview.status && typeof interview.status === 'string'
+                        ? interview.status.charAt(0).toUpperCase() +
+                          interview.status.slice(1)
+                        : ''}
                     </span>
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm'>
@@ -414,8 +428,11 @@ const AdminInterviewApprovals = () => {
                       className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full shadow-sm ${getStatusClasses(
                         interview.approvalStatus,
                       )}`}>
-                      {interview.approvalStatus.charAt(0).toUpperCase() +
-                        interview.approvalStatus.slice(1)}
+                      {interview.approvalStatus &&
+                      typeof interview.approvalStatus === 'string'
+                        ? interview.approvalStatus.charAt(0).toUpperCase() +
+                          interview.approvalStatus.slice(1)
+                        : ''}
                     </span>
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-center text-sm font-medium'>

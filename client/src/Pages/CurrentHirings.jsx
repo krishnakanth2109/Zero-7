@@ -277,8 +277,7 @@ const CurrentHirings = () => {
                 >
                   <div className="card-gradient-overlay"></div>
                   
-                  {/* Huge Number */}
-                  <div className="big-number">{step.id}</div>
+                  {/* REMOVED: <div className="big-number">{step.id}</div> */}
                   
                   <motion.div 
                     className="icon-circle"
@@ -345,7 +344,6 @@ const CurrentHirings = () => {
                       <td>{job.location}</td>
                       <td className="align-right">
                         <button 
-                          // FIXED: Removed "text-blue" and replaced with explicit colors
                           className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
                           onClick={() => handleApplyClick(job)}
                         >

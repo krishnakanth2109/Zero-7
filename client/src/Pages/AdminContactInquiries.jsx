@@ -1,9 +1,9 @@
 // File: src/Pages/AdminContactInquiries.jsx
 
 import React, { useEffect, useState } from "react";
-import api from "../api/axios"; // Assuming you have a central axios instance
-import { MessageSquare, Loader2, ShieldX, Trash2, Contact } from "lucide-react";
-import * as XLSX from "xlsx"; // --- ADDED: Import the xlsx library ---
+import api from "../api/axios"; 
+import { Loader2, ShieldX, Trash2, Contact } from "lucide-react"; 
+import * as XLSX from "xlsx"; 
 
 const AdminContactInquiries = () => {
   const [inquiries, setInquiries] = useState([]);
@@ -38,13 +38,10 @@ const AdminContactInquiries = () => {
     }
   };
 
-  // --- ADDED: Function to handle exporting data to an Excel sheet ---
   const handleExportToExcel = () => {
-    // Clean up the data for a more readable export
     const dataToExport = inquiries.map(
       ({ _id, __v, updatedAt, ...rest }) => ({
         ...rest,
-        // Format the date to be more human-readable in the Excel sheet
         createdAt: new Date(rest.createdAt).toLocaleString(),
       })
     );
@@ -53,37 +50,46 @@ const AdminContactInquiries = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Contact Inquiries");
 
-    // Trigger the file download
     XLSX.writeFile(workbook, "ContactInquiries.xlsx");
   };
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-full">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between text-white">
+      {/* 
+         TOP HEADER CARD 
+         - Solid Blue Background (bg-blue-600)
+         - Icon Logic Fixed: White Circle (bg-white) with Blue Icon (text-blue-600)
+      */}
+      <div className="bg-blue-600 rounded-xl shadow-lg p-6 mb-8 flex items-center justify-between text-white">
         <div className="flex items-center space-x-4">
-          <div className="b bg-opacity-10 p-3 rounded-full">
-            <Contact />
+          {/* Icon Container: Solid White Circle */}
+          <div className="bg-white p-3 rounded-full shadow-md">
+            {/* Icon: Blue Color to contrast with the white circle */}
+            <Contact className="text-blue-600" size={32} />
           </div>
+          
+          {/* Text Container */}
           <div>
             <h3 className="text-2xl sm:text-3xl font-bold">
               Contact Us Inquiries
             </h3>
-            <p className="text-blue-200 text-sm">
+            <p className="text-blue-100 text-sm">
               Messages from the public contact form
             </p>
           </div>
         </div>
+
+        {/* Stats Container (Right Side) */}
         <div className="text-right">
           <p className="text-3xl sm:text-5xl font-extrabold">
             {inquiries.length}
           </p>
-          <p className="text-blue-200 text-sm">Total Inquiries</p>
+          <p className="text-blue-100 text-sm">Total Inquiries</p>
         </div>
       </div>
 
-      {/* Content Area Card */}
+      {/* CONTENT AREA */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        {/* --- ADDED: Header for the table card with the export button on the top right --- */}
         <div className="flex justify-between items-center mb-4">
             <h4 className="text-lg font-semibold text-gray-700">All Inquiries</h4>
             <button
@@ -104,31 +110,31 @@ const AdminContactInquiries = () => {
           <div className="flex flex-col items-center justify-center py-16 text-red-600">
             <ShieldX size={48} />
             <p className="mt-4 font-semibold">{error}</p>
-
           </div>
         )}
 
         {!loading && !error && (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              {/* TABLE HEADER (Blue bg, White text) */}
+              <thead className="bg-blue-600 text-white">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Submitted On
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Service
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Message
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>

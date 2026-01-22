@@ -4,6 +4,11 @@ import { useEffect } from 'react';
 import { Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import Cookie from 'js-cookie';
 
+
+// Bootstrap imports
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
 // --- Public Components & Pages ---
 import Navbar from './Components/Navbar';
 import Home from './Pages/Home';
@@ -60,6 +65,7 @@ import AdminManageTestimonials from './Pages/ManageTestimonials';
 
 import { NotificationProvider } from './context/NotificationContext';
 import './App.css';
+import ScrollToTopButton from './Pages/ScrollToTopButton.jsx';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -154,10 +160,12 @@ function App() {
             </Route>
           </Routes>
         </div>
+        <ScrollToTopButton />
         {!isAdminPage && <Footer />}
         {!isAdminPage && <FloatingWhatsApp />}
       </div>
     </NotificationProvider>
+    
   );
 }
 

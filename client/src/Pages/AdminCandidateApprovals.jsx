@@ -280,7 +280,7 @@ const AdminCandidateApprovals = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-             <Search className="h-4 w-4" />
+             <Search className="h-3 w-3" />
           </div>
         </div>
 

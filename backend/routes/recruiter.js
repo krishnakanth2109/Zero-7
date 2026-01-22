@@ -2,7 +2,7 @@
 
 import express from 'express';
 import bcrypt from 'bcrypt';
-import User from '../models/User.js'; // <-- IMPORTANT: We use the unified User model
+import User from '../models/User.js';
 import Notification from '../models/notifications.js'; 
 const router = express.Router();
 
@@ -26,16 +26,18 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'A user with this email or employee ID already exists.' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // FIX: Removed manual bcrypt hashing here to prevent Double Hashing.
+        // The User model's pre-save hook will handle the hashing.
+
         const newRecruiter = new User({
             name,
             email,
             employeeId: employeeID,
-            password: hashedPassword,
+            password: password, // Send plain text, let the Model hash it
             assigned_Company,
             phone,
             age,
-            role: 'recruiter' // CRITICAL: Set the role explicitly
+            role: 'recruiter'
         });
 
         await newRecruiter.save();
@@ -53,6 +55,7 @@ router.put('/:id', async (req, res) => {
     try {
         const updateData = { name, email, employeeId: employeeID, assigned_Company, phone, age };
 
+        // We DO need manual hashing here because findByIdAndUpdate bypasses the pre-save hook
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);
         }

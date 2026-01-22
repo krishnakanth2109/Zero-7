@@ -1,4 +1,37 @@
 .admin-layout {
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Sidebar is fixed, so we push content */
+.admin-main {
+  margin-left: 16rem;  /* 256px sidebar */
+  min-height: 100vh;
   display: flex;
-  height: 90vh;
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
+}
+
+/* Collapsed sidebar */
+.admin-main.collapsed {
+  margin-left: 5rem;   /* 80px */
+}
+
+.admin-content {
+  flex: 1;
+  padding: 16px;
+  background: #f8f9fa;
+  overflow-y: auto;
+}
+
+/* Mobile */
+@media (max-width: 1024px) {
+  .admin-main,
+  .admin-main.collapsed {
+    margin-left: 0;
+  }
+}
+.admin-main.expanded {
+  margin-left: 16rem;
 }

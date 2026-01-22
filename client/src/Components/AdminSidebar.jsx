@@ -27,15 +27,15 @@ import {
   Users,
   Briefcase,
   FolderOpen,
-  Quote, 
+  Quote,
 } from 'lucide-react'
 import Cookie from 'js-cookie'
 import './AdminSidebar.css'
 
-export default function AdminSidebar({ isOpen }) {
+export default function AdminSidebar({ isOpen, setIsOpen }) {
   const location = useLocation()
   const navigate = useNavigate()
-  
+
   // State for each dropdown
   const [openInterviews, setOpenInterviews] = useState(false)
   const [openBenchManagement, setOpenBenchManagement] = useState(false)
@@ -43,13 +43,13 @@ export default function AdminSidebar({ isOpen }) {
   const [openJobsCompanies, setOpenJobsCompanies] = useState(false)
   const [openRequests, setOpenRequests] = useState(false)
   const [openServices, setOpenServices] = useState(false)
-  
+
   // Notification count (mock)
   const [newRequestCount, setNewRequestCount] = useState(0)
 
   // Get User Role
   const user = Cookie.get('user') ? JSON.parse(Cookie.get('user')) : null
-  const role = user?.role?.toLowerCase() || '' // Ensure case-insensitive comparison
+  const role = user?.role?.toLowerCase() || ''
 
   const isActive = (path) => location.pathname === path
   const isSubmenuActive = (paths) => paths.some(path => location.pathname.includes(path))
@@ -60,6 +60,12 @@ export default function AdminSidebar({ isOpen }) {
     navigate('/admin')
   }
 
+  const closeOnMobile = () => {
+    if (window.innerWidth <= 1024) {
+      setIsOpen(false);
+    }
+  };
+
   // --- 1. SHARED/COMMON LINKS ---
   const commonLinks = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -68,7 +74,6 @@ export default function AdminSidebar({ isOpen }) {
   // --- 2. ADMIN LINKS (Full Access) ---
   const adminLinks = [
     ...commonLinks,
-    // Interviews
     {
       type: 'dropdown',
       key: 'interviews',
@@ -81,7 +86,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/interviews/approvals', label: 'Interviews Approvals', icon: Hourglass },
       ]
     },
-    // Bench Management
     {
       type: 'dropdown',
       key: 'bench-management',
@@ -94,7 +98,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/candidateList', label: 'Bench Approvals', icon: Hourglass },
       ]
     },
-    // Candidates
     {
       type: 'dropdown',
       key: 'candidates',
@@ -109,7 +112,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/digital-courses-enrollment', label: 'Digital Courses Enrollment', icon: GraduationCap },
       ]
     },
-    // Jobs & Companies
     {
       type: 'dropdown',
       key: 'jobs-companies',
@@ -122,7 +124,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/companies', label: 'Manage Companies', icon: Building },
       ]
     },
-    // Requests
     {
       type: 'dropdown',
       key: 'requests',
@@ -135,7 +136,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/view-requests', label: 'View Requests', icon: AudioLines, isNotification: true },
       ]
     },
-    // Single Links
     { path: '/admin/manage-recruiters', label: 'Add Recruiter', icon: UserSearch },
     { path: '/admin/manage-managers', label: 'Add Managers', icon: UserCog },
     { path: '/admin/manage-blogs', label: 'Manage Blogs', icon: Shield },
@@ -144,7 +144,6 @@ export default function AdminSidebar({ isOpen }) {
     { path: '/admin/forms', label: 'College Connect Form', icon: Layers },
     { path: '/admin/manage-offer', label: 'Manage Offer', icon: Gift },
     { path: '/admin/batch-enrollments', label: 'Batch Enrollments', icon: ClipboardList },
-    // Services
     {
       type: 'dropdown',
       key: 'services',
@@ -163,7 +162,6 @@ export default function AdminSidebar({ isOpen }) {
   // --- 3. MANAGER LINKS (Sub-Admin Access) ---
   const managerLinks = [
     ...commonLinks,
-    // Interviews
     {
       type: 'dropdown',
       key: 'interviews',
@@ -176,7 +174,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/interviews/approvals', label: 'Interviews Approvals', icon: Hourglass },
       ]
     },
-    // Bench Management
     {
       type: 'dropdown',
       key: 'bench-management',
@@ -189,7 +186,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/candidateList', label: 'Bench Approvals', icon: Hourglass },
       ]
     },
-    // Candidates
     {
       type: 'dropdown',
       key: 'candidates',
@@ -203,7 +199,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/placedcandidates', label: 'Placed Candidates', icon: CircleUser },
       ]
     },
-    // Jobs
     {
       type: 'dropdown',
       key: 'jobs-companies',
@@ -216,7 +211,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/companies', label: 'Manage Companies', icon: Building },
       ]
     },
-    // Requests
     {
       type: 'dropdown',
       key: 'requests',
@@ -229,8 +223,7 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/view-requests', label: 'View Requests', icon: AudioLines },
       ]
     },
-    // Manager Specific Single Links
-    { path: '/admin/manage-recruiters', label: 'Add Recruiter', icon: UserSearch }, // Managers can usually add recruiters
+    { path: '/admin/manage-recruiters', label: 'Add Recruiter', icon: UserSearch },
     { path: '/admin/manage-blogs', label: 'Manage Blogs', icon: Shield },
     { path: '/admin/manage-testimonials', label: 'Manage Testimonials', icon: Quote },
     { path: '/admin/new-batch-dashboard', label: 'New Batches', icon: FileUser },
@@ -239,7 +232,6 @@ export default function AdminSidebar({ isOpen }) {
   // --- 4. RECRUITER LINKS (Limited Access) ---
   const recruiterLinks = [
     ...commonLinks,
-    // Interviews (Usually just view/schedule, maybe not approval depending on logic)
     {
       type: 'dropdown',
       key: 'interviews',
@@ -251,7 +243,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
       ]
     },
-    // Bench (Manage list only)
     {
       type: 'dropdown',
       key: 'bench-management',
@@ -263,7 +254,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/manage-candidates', label: 'Manage Bench List', icon: AlignHorizontalJustifyStart },
       ]
     },
-    // Candidates
     {
       type: 'dropdown',
       key: 'candidates',
@@ -277,7 +267,6 @@ export default function AdminSidebar({ isOpen }) {
         { path: '/admin/placedcandidates', label: 'Placed Candidates', icon: CircleUser },
       ]
     },
-    // Jobs
     {
       type: 'dropdown',
       key: 'jobs-companies',
@@ -292,9 +281,8 @@ export default function AdminSidebar({ isOpen }) {
     },
   ]
 
-  // --- 5. DETERMINE WHICH LINKS TO RENDER ---
   let linksToRender = []
-  
+
   if (role === 'admin') {
     linksToRender = adminLinks
   } else if (role === 'manager') {
@@ -302,12 +290,12 @@ export default function AdminSidebar({ isOpen }) {
   } else if (role === 'recruiter') {
     linksToRender = recruiterLinks
   } else {
-    // Fallback for unknown roles or unauthenticated (though likely redirected by router)
     linksToRender = commonLinks
   }
 
   return (
-    <aside className={`admin-sidebar overflow-y-auto ${!isOpen ? 'collapsed' : ''}`}>
+    <aside className={`admin-sidebar ${isOpen ? "open" : "collapsed"} overflow-y-auto`}>
+
       <div>
         <div className='admin-sidebar-header'>
           <div className='logo-img'>
@@ -321,10 +309,9 @@ export default function AdminSidebar({ isOpen }) {
         <nav>
           {linksToRender.map((link, index) => {
             if (link.type === 'dropdown') {
-              // Calculate if submenu is active
               const submenuPaths = link.submenu.map(item => item.path)
               const isDropdownActive = isSubmenuActive(submenuPaths)
-              
+
               return (
                 <div className='dropdown-container' key={link.key || index}>
                   <div
@@ -346,8 +333,10 @@ export default function AdminSidebar({ isOpen }) {
                         <Link
                           key={sublink.path}
                           to={sublink.path}
+                          onClick={closeOnMobile}
                           className={`sidebar-link ${isActive(sublink.path) ? 'active' : ''}`}
-                          data-tooltip={sublink.label}>
+                          data-tooltip={sublink.label}
+                        >
                           <div className='dashboard-icon'>
                             {sublink.icon && <sublink.icon style={{ width: '16px', flexShrink: 0 }} />}
                             <span className='link-text'>{sublink.label}</span>
@@ -360,7 +349,6 @@ export default function AdminSidebar({ isOpen }) {
               )
             }
 
-            // Render Single Link
             return (
               <Link
                 key={link.path}
@@ -377,11 +365,15 @@ export default function AdminSidebar({ isOpen }) {
               </Link>
             )
           })}
-          
+
           <button
-            className='logout-btn'
-            onClick={handleLogout}
-            data-tooltip='Logout'>
+            className="logout-btn"
+            data-tooltip="Logout" 
+            onClick={() => {
+              closeOnMobile();
+              handleLogout();
+            }}
+          >
             <LogOut size={18} />
             <span className='link-text'>Logout</span>
           </button>

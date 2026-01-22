@@ -4,23 +4,30 @@ import './AdminManageJobs.css';
 import * as XLSX from 'xlsx';
 import {
   FilePenLine,
-  FileText, // Ensures this is imported
+  FileText,
   ChevronLeft,
   ChevronRight,
   Briefcase,
   CheckCircle,
-  XCircle
+  XCircle,
+  Plus,
+  Upload,
+  Download
 } from 'lucide-react';
 
 const AdminManageJobs = () => {
+  // --- STATE MANAGEMENT ---
   const [jobs, setJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [company, setCompany] = useState([]);
+  
+  // Filters
   const [selectedCompany, setSelectedCompany] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedJobs, setSelectedJobs] = useState([]); 
 
+  // Form State
   const [formState, setFormState] = useState({
     companyId: '',
     role: '',
@@ -30,8 +37,10 @@ const AdminManageJobs = () => {
     location: '',
     industry: 'Information Technology',
     status: 'active',
+    companyName: '' // Added to prevent controlled/uncontrolled input errors
   });
 
+  // UI State
   const [showPopup, setShowPopup] = useState(false);
   const [editPopup, setEditPopup] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,15 +48,23 @@ const AdminManageJobs = () => {
 
   // --- STATS CALCULATIONS ---
   const totalJobs = jobs.length;
-  // Matching "active" and "in active"
-  const activeJobs = jobs.filter(job => job.status === 'active').length;
-  const inactiveJobs = jobs.filter(job => job.status === 'in active' || job.status === 'inactive').length;
+  
+  // Normalize status checks to handle 'active', 'Active', etc.
+  const activeJobs = jobs.filter(job => 
+    job.status?.toLowerCase() === 'active'
+  ).length;
+  
+  const inactiveJobs = jobs.filter(job => 
+    ['inactive', 'in active'].includes(job.status?.toLowerCase())
+  ).length;
 
+  // --- API CALLS ---
   const fetchJobs = async () => {
     try {
       setIsLoading(true);
       const response = await api.get('/jobs');
       setJobs(response.data);
+      setError(null);
     } catch (err) {
       setError('Could not fetch jobs. Please try again later.');
       console.error('Error fetching jobs:', err);
@@ -70,6 +87,8 @@ const AdminManageJobs = () => {
     fetchCompanies();
   }, []);
 
+  // --- HANDLERS ---
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormState((prevState) => ({ ...prevState, [name]: value }));
@@ -89,16 +108,7 @@ const AdminManageJobs = () => {
       await api.post('/jobs', formState);
       fetchJobs();
       setShowPopup(false);
-      setFormState({
-        companyId: '',
-        role: '',
-        exp: '',
-        skills: '',
-        salary: '',
-        location: '',
-        industry: 'Information Technology',
-        status: 'active',
-      });
+      resetForm();
       alert('Job added successfully!');
     } catch (err) {
       alert(err?.response?.data?.message || 'Error adding job');
@@ -106,15 +116,35 @@ const AdminManageJobs = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormState({
+      companyId: '',
+      role: '',
+      exp: '',
+      skills: '',
+      salary: '',
+      location: '',
+      industry: 'Information Technology',
+      status: 'active',
+      companyName: ''
+    });
+  };
+
   const handleEditPopup = (job) => {
-    setFormState(job);
+    setFormState({
+      ...job,
+      companyId: job.companyId?._id || job.companyId, // Handle populated vs unpopulated ID
+      companyName: job.companyName || ''
+    });
     setEditPopup(true);
   };
 
   const handleEditJob = async (e) => {
     e.preventDefault();
     try {
-      await api.patch(`/jobs/${formState._id}`, formState);
+      // Remove companyName from payload if it exists (usually redundant for update)
+      const { companyName, ...updateData } = formState;
+      await api.patch(`/jobs/${formState._id}`, updateData);
       setEditPopup(false);
       fetchJobs();
       alert('Job updated successfully!');
@@ -131,23 +161,45 @@ const AdminManageJobs = () => {
         setJobs(jobs.filter((job) => job._id !== jobId));
         alert('Job deleted successfully!');
       } catch (err) {
-        alert('Failed to delete job. Check console for details.');
+        alert('Failed to delete job.');
         console.error('Error deleting job:', err);
       }
     }
   };
 
+  const handleDeleteSelectedJobs = async () => {
+    if (window.confirm(`Are you sure you want to delete ${selectedJobs.length} selected jobs?`)) {
+      try {
+        const deletePromises = selectedJobs.map(jobId => api.delete(`/jobs/${jobId}`));
+        await Promise.all(deletePromises);
+        alert('Selected jobs deleted successfully!');
+        fetchJobs();
+        setSelectedJobs([]);
+      } catch (err) {
+        alert('Failed to delete some jobs.');
+        console.error('Error deleting selected jobs:', err);
+      }
+    }
+  };
+
+  // --- EXCEL HANDLERS ---
   const handleExportToExcel = () => {
-    const jobsToExport = filteredJobs.map(
-      ({ _id, __v, companyId, ...rest }) => ({
-        ...rest,
-        industry: rest.industry || 'N/A',
-      })
-    );
+    // Explicitly define the object structure to enforce column order
+    const jobsToExport = filteredJobs.map((job) => ({
+      "Company Name": job.companyName || 'N/A', // First Column
+      "Role": job.role,
+      "Experience": job.exp,
+      "Skills": job.skills,
+      "Salary": job.salary,
+      "Location": job.location,
+      "Industry": job.industry || 'N/A',
+      "Status": job.status || 'N/A'
+    }));
+
     const worksheet = XLSX.utils.json_to_sheet(jobsToExport);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Jobs');
-    XLSX.writeFile(workbook, 'FilteredJobListings.xlsx');
+    XLSX.writeFile(workbook, 'Job_Listings.xlsx');
   };
 
   const handleImportFromExcel = (e) => {
@@ -168,24 +220,12 @@ const AdminManageJobs = () => {
         const data = XLSX.utils.sheet_to_json(worksheet);
 
         let importedCount = 0;
-        let failedRecords = [];
-
+        
         for (const job of data) {
-          if (!job.companyName) {
-            console.warn('Row is missing "companyName". Skipping row:', job);
-            failedRecords.push(job.role || 'A row without a company name');
-            continue;
-          }
+          if (!job.companyName) continue;
             
-          const companyId = companyNameToIdMap.get(
-            job.companyName?.toLowerCase().trim()
-          );
-
-          if (!companyId) {
-            console.warn(`Company "${job.companyName}" not found in the database. Skipping row.`);
-            failedRecords.push(job.role || `Role with unknown company: ${job.companyName}`);
-            continue;
-          }
+          const companyId = companyNameToIdMap.get(job.companyName?.toLowerCase().trim());
+          if (!companyId) continue;
 
           const jobPayload = {
             companyId: companyId,
@@ -203,19 +243,12 @@ const AdminManageJobs = () => {
             importedCount++;
           } catch (err) {
              console.error(`Failed to import job: ${job.role}`, err);
-             failedRecords.push(job.role || 'Unknown Role');
           }
         }
-
-        let alertMessage = `${importedCount} jobs imported successfully!`;
-        if (failedRecords.length > 0) {
-          alertMessage += `\n\nFailed to import ${failedRecords.length} jobs. Please check the console for details. Common issues are missing required fields or incorrect company names in the Excel file.`;
-        }
-        alert(alertMessage);
-        
+        alert(`${importedCount} jobs imported successfully!`);
         fetchJobs();
       } catch (err) {
-        alert('Failed to process the Excel file. Please ensure it is correctly formatted and the first sheet contains the job data.');
+        alert('Failed to process the Excel file.');
         console.error('Error processing Excel file:', err);
       }
     };
@@ -223,500 +256,326 @@ const AdminManageJobs = () => {
     e.target.value = '';
   };
 
-  const handleCompanyFilterChange = (e) => {
-    setSelectedCompany(e.target.value);
-    setCurrentPage(1);
-  };
-
-  const handleStatusFilterChange = (e) => {
-    setSelectedStatus(e.target.value);
-    setCurrentPage(1);
-  };
-
+  // --- PAGINATION & FILTERS ---
   const filteredJobs = jobs.filter((job) => {
-    const companyMatch = selectedCompany
-      ? job.companyName === selectedCompany
-      : true;
+    const companyMatch = selectedCompany ? job.companyName === selectedCompany : true;
     const statusMatch = selectedStatus ? job.status === selectedStatus : true;
     return companyMatch && statusMatch;
   });
 
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentJobs = filteredJobs.slice(startIndex, endIndex);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handleItemsPerPageChange = (e) => {
-    setItemsPerPage(Number(e.target.value));
-    setCurrentPage(1);
-  };
+  const currentJobs = filteredJobs.slice(startIndex, startIndex + itemsPerPage);
 
   const handleSelectJob = (jobId) => {
-    setSelectedJobs((prevSelected) => {
-      if (prevSelected.includes(jobId)) {
-        return prevSelected.filter((id) => id !== jobId);
-      } else {
-        return [...prevSelected, jobId];
-      }
-    });
+    setSelectedJobs((prev) => 
+      prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId]
+    );
   };
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
-      const currentPageJobIds = currentJobs.map((job) => job._id);
-      setSelectedJobs((prevSelected) => [...new Set([...prevSelected, ...currentPageJobIds])]);
+      const ids = currentJobs.map((job) => job._id);
+      setSelectedJobs((prev) => [...new Set([...prev, ...ids])]);
     } else {
-      const currentPageJobIds = currentJobs.map((job) => job._id);
-      setSelectedJobs((prevSelected) => prevSelected.filter((id) => !currentPageJobIds.includes(id)));
+      const ids = currentJobs.map((job) => job._id);
+      setSelectedJobs((prev) => prev.filter((id) => !ids.includes(id)));
     }
   };
 
-  const handleDeleteSelectedJobs = async () => {
-    if (window.confirm(`Are you sure you want to delete ${selectedJobs.length} selected jobs?`)) {
-      try {
-        const deletePromises = selectedJobs.map(jobId => api.delete(`/jobs/${jobId}`));
-        await Promise.all(deletePromises);
-        alert('Selected jobs deleted successfully!');
-        fetchJobs();
-        setSelectedJobs([]);
-      } catch (err) {
-        alert('Failed to delete some of the selected jobs. Check console for details.');
-        console.error('Error deleting selected jobs:', err);
-      }
-    }
-  };
-  
   return (
-    <div className="admin-manage-jobs w-[80vw]">
-      {/* HEADER SECTION */}
-      <div className="bg-[#267edc] rounded-xl shadow-lg p-6 mb-8">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-          
-          {/* Title Section */}
-          <div className="flex items-center space-x-4 w-full lg:w-auto">
-            {/* FIX: Solid white background with blue icon ensures visibility */}
-            <div className="bg-white p-3 rounded-full text-[#267edc] shadow-sm">
-              <FileText size={32} />
+    <div className="admin-manage-jobs w-[80vw] mx-auto p-4">
+      
+      {/* --- HEADER SECTION (MATCHING SCREENSHOT) --- */}
+      <div className="bg-[#1877f2] p-8 rounded-2xl flex flex-wrap gap-6 items-center justify-between mb-8 shadow-md min-h-[160px]">
+        {/* Title / Description */}
+        <div className="text-white">
+            <div className="flex items-center gap-3 mb-2">
+                <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                    <FileText size={24} className="text-white" />
+                </div>
+                <h3 className="text-3xl font-bold tracking-tight">Manage Job Postings</h3>
             </div>
-            <div>
-              <h3 className="text-3xl font-bold text-white">
-                Manage Job Postings
-              </h3>
-              <p className="text-blue-100 text-sm">
-                Add, update, or remove job listings
-              </p>
-            </div>
-          </div>
+            <p className="text-blue-100 text-sm ml-1 opacity-90">Add, update, or remove job listings from the portal.</p>
+        </div>
 
-          {/* Stats Section */}
-          <div className="flex items-center justify-end gap-4 w-full lg:w-auto overflow-x-auto">
+        {/* Stats Cards */}
+        <div className="flex gap-6 flex-wrap justify-center md:justify-end">
             
-            {/* Total Jobs */}
-            <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl shadow-md min-w-[140px] h-[100px] transition-transform hover:scale-105">
-              {/* FIX: Explicit blue text color for visibility */}
-              <div className="flex items-center gap-2 text-blue-600 mb-2">
-                <Briefcase size={20} />
-                <span className="text-xs uppercase font-bold tracking-wider">Total</span>
-              </div>
-              <span className="text-3xl font-extrabold text-slate-800">{totalJobs}</span>
+            {/* Total Card */}
+            <div className="bg-white rounded-xl w-[160px] h-[120px] flex flex-col items-center justify-center shadow-lg transform transition-transform hover:-translate-y-1">
+                <div className="flex items-center gap-2 mb-3">
+                    <Briefcase className="text-[#1877f2]" size={20} />
+                    <span className="text-[#1877f2] font-bold text-sm tracking-wider uppercase">TOTAL</span>
+                </div>
+                <span className="text-4xl font-extrabold text-slate-800">{totalJobs}</span>
             </div>
 
-            {/* Active Jobs */}
-            <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl shadow-md min-w-[140px] h-[100px] transition-transform hover:scale-105">
-              <div className="flex items-center gap-2 text-emerald-500 mb-2">
-                <CheckCircle size={20} />
-                <span className="text-xs uppercase font-bold tracking-wider">Active</span>
-              </div>
-              <span className="text-3xl font-extrabold text-slate-800">{activeJobs}</span>
+            {/* Active Card */}
+            <div className="bg-white rounded-xl w-[160px] h-[120px] flex flex-col items-center justify-center shadow-lg transform transition-transform hover:-translate-y-1">
+                <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle className="text-emerald-500" size={20} />
+                    <span className="text-emerald-500 font-bold text-sm tracking-wider uppercase">ACTIVE</span>
+                </div>
+                <span className="text-4xl font-extrabold text-slate-800">{activeJobs}</span>
             </div>
 
-            {/* Inactive Jobs */}
-            <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl shadow-md min-w-[140px] h-[100px] transition-transform hover:scale-105">
-              <div className="flex items-center gap-2 text-rose-500 mb-2">
-                <XCircle size={20} />
-                <span className="text-xs uppercase font-bold tracking-wider">Inactive</span>
-              </div>
-              <span className="text-3xl font-extrabold text-slate-800">{inactiveJobs}</span>
+            {/* Inactive Card */}
+            <div className="bg-white rounded-xl w-[160px] h-[120px] flex flex-col items-center justify-center shadow-lg transform transition-transform hover:-translate-y-1">
+                <div className="flex items-center gap-2 mb-3">
+                    <XCircle className="text-rose-500" size={20} />
+                    <span className="text-rose-500 font-bold text-sm tracking-wider uppercase">INACTIVE</span>
+                </div>
+                <span className="text-4xl font-extrabold text-slate-800">{inactiveJobs}</span>
             </div>
 
-          </div>
         </div>
       </div>
 
-      <div className="top-actions-container">
-        <div className="left-actions">
+      {/* --- ACTION BAR --- */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div className="flex gap-3 w-full md:w-auto">
           <button
             onClick={() => setShowPopup(true)}
-            className="add-new-job-button">
-            Add New Job Posting
+            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow transition-colors w-full md:w-auto">
+            <Plus size={18} /> Add New Job
           </button>
           {selectedJobs.length > 0 && (
             <button
               onClick={handleDeleteSelectedJobs}
-              className="delete-selected-button"
-            >
-              Delete Selected ({selectedJobs.length})
+              className="flex items-center justify-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow transition-colors">
+              Delete ({selectedJobs.length})
             </button>
           )}
         </div>
 
-        <div className="right-actions">
-          <label htmlFor="import-excel" className="excel-action-link">
-            Import
+        <div className="flex gap-3 w-full md:w-auto">
+          <label className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-5 rounded-lg cursor-pointer shadow transition-colors flex-1 md:flex-none">
+            <Upload size={18} /> Import
+            <input type="file" accept=".xlsx, .xls" onChange={handleImportFromExcel} className="hidden" />
           </label>
-          <input
-            id="import-excel"
-            type="file"
-            accept=".xlsx, .xls"
-            onChange={handleImportFromExcel}
-            style={{ display: 'none' }}
-          />
-          <button onClick={handleExportToExcel} className="excel-action-link">
-            Export
+          <button 
+            onClick={handleExportToExcel} 
+            className="flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2.5 px-5 rounded-lg shadow transition-colors flex-1 md:flex-none">
+            <Download size={18} /> Export
           </button>
         </div>
       </div>
 
-      {/* ADD JOB POPUP */}
-      {showPopup && (
-        <div className="popup-overlay">
-          <div className="popup-content w-[90%] sm:w-[70%] md:w-[50%] lg:w-[40%] bg-white p-6 rounded-xl shadow-xl max-h-[80vh] overflow-y-auto">
-            <button
-              className="close-popup-button"
-              onClick={() => setShowPopup(false)}>
-              &times;
-            </button>
-            <h2>Add New Job Posting</h2>
-            <form onSubmit={handleAddJob} className="add-job-form">
-              <div className="form-group">
-                <label htmlFor="companyId">Company</label>
-                <select
-                  id="companyId"
-                  name="companyId"
-                  value={formState.companyId}
-                  onChange={handleCompanySelectChange}
-                  required
-                  className="form-select">
-                  <option value="">Select a Company</option>
-                  {company.map((comp) => (
-                    <option key={comp._id} value={comp._id}>
-                      {comp.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label htmlFor="role">Job Role</label>
-                <input
-                  id="role"
-                  name="role"
-                  value={formState.role}
-                  onChange={handleInputChange}
-                  placeholder="e.g., Frontend Developer"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="exp">Experience</label>
-                <input
-                  id="exp"
-                  name="exp"
-                  value={formState.exp}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 0-2 yrs"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="skills">Skills</label>
-                <input
-                  id="skills"
-                  name="skills"
-                  value={formState.skills}
-                  onChange={handleInputChange}
-                  placeholder="e.g., React, JS, HTML"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="salary">Salary</label>
-                <input
-                  id="salary"
-                  name="salary"
-                  value={formState.salary}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 3-4 LPA"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="location">Location</label>
-                <input
-                  id="location"
-                  name="location"
-                  value={formState.location}
-                  onChange={handleInputChange}
-                  placeholder="e.g., Hyderabad"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="industry">Industry</label>
-                <input
-                  id="industry"
-                  name="industry"
-                  value={formState.industry}
-                  onChange={handleInputChange}
-                  placeholder="e.g., Information Technology"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="jobStatus">Job Status</label>
-                <select
-                  name="status"
-                  onChange={handleInputChange}
-                  value={formState.status}
-                  id="jobStatus">
-                  <option value="active">Active</option>
-                  <option value="in active">In Active</option>
-                </select>
-              </div>
-              <button type="submit" className="post-job-button">
-                Post Job
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* --- TABLE SECTION --- */}
+      <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+        <div className="p-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50">
+          <h2 className="text-lg font-bold text-gray-700">Current Listings</h2>
+          <div className="flex gap-3">
+            <select
+              value={selectedCompany}
+              onChange={(e) => { setSelectedCompany(e.target.value); setCurrentPage(1); }}
+              className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+              <option value="">All Companies</option>
+              {company.map((comp) => <option key={comp._id} value={comp.name}>{comp.name}</option>)}
+            </select>
 
-      {/* EDIT JOB POPUP */}
-      {editPopup && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
-          <div className="relative p-8 border w-11/12 max-w-lg shadow-lg rounded-md bg-white h-auto max-h-[90vh] overflow-y-auto">
-            <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-semibold"
-              onClick={() => setEditPopup(false)}>
-              &times;
-            </button>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-              Edit Job Posting
-            </h2>
-            <form onSubmit={handleEditJob} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="edit-companyName"
-                  className="block text-sm font-medium text-gray-700 mb-1">
-                  Company
-                </label>
-                <input
-                  type="text"
-                  id="edit-companyName"
-                  value={formState.companyName || ''} 
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed"
-                />
-              </div>
-              <div className='space-y-4'>
-                <label htmlFor="edit-role">Job Role</label>
-                <input id="edit-role" name="role" value={formState.role} onChange={handleInputChange} required />
-                <label htmlFor="edit-exp">Experience</label>
-                <input id="edit-exp" name="exp" value={formState.exp} onChange={handleInputChange} required />
-                <label htmlFor="edit-skills">Skills</label>
-                <input id="edit-skills" name="skills" value={formState.skills} onChange={handleInputChange} required />
-                <label htmlFor="edit-salary">Salary</label>
-                <input id="edit-salary" name="salary" value={formState.salary} onChange={handleInputChange} required />
-                <label htmlFor="edit-location">Location</label>
-                <input id="edit-location" name="location" value={formState.location} onChange={handleInputChange} required />
-                <label htmlFor="edit-industry">Industry</label>
-                <input id="edit-industry" name="industry" value={formState.industry} onChange={handleInputChange} required />
-                <label htmlFor="edit-jobStatus">Job Status</label>
-                <select id="edit-jobStatus" name="status" value={formState.status} onChange={handleInputChange}>
-                  <option value="active">Active</option>
-                  <option value="in active">In Active</option>
-                </select>
-              </div>
-              <button
-                type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 mt-6">
-                Save Changes
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* JOBS LISTING TABLE */}
-      <div className="listings-container card">
-        <div className="flex justify-between items-center p-5">
-          <h2>Current Job Listings</h2>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <label htmlFor="company-filter">Filter by Company:</label>
-              <select
-                id="company-filter"
-                value={selectedCompany}
-                onChange={handleCompanyFilterChange}
-                className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">All Companies</option>
-                {company.map((comp) => (
-                  <option key={comp._id} value={comp.name}>
-                    {comp.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <label htmlFor="status-filter">Filter by Status:</label>
-              <select
-                id="status-filter"
-                value={selectedStatus}
-                onChange={handleStatusFilterChange}
-                className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="in active">In Active</option>
-              </select>
-            </div>
+            <select
+              value={selectedStatus}
+              onChange={(e) => { setSelectedStatus(e.target.value); setCurrentPage(1); }}
+              className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+              <option value="">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="in active">In Active</option>
+            </select>
           </div>
         </div>
 
-        {isLoading && <p>Loading jobs...</p>}
-        {error && <p className="error-message">{error}</p>}
-        {!isLoading && !error && (
-          <div className="table-responsive">
-            <table className="jobs-table">
-              <thead>
+        {isLoading ? (
+          <div className="p-10 text-center text-gray-500">Loading jobs...</div>
+        ) : error ? (
+          <div className="p-10 text-center text-red-500">{error}</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-gray-100 text-gray-600 uppercase text-xs font-bold tracking-wider">
                 <tr>
-                  <th>
-                    <input
-                      type="checkbox"
-                      onChange={handleSelectAll}
-                      checked={
-                        currentJobs.length > 0 &&
-                        currentJobs.every((job) => selectedJobs.includes(job._id))
-                      }
-                    />
+                  <th className="p-4 w-10">
+                    <input type="checkbox" onChange={handleSelectAll} checked={currentJobs.length > 0 && currentJobs.every(job => selectedJobs.includes(job._id))} />
                   </th>
-                  <th>Job Id</th>
-                  <th>Company</th>
-                  <th>Role</th>
-                  <th>Experience</th>
-                  <th>Skills</th>
-                  <th>Salary</th>
-                  <th>Location</th>
-                  <th>Industry</th>
-                  <th>Job Status</th>
-                  <th>Action</th>
+                  <th className="p-4">Company</th>
+                  <th className="p-4">Role</th>
+                  <th className="p-4">Experience</th>
+                  <th className="p-4">Skills</th>
+                  <th className="p-4">Salary</th>
+                  <th className="p-4">Location</th>
+                  <th className="p-4">Status</th>
+                  <th className="p-4 text-center">Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-100">
                 {currentJobs.length > 0 ? (
                   currentJobs.map((job) => (
-                    <tr key={job._id}>
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={selectedJobs.includes(job._id)}
-                          onChange={() => handleSelectJob(job._id)}
-                        />
+                    <tr key={job._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="p-4">
+                        <input type="checkbox" checked={selectedJobs.includes(job._id)} onChange={() => handleSelectJob(job._id)} />
                       </td>
-                      <td>{job._id}</td>
-                      <td>{job.companyName}</td>
-                      <td>{job.role}</td>
-                      <td>{job.exp}</td>
-                      <td>{job.skills}</td>
-                      <td>{job.salary}</td>
-                      <td>{job.location}</td>
-                      <td>{job.industry || 'N/A'}</td>
-                      <td>{job.status || 'N/A'}</td>
-                      <td className="flex align-center justify-center gap-3 p-5">
-                        <button
-                          onClick={() => handleEditPopup(job)}
-                          className="text-indigo-600 hover:text-indigo-900 text-sm">
-                          <FilePenLine />
+                      <td className="p-4 font-medium text-gray-800">{job.companyName}</td>
+                      <td className="p-4 text-gray-600">{job.role}</td>
+                      <td className="p-4 text-gray-600">{job.exp}</td>
+                      <td className="p-4 text-gray-600 max-w-xs truncate" title={job.skills}>{job.skills}</td>
+                      <td className="p-4 text-gray-600">{job.salary}</td>
+                      <td className="p-4 text-gray-600">{job.location}</td>
+                      <td className="p-4">
+                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                           job.status?.toLowerCase() === 'active' 
+                           ? 'bg-green-100 text-green-700' 
+                           : 'bg-red-100 text-red-700'
+                         }`}>
+                             {job.status?.toUpperCase() || 'N/A'}
+                         </span>
+                      </td>
+                      <td className="p-4 text-center">
+                        <button onClick={() => handleEditPopup(job)} className="text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 p-2 rounded-lg">
+                          <FilePenLine size={18} />
                         </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="11" className="no-jobs-found">
-                      No job positions found.
-                    </td>
+                    <td colSpan="9" className="p-8 text-center text-gray-500">No job listings found.</td>
                   </tr>
                 )}
               </tbody>
             </table>
+          </div>
+        )}
 
-            {filteredJobs.length > 0 && (
-              <div className="p-5 border-t border-gray-200 bg-gray-50">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <span>Show:</span>
-                      <select
-                        value={itemsPerPage}
-                        onChange={handleItemsPerPageChange}
-                        className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value={5}>5</option>
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={50}>50</option>
-                      </select>
-                      <span>per page</span>
-                    </div>
-                    <div>
-                      Showing{' '}
-                      <strong className="font-semibold">
-                        {filteredJobs.length === 0 ? 0 : startIndex + 1}
-                      </strong>{' '}
-                      -{' '}
-                      <strong className="font-semibold">
-                        {Math.min(endIndex, filteredJobs.length)}
-                      </strong>{' '}
-                      of{' '}
-                      <strong className="font-semibold">
-                        {filteredJobs.length}
-                      </strong>{' '}
-                      jobs
-                    </div>
-                  </div>
-
-                  {totalPages > 1 && (
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200">
-                        <ChevronLeft size={16} className="mr-2" />
-                        Previous Page
-                      </button>
-
-                      <span className="text-sm text-gray-600">
-                        Page {currentPage} of {totalPages}
-                      </span>
-
-                      <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200">
-                        Next Page
-                        <ChevronRight size={16} className="ml-2" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+        {/* PAGINATION */}
+        {filteredJobs.length > 0 && (
+          <div className="p-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+             <div className="text-sm text-gray-600">
+                Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredJobs.length)} of {filteredJobs.length}
+             </div>
+             <div className="flex gap-2">
+                <button 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50">
+                  <ChevronLeft size={16} />
+                </button>
+                <button 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50">
+                  <ChevronRight size={16} />
+                </button>
+             </div>
           </div>
         )}
       </div>
+
+      {/* --- ADD POPUP --- */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-blue-600 p-4 flex justify-between items-center text-white">
+                <h3 className="font-bold text-lg">Add New Job</h3>
+                <button onClick={() => setShowPopup(false)} className="hover:bg-blue-700 p-1 rounded"><XCircle /></button>
+            </div>
+            <form onSubmit={handleAddJob} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+              <div className="space-y-4">
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                    <select name="companyId" value={formState.companyId} onChange={handleCompanySelectChange} required className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="">Select Company</option>
+                        {company.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+                    </select>
+                 </div>
+                 <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                        <input name="role" value={formState.role} onChange={handleInputChange} required className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Experience</label>
+                        <input name="exp" value={formState.exp} onChange={handleInputChange} required className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" />
+                    </div>
+                 </div>
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Skills</label>
+                    <input name="skills" value={formState.skills} onChange={handleInputChange} required className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" />
+                 </div>
+                 <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Salary</label>
+                        <input name="salary" value={formState.salary} onChange={handleInputChange} required className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                        <input name="location" value={formState.location} onChange={handleInputChange} required className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" />
+                    </div>
+                 </div>
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" value={formState.status} onChange={handleInputChange} className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="active">Active</option>
+                        <option value="in active">In Active</option>
+                    </select>
+                 </div>
+              </div>
+              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow mt-2">Post Job</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- EDIT POPUP --- */}
+      {editPopup && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+             <div className="bg-indigo-600 p-4 flex justify-between items-center text-white">
+                <h3 className="font-bold text-lg">Edit Job Posting</h3>
+                <button onClick={() => setEditPopup(false)} className="hover:bg-indigo-700 p-1 rounded"><XCircle /></button>
+            </div>
+            <form onSubmit={handleEditJob} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+               <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Company (Read Only)</label>
+                  <input type="text" value={formState.companyName} disabled className="w-full border border-gray-200 bg-gray-100 rounded-lg p-2.5 text-gray-500" />
+               </div>
+               <div className="grid grid-cols-2 gap-4">
+                   <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                      <input name="role" value={formState.role} onChange={handleInputChange} required className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                   </div>
+                   <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Experience</label>
+                      <input name="exp" value={formState.exp} onChange={handleInputChange} required className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                   </div>
+               </div>
+               <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Skills</label>
+                  <input name="skills" value={formState.skills} onChange={handleInputChange} required className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none" />
+               </div>
+               <div className="grid grid-cols-2 gap-4">
+                   <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Salary</label>
+                      <input name="salary" value={formState.salary} onChange={handleInputChange} required className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                   </div>
+                   <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                      <input name="location" value={formState.location} onChange={handleInputChange} required className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none" />
+                   </div>
+               </div>
+               <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" value={formState.status} onChange={handleInputChange} className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="active">Active</option>
+                        <option value="in active">In Active</option>
+                    </select>
+               </div>
+               <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow mt-2">Save Changes</button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

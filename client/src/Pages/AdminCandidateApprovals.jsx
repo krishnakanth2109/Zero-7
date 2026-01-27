@@ -32,7 +32,7 @@ const AdminCandidateApprovals = () => {
   
   // State for filtering
   const [filterStatus, setFilterStatus] = useState('all') 
-  const [activeStatus, setActiveStatus] = useState("all") // Defaulted to 'all' to match filterStatus
+  const [activeStatus, setActiveStatus] = useState("all") 
 
   const [filterRole, setFilterRole] = useState('all') 
   const [filterLocation, setFilterLocation] = useState('all') 
@@ -130,7 +130,6 @@ const AdminCandidateApprovals = () => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase()
 
     return candidates.filter((candidate) => {
-      // Search term matching
       const matchesSearch =
         (candidate.name && candidate.name.toLowerCase().includes(lowerCaseSearchTerm)) ||
         (candidate.role && candidate.role.toLowerCase().includes(lowerCaseSearchTerm)) ||
@@ -138,19 +137,12 @@ const AdminCandidateApprovals = () => {
         (candidate.skills && candidate.skills.toLowerCase().includes(lowerCaseSearchTerm)) ||
         (candidate.userName && candidate.userName.toLowerCase().includes(lowerCaseSearchTerm))
 
-      // FIXED: Use filterStatus here instead of activeStatus for reliability
       const matchesStatus = filterStatus === 'all' || candidate.status === filterStatus
-      
       const matchesRecruiter = filterRecruiter === 'all' || (candidate.userName && candidate.userName === filterRecruiter)
 
       return matchesSearch && matchesStatus && matchesRecruiter
     })
-  }, [
-    candidates,
-    searchTerm,
-    filterStatus, // Depends on filterStatus now
-    filterRecruiter,
-  ])
+  }, [candidates, searchTerm, filterStatus, filterRecruiter])
 
   // --- Export to CSV Functionality ---
   const handleExport = () => {
@@ -159,9 +151,10 @@ const AdminCandidateApprovals = () => {
       return
     }
 
-    const headers = ['Name', 'Role', 'Location', 'Skills', 'Recruiter', 'Status']
-    const csvRows = filteredCandidates.map((candidate) => {
+    const headers = ['S.No', 'Name', 'Role', 'Location', 'Skills', 'Recruiter', 'Status']
+    const csvRows = filteredCandidates.map((candidate, index) => {
       return [
+        index + 1,
         `"${String(candidate.name || '').replace(/"/g, '""')}"`,
         `"${String(candidate.role || '').replace(/"/g, '""')}"`,
         `"${String(candidate.location || '').replace(/"/g, '""')}"`,
@@ -204,7 +197,6 @@ const AdminCandidateApprovals = () => {
 
       {/* Status Count Containers */}
       <div className="flex w-full gap-6 mb-8 max-w-6xl flex-nowrap overflow-x-auto pb-4 sm:pb-0">
-        {/* Pending */}
         <div
           onClick={() => handleFilterChange("pending")}
           className={`flex-1 min-w-[200px] bg-white p-5 rounded-xl shadow-lg flex items-center justify-between border-b-4 cursor-pointer transition
@@ -220,7 +212,6 @@ const AdminCandidateApprovals = () => {
           </span>
         </div>
 
-        {/* Approved */}
         <div
           onClick={() => handleFilterChange("approved")}
           className={`flex-1 min-w-[200px] bg-white p-5 rounded-xl shadow-lg flex items-center justify-between border-b-4 cursor-pointer transition
@@ -236,7 +227,6 @@ const AdminCandidateApprovals = () => {
           </span>
         </div>
 
-        {/* Rejected */}
         <div
           onClick={() => handleFilterChange("rejected")}
           className={`flex-1 min-w-[200px] bg-white p-5 rounded-xl shadow-lg flex items-center justify-between border-b-4 cursor-pointer transition
@@ -252,7 +242,6 @@ const AdminCandidateApprovals = () => {
           </span>
         </div>
 
-        {/* Placed */}
         <div
           onClick={() => handleFilterChange("placed")}
           className={`flex-1 min-w-[200px] bg-white p-5 rounded-xl shadow-lg flex items-center justify-between border-b-4 cursor-pointer transition
@@ -284,18 +273,17 @@ const AdminCandidateApprovals = () => {
           </div>
         </div>
 
-        {/* Status Filter - Dropdown */}
         <div className='relative w-full md:w-auto min-w-[150px]'>
           <select
             className='block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
             value={filterStatus}
-            onChange={(e) => handleFilterChange(e.target.value)} // UPDATED: Now uses handleFilterChange to sync both states
+            onChange={(e) => handleFilterChange(e.target.value)}
           >
             <option value='all'>All Statuses</option>
             <option value='pending'>Pending</option>
             <option value='approved'>Approved</option>
             <option value='rejected'>Rejected</option>
-            <option value='placed'>Placed</option> {/* ADDED: Placed option */}
+            <option value='placed'>Placed</option>
           </select>
           <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
             <svg className='fill-current h-4 w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'>
@@ -304,7 +292,6 @@ const AdminCandidateApprovals = () => {
           </div>
         </div>
 
-        {/* Recruiter Filter */}
         <div className='relative w-full md:w-auto min-w-[150px]'>
           <select
             className='block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
@@ -323,7 +310,6 @@ const AdminCandidateApprovals = () => {
           </div>
         </div>
 
-        {/* Export Button */}
         <button
           onClick={handleExport}
           className='flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 w-full md:w-auto mt-4 md:mt-0'
@@ -337,6 +323,8 @@ const AdminCandidateApprovals = () => {
         <table className='min-w-full divide-y divide-gray-200'>
           <thead className='bg-[#267edc] text-white'>
             <tr>
+              {/* Added S.No Header */}
+              <th className='px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider'>S.No</th>
               <th className='px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider'>Name</th>
               <th className='px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider'>Role</th>
               <th className='px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider'>Location</th>
@@ -348,19 +336,21 @@ const AdminCandidateApprovals = () => {
           </thead>
           <tbody className='bg-white divide-y divide-gray-200'>
             {filteredCandidates.length > 0 ? (
-              filteredCandidates.map((candidate) => (
+              filteredCandidates.map((candidate, index) => (
                 <tr
                   key={candidate._id}
                   className='hover:bg-gray-100 transition-colors duration-150 ease-in-out'>
+                  {/* Added S.No Data Cell */}
+                  <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700'>{index + 1}</td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>{candidate.name}</td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-700'>{candidate.role}</td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-700'>{candidate.location}</td>
                   <td className='px-6 py-4'>
                     <div className='flex flex-wrap gap-2'>
                       {candidate.skills &&
-                        candidate.skills.split(',').map((skill, index) => (
+                        candidate.skills.split(',').map((skill, idx) => (
                           <span
-                            key={index}
+                            key={idx}
                             className='px-3 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-full shadow-sm'>
                             {skill.trim()}
                           </span>
@@ -393,7 +383,8 @@ const AdminCandidateApprovals = () => {
               ))
             ) : (
               <tr>
-                <td colSpan='7' className='px-6 py-10 text-center text-gray-500 text-lg'>
+                {/* Updated colSpan to 8 because of S.No column */}
+                <td colSpan='8' className='px-6 py-10 text-center text-gray-500 text-lg'>
                   No candidates found for the current search/filter.
                 </td>
               </tr>

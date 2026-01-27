@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/axios";
 import { 
-  Receipt, 
+  IndianRupee, // Replaced Receipt with IndianRupee
   Loader2, 
   ShieldX, 
   Trash2, 
@@ -68,7 +68,7 @@ const AdminPayrollRequests = () => {
   };
 
   return (
-    <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans">
+    <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans text-slate-900">
       
       {/* ============ BLUE HEADER SECTION ============ */}
       <div className="bg-[#1976d2] rounded-xl shadow-lg p-6 mb-8 flex flex-col md:flex-row items-center justify-between text-white">
@@ -76,7 +76,7 @@ const AdminPayrollRequests = () => {
         {/* Left Side: Icon & Text */}
         <div className="flex items-center space-x-5 w-full md:w-auto mb-6 md:mb-0">
           <div className="bg-white p-4 rounded-full flex items-center justify-center shadow-md">
-            <Receipt className="text-[#1976d2]" size={32} />
+            <IndianRupee className="text-[#1976d2]" size={32} />
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Payroll Consultation Requests</h1>
@@ -192,7 +192,7 @@ const AdminPayrollRequests = () => {
                       className="px-6 py-12 text-center text-gray-400 bg-gray-50"
                     >
                       <div className="flex flex-col items-center">
-                        <Receipt size={40} className="mb-2 opacity-50" />
+                        <IndianRupee size={40} className="mb-2 opacity-50 text-slate-400" />
                         <p>No payroll requests found.</p>
                       </div>
                     </td>

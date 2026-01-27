@@ -59,7 +59,7 @@ import AdminPayrollRequests from './Pages/AdminPayrollRequests';
 import AdminManageOffer from './Pages/AdminManageOffer';
 import AdminBatchEnrollments from './Pages/AdminBatchEnrollments';
 import AdminUserPage from './Pages/AdminUserPage.jsx';
-
+import AdminDigitalCourses from './Pages/AdminDigitalCourses.jsx';
 // --- NEW IMPORT FOR TESTIMONIALS ---
 import AdminManageTestimonials from './Pages/ManageTestimonials'; 
 
@@ -157,6 +157,7 @@ function App() {
               <Route path='payroll-requests' element={<AdminPayrollRequests />} />
               <Route path='manage-offer' element={<AdminManageOffer />} />
               <Route path='batch-enrollments' element={<AdminBatchEnrollments />} />
+                 <Route path='manage-digital-courses' element={<AdminDigitalCourses />} />
             </Route>
           </Routes>
         </div>

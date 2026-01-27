@@ -38,6 +38,7 @@ import batchEnrollmentRoutes from './routes/batchEnrollmentRoutes.js';
 // Add this import with your other route imports
 import resumeRoutes from './routes/resumeRoutes.js';
 import testimonialRoutes from './routes/testimonials.js'; 
+import digitalCourseRoutes from './routes/digitalCourses.js';
 // ... other code
 
 // Add this line with your other app.use() statements
@@ -97,7 +98,7 @@ app.use('/api/candidate-enrollment', candidateEnrollmentRoutes);
 app.use('/api/contact-inquiries', contactInquiryRoutes);
 // --- FIX: The payroll route is now correctly placed after the middleware ---
 app.use('/api/payroll-consultations', payrollConsultationRoutes);
-
+app.use('/api/digital-courses', digitalCourseRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/batch-enrollments', batchEnrollmentRoutes);
 // ... other code

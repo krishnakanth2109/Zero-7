@@ -29,25 +29,25 @@ const Login = () => {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false)
 
+  // Provided Logo URL
+  const logoUrl = "https://instasize.com/api/image/9588a187c7d2ffc83f9e7d0424865e484f9e83f3de1bdc25afa8f7882075b28c.jpeg"
+
   const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
     setSuccessMessage('')
     setIsLoading(true)
 
-    // ✅ FIXED: Changed payload to match backend expectation
     const payload = { 
-      email,  // Backend now expects 'email' field
+      email, 
       password 
     }
 
     try {
-      // ✅ FIXED: Use api instance instead of fetch
       const response = await api.post('/user/login', payload)
       
       if (response.data && response.data.token) {
         Cookie.set('token', response.data.token, { expires: 1 })
-        // ✅ FIXED: Backend sends 'user' not 'payload'
         Cookie.set('user', JSON.stringify(response.data.user), { expires: 1 })
         console.log('Login successful, navigating to dashboard...')
         navigate('/admin/dashboard')
@@ -74,14 +74,12 @@ const Login = () => {
       const response = await api.post('/user/forgot-password', {
         email: resetEmail,
       })
-      console.log(response.data)
       setSuccessMessage(
         response.data.message || 'A verification code has been sent to your email.',
       )
       setShowForgotPassword(false)
       setShowVerifyCodeForm(true)
     } catch (err) {
-      console.error('Forgot password error:', err)
       setError(
         err.response?.data?.message || 'Failed to send reset code. Try again.',
       )
@@ -101,14 +99,11 @@ const Login = () => {
         email: resetEmail,
         otp: resetCode,
       })
-      console.log(response.data)
       setSuccessMessage(response.data.message || 'Code verified successfully.')
-      // ✅ FIXED: Backend now returns a token after OTP verification
       setResetToken(response.data.token)
       setShowVerifyCodeForm(false)
       setShowSetNewPasswordForm(true)
     } catch (err) {
-      console.error('Verify code error:', err)
       setError(err.response?.data?.message || 'Invalid or expired code. Please try again.')
     } finally {
       setIsLoading(false)
@@ -127,7 +122,6 @@ const Login = () => {
       return
     }
 
-    // ✅ ADDED: Password strength validation
     if (newPassword.length < 6) {
       setError('Password must be at least 6 characters long.')
       setIsLoading(false)
@@ -147,16 +141,13 @@ const Login = () => {
           },
         },
       )
-      console.log(response.data)
       setSuccessMessage(
         response.data.message || 'Password updated successfully! You can now login.',
       )
-      // Reset all states after 2 seconds and go back to login
       setTimeout(() => {
         backToLogin()
       }, 2000)
     } catch (err) {
-      console.error('Set new password error:', err)
       setError(
         err.response?.data?.message || 
         'Failed to set new password. Your reset session may have expired.'
@@ -206,7 +197,18 @@ const Login = () => {
           !showVerifyCodeForm &&
           !showSetNewPasswordForm && (
             <form className='login-form-content' onSubmit={handleLogin}>
-              <h2 className='text-sm'>Zero7 Dashboard Login</h2>
+              
+              {/* --- LOGO ADDED HERE --- */}
+              <div className="login-logo-wrapper" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                <img 
+                  src={logoUrl} 
+                  alt="Zero7 Logo" 
+                  style={{ width: '150px', height: 'auto', borderRadius: '8px' }} 
+                />
+              </div>
+
+          
+              
               <div className={`input-field-group`}>
                 <label htmlFor='email-input'>Email Address</label>
                 <input
@@ -219,9 +221,7 @@ const Login = () => {
                 />
               </div>
 
-              <div
-                className={`input-field-group password-field-group`}
-                style={{ position: 'relative' }}>
+              <div className={`input-field-group password-field-group`} style={{ position: 'relative' }}>
                 <label htmlFor='password-input'>Password</label>
                 <input
                   id='password-input'
@@ -232,9 +232,7 @@ const Login = () => {
                   required
                   style={{ paddingRight: '35px' }}
                 />
-                <span
-                  onClick={() => setShowPassword(!showPassword)}
-                  className='password-toggle-icon'>
+                <span onClick={() => setShowPassword(!showPassword)} className='password-toggle-icon'>
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
@@ -243,23 +241,16 @@ const Login = () => {
                 Log In to Dashboard
               </button>
 
-              <p
-                className='forgot-password-link'
-                onClick={() => setShowForgotPassword(true)}>
+              <p className='forgot-password-link' onClick={() => setShowForgotPassword(true)}>
                 Forgot Password?
               </p>
             </form>
           )}
 
         {/* 2. Forgot Password Form */}
-        {showForgotPassword &&
-          !showVerifyCodeForm &&
-          !showSetNewPasswordForm && (
-            <form
-              className='reset-password-form-content'
-              onSubmit={handleForgotPassword}>
+        {showForgotPassword && !showVerifyCodeForm && !showSetNewPasswordForm && (
+            <form className='reset-password-form-content' onSubmit={handleForgotPassword}>
               <h2 className='reset-password-title'>Reset Password</h2>
-
               <div className='input-field-group'>
                 <label htmlFor='reset-email-input'>Enter your email</label>
                 <input
@@ -271,28 +262,19 @@ const Login = () => {
                   required
                 />
               </div>
-
               <button type='submit' className='send-reset-link-button'>
                 Send Verification Code
               </button>
-
-              <p className='back-to-login-link' onClick={backToLogin}>
-                Back to Login
-              </p>
+              <p className='back-to-login-link' onClick={backToLogin}>Back to Login</p>
             </form>
           )}
 
         {/* 3. Verify Code Form */}
         {showVerifyCodeForm && (
-          <form
-            className='verify-code-form-content'
-            onSubmit={handleVerifyCode}>
+          <form className='verify-code-form-content' onSubmit={handleVerifyCode}>
             <h2 className='verify-code-title'>Verify Reset Code</h2>
-
             <div className='input-field-group'>
-              <label htmlFor='reset-code-input'>
-                Enter the 6-digit code sent to {resetEmail}
-              </label>
+              <label htmlFor='reset-code-input'>Enter the 6-digit code sent to {resetEmail}</label>
               <input
                 id='reset-code-input'
                 type='text'
@@ -303,27 +285,16 @@ const Login = () => {
                 required
               />
             </div>
-
-            <button type='submit' className='verify-code-button'>
-              Verify Code
-            </button>
-
-            <p className='back-to-login-link' onClick={backToLogin}>
-              Back to Login
-            </p>
+            <button type='submit' className='verify-code-button'>Verify Code</button>
+            <p className='back-to-login-link' onClick={backToLogin}>Back to Login</p>
           </form>
         )}
 
         {/* 4. Set New Password Form */}
         {showSetNewPasswordForm && (
-          <form
-            className='set-new-password-form-content'
-            onSubmit={handleSetNewPassword}>
+          <form className='set-new-password-form-content' onSubmit={handleSetNewPassword}>
             <h2 className='set-new-password-title'>Set New Password</h2>
-
-            <div
-              className={`input-field-group password-field-group`}
-              style={{ position: 'relative' }}>
+            <div className={`input-field-group password-field-group`} style={{ position: 'relative' }}>
               <label htmlFor='new-password-input'>New Password</label>
               <input
                 id='new-password-input'
@@ -335,19 +306,12 @@ const Login = () => {
                 minLength={6}
                 style={{ paddingRight: '35px' }}
               />
-              <span
-                onClick={() => setShowNewPassword(!showNewPassword)}
-                className='password-toggle-icon'>
+              <span onClick={() => setShowNewPassword(!showNewPassword)} className='password-toggle-icon'>
                 {showNewPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
-
-            <div
-              className={`input-field-group password-field-group`}
-              style={{ position: 'relative' }}>
-              <label htmlFor='confirm-new-password-input'>
-                Confirm New Password
-              </label>
+            <div className={`input-field-group password-field-group`} style={{ position: 'relative' }}>
+              <label htmlFor='confirm-new-password-input'>Confirm New Password</label>
               <input
                 id='confirm-new-password-input'
                 type={showConfirmNewPassword ? 'text' : 'password'}
@@ -358,22 +322,12 @@ const Login = () => {
                 minLength={6}
                 style={{ paddingRight: '35px' }}
               />
-              <span
-                onClick={() =>
-                  setShowConfirmNewPassword(!showConfirmNewPassword)
-                }
-                className='password-toggle-icon'>
+              <span onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)} className='password-toggle-icon'>
                 {showConfirmNewPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
-
-            <button type='submit' className='set-password-button'>
-              Set Password
-            </button>
-
-            <p className='back-to-login-link' onClick={backToLogin}>
-              Back to Login
-            </p>
+            <button type='submit' className='set-password-button'>Set Password</button>
+            <p className='back-to-login-link' onClick={backToLogin}>Back to Login</p>
           </form>
         )}
       </div>

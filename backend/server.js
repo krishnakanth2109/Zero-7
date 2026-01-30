@@ -37,7 +37,8 @@ const io = new Server(server, {
     origin: [
       'https://zero7-lw66.onrender.com', // backend host
       'https://zero7tech.netlify.app', // frontend host
-      'http://localhost:3000', // local dev
+      'http://localhost:3000',
+      'https://zero-7-vbod.onrender.com'// local dev
     ],
     methods: ['GET', 'POST'],
     credentials: true,

@@ -125,11 +125,9 @@ const BenchList = () => {
       } catch (error) { console.error('Failed to fetch candidates:', error) }
     }
 
-    // --- UPDATED LOGIC HERE ---
     const fetchPlaced = async () => {
       try {
         const response = await api.get('/interview')
-        // STRICT FILTERING: Only show if interviewLevel is 'placed'
         const placedCandidates = response.data.filter(
           (interview) => interview.interviewLevel?.toLowerCase() === 'placed'
         )
@@ -294,7 +292,7 @@ const BenchList = () => {
         .stat-content h2 { font-size: 3.2rem; font-weight: 800; margin: 0 0 10px 0; line-height: 1; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .stat-content p { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin: 0; }
 
-        /* --- CANDIDATES TABLE --- */
+        /* --- CANDIDATES TABLE (FIXED OVERLAPPING) --- */
         .candidates-section { padding: 40px 20px; text-align: center; background: white; }
         .candidates-section h2 { 
             color: #1a3b8c; 
@@ -305,7 +303,10 @@ const BenchList = () => {
         }
         
         .candidate-table-wrapper { 
+            display: block;
+            width: 100%;
             overflow-x: auto; 
+            -webkit-overflow-scrolling: touch;
             border-radius: 8px; 
             border: 1px solid #e0e0e0;
             max-width: 1200px; 
@@ -316,7 +317,8 @@ const BenchList = () => {
             width: 100%; 
             border-collapse: collapse; 
             background: white; 
-            min-width: 800px; 
+            min-width: 900px; /* Ensures enough width to prevent overlap */
+            table-layout: auto;
         }
         
         .candidate-table thead { 
@@ -330,6 +332,7 @@ const BenchList = () => {
             font-weight: 700;
             font-size: 16px;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         .candidate-table tbody tr {
@@ -341,77 +344,41 @@ const BenchList = () => {
         }
 
         .candidate-table td { 
-            padding: 20px 15px; 
+            padding: 15px 15px; 
             text-align: left; 
             color: #333;
             font-size: 15px;
             vertical-align: middle;
+            word-wrap: break-word;
         }
         
-        .candidate-table td:nth-child(2) { color: #555; }
-        .candidate-table td:nth-child(3) { color: #555; max-width: 300px; }
+        /* Fixed widths for specific columns to avoid overlap */
+        .candidate-table th:nth-child(1), .candidate-table td:nth-child(1) { min-width: 150px; }
+        .candidate-table th:nth-child(2), .candidate-table td:nth-child(2) { min-width: 150px; }
+        .candidate-table th:nth-child(3), .candidate-table td:nth-child(3) { min-width: 250px; }
 
         .btn-request {
             background-color: #0099ff; 
             color: white;
-            padding: 10px 20px;
-            font-size: 14px;
+            padding: 8px 16px;
+            font-size: 13px;
             border: none;
             border-radius: 4px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
             white-space: nowrap;
-            display: inline-block;
-            text-align: center;
         }
         
-        .btn-request:hover {
-            background-color: #0088e0;
-        }
+        .btn-request:hover { background-color: #0088e0; transform: scale(1.02); }
 
-        /* --- POPUP FORM INPUT ICONS --- */
-        .popup-form .form-group {
-            position: relative;
-            margin-bottom: 15px;
-        }
-        
-        .popup-form .form-group i.input-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6b7280;
-            font-size: 14px;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .popup-form .form-group i.input-icon.textarea-icon {
-            top: 20px;
-            transform: none;
-        }
-
-        .popup-form input, 
-        .popup-form textarea,
-        .popup-form select {
-            width: 100%;
-            padding: 12px 12px 12px 40px !important;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        .popup-form .form-row {
-            display: flex;
-            gap: 15px;
-        }
-
-        .popup-form .form-row .form-group {
-            flex: 1;
-        }
+        /* --- POPUP FORM --- */
+        .popup-form .form-group { position: relative; margin-bottom: 15px; }
+        .popup-form .form-group i.input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #6b7280; font-size: 14px; pointer-events: none; z-index: 10; }
+        .popup-form .form-group i.input-icon.textarea-icon { top: 20px; transform: none; }
+        .popup-form input, .popup-form textarea, .popup-form select { width: 100%; padding: 12px 12px 12px 40px !important; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.3s; }
+        .popup-form .form-row { display: flex; gap: 15px; }
+        .popup-form .form-row .form-group { flex: 1; }
 
         /* --- SUCCESS STORIES --- */
         .success-stories-section { padding: 80px 20px; background-color: #f8f9fa; text-align: center; }
@@ -429,73 +396,29 @@ const BenchList = () => {
         .author-role { font-size: 0.9rem; color: #6b7280; margin: 0; }
 
         /* --- HIRING PROCESS SECTION --- */
-        .process-section {
-          padding: 80px 20px;
-          background-color: #f8fafc;
-          text-align: center;
-        }
+        .process-section { padding: 80px 20px; background-color: #f8fafc; text-align: center; }
+        .process-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 50px; }
+        .process-card { background: white; border-radius: 24px; padding: 40px 30px; width: 280px; height: 320px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; border: 1px solid #f1f5f9; cursor: pointer; }
+        .process-card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .icon-bubble { width: 80px; height: 80px; background-color: #eff6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; color: #3b82f6; font-size: 32px; }
+        .process-card h3 { font-size: 1.5rem; font-weight: 800; color: #111827; margin-bottom: 12px; }
+        .process-card p { color: #6b7280; font-size: 1rem; line-height: 1.5; margin: 0; font-weight: 500; }
 
-        .process-container {
-          display: flex;
-          justify-content: center;
-          gap: 30px;
-          flex-wrap: wrap;
-          margin-top: 50px;
-        }
-
-        .process-card {
-          background: white;
-          border-radius: 24px;
-          padding: 40px 30px;
-          width: 280px;
-          height: 320px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-          transition: all 0.3s ease;
-          border: 1px solid #f1f5f9;
-          cursor: pointer;
-        }
-
-        .process-card:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .icon-bubble {
-          width: 80px;
-          height: 80px;
-          background-color: #eff6ff;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 30px;
-          color: #3b82f6;
-          font-size: 32px;
-        }
-
-        .process-card h3 {
-          font-size: 1.5rem;
-          font-weight: 800;
-          color: #111827;
-          margin-bottom: 12px;
-        }
-
-        .process-card p {
-          color: #6b7280;
-          font-size: 1rem;
-          line-height: 1.5;
-          margin: 0;
-          font-weight: 500;
-        }
-
+        /* --- RESPONSIVE FIXES --- */
         @media (max-width: 768px) {
             .stats-section { flex-direction: column; align-items: center; padding: 40px 20px; }
             .stat-card { width: 320px; height: 320px; max-width: 100%; margin-bottom: 20px; }
             .stories-title { font-size: 2rem; }
-            .candidate-table td, .candidate-table th { padding: 10px; }
+            .candidate-table th, .candidate-table td { padding: 12px 10px; font-size: 13px; }
+            .candidate-table { min-width: 800px; }
+            .candidate-table-wrapper { border-radius: 0; border-left: none; border-right: none; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-section { height: 300px; }
+            .overlay h1 { font-size: 1.8rem; }
+            .popup-form { width: 95%; padding: 20px; }
+            .form-row { flex-direction: column; gap: 0; }
         }
       `}</style>
 
@@ -746,4 +669,4 @@ Structured support to help candidates secure the right job opportunities.</p></d
   )
 }
 
-export default BenchList
+export default BenchList;

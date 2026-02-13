@@ -34,9 +34,8 @@ const DigitalCourses = () => {
           desc: item.paragraph,
           img: item.image,
           rating: item.rating || 4.5,
-          reviews: Math.floor(Math.random() * 500) + 50, // Mock reviews count for UI
+          reviews: Math.floor(Math.random() * 500) + 50, 
           // If your backend doesn't have a 'domain' field yet, we default to 'Coding' 
-          // or try to guess based on title, or you can update your Admin to save domain.
           domain: item.domain || determineDomain(item.heading) || 'Coding'
         }));
 
@@ -74,11 +73,11 @@ const DigitalCourses = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      // Sending to the standard enrollment endpoint
-      // Ensure this route exists in your backend, or use '/digital-courses-enrollment'
-      await api.post('/digital-courses-enrollment', { 
+      // FIX 1: Use the correct endpoint '/enrollments' (matches backend enrollments.js)
+      // FIX 2: Change 'courseName' to 'course' to match Mongoose Schema
+      await api.post('/enrollments', { 
         ...formData, 
-        courseName: selectedCourse.title // Mapping title to courseName for backend
+        course: selectedCourse.title 
       });
       
       alert(`Enrollment for ${selectedCourse.title} submitted successfully!`);
@@ -86,7 +85,8 @@ const DigitalCourses = () => {
       setFormData({ name: '', email: '', contact: '', message: '' });
     } catch (error) {
       console.error(error);
-      alert(`Error: ${error.response?.data?.message || 'Something went wrong'}`);
+      const errorMsg = error.response?.data?.message || 'Something went wrong';
+      alert(`Error: ${errorMsg}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -185,65 +185,72 @@ const DigitalCourses = () => {
       </section>
 
       {/* --- ENROLLMENT MODAL --- */}
-      {selectedCourse && (
+{selectedCourse && (
         <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedCourse(null)}></div>
-          <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 animate-in fade-in zoom-in duration-300">
-            <button className="absolute top-4 right-4 text-gray-400 hover:text-black" onClick={() => setSelectedCourse(null)}>
+          
+          <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
+            
+            <button className="absolute top-4 right-4 text-gray-400 hover:text-black transition-colors" onClick={() => setSelectedCourse(null)}>
               <FaTimes className="text-xl" />
             </button>
-            <h3 className="text-2xl font-bold mb-2 text-gray-900">Enrollment Form</h3>
-            <p className="text-gray-500 text-sm mb-8">Course: <span className="text-cyan-600 font-bold">{selectedCourse.title}</span></p>
             
-            <form onSubmit={handleFormSubmit} className="space-y-5">
+            <h3 className="text-2xl font-bold mb-2 text-gray-900">Enrollment Form</h3>
+            <p className="text-gray-500 text-sm mb-6">Course: <span className="text-cyan-600 font-bold">{selectedCourse.title}</span></p>
+            
+            <form onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-5">
               <div>
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Your Name</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Your Name</label>
                 <input 
                   type="text" 
-                  className="w-full border-b-2 border-gray-100 py-2 focus:border-cyan-500 outline-none transition-colors" 
+                  className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg px-4 py-2.5 sm:py-3 focus:bg-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all placeholder-gray-400" 
                   placeholder="Full Name"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value.replace(/[^A-Za-z ]/g, '')})}
                   required 
                 />
               </div>
+              
               <div>
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Email Address</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Email Address</label>
                 <input 
                   type="email" 
-                  className="w-full border-b-2 border-gray-100 py-2 focus:border-cyan-500 outline-none transition-colors" 
+                  className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg px-4 py-2.5 sm:py-3 focus:bg-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all placeholder-gray-400" 
                   placeholder="email@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                   required 
                 />
               </div>
+              
               <div>
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Contact Number</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Contact Number</label>
                 <input 
                   type="text" 
                   maxLength="10"
-                  className="w-full border-b-2 border-gray-100 py-2 focus:border-cyan-500 outline-none transition-colors" 
+                  className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg px-4 py-2.5 sm:py-3 focus:bg-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all placeholder-gray-400" 
                   placeholder="10-digit mobile number"
                   value={formData.contact}
                   onChange={(e) => setFormData({...formData, contact: e.target.value.replace(/\D/g, '')})}
                   required 
                 />
               </div>
+              
               <div>
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Additional Message</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Additional Message</label>
                 <textarea 
-                  className="w-full border-b-2 border-gray-100 py-2 focus:border-cyan-500 outline-none transition-colors resize-none" 
-                  rows="2"
+                  className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg px-4 py-3 focus:bg-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all resize-none placeholder-gray-400" 
+                  rows="3"
                   placeholder="Tell us about your requirements..."
                   value={formData.message}
                   onChange={(e) => setFormData({...formData, message: e.target.value})}
                 ></textarea>
               </div>
+              
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="w-full bg-cyan-500 text-white py-4 rounded-xl font-bold text-lg hover:bg-cyan-600 shadow-lg shadow-cyan-100 transition-all active:scale-95 disabled:opacity-50"
+                className="w-full bg-cyan-500 text-white py-3 sm:py-3.5 rounded-xl font-bold text-lg hover:bg-cyan-600 shadow-lg shadow-cyan-100 transition-all active:scale-95 disabled:opacity-50 mt-2"
               >
                 {isSubmitting ? 'Processing...' : 'Submit Enrollment'}
               </button>

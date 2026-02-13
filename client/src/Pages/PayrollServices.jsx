@@ -77,9 +77,8 @@ const PayrollServices = () => {
               <a href="#consultation" className="px-8 py-4 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all text-center">
                 Request Free Payroll Consultation
               </a>
-              <button className="px-8 py-4 border-2 border-slate-200 text-slate-800 font-bold rounded-full hover:bg-slate-50 transition-all">
-                Contact Us
-              </button>
+            
+             
             </motion.div>
           </motion.div>
 
@@ -233,14 +232,12 @@ const PayrollServices = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-5 bg-blue-600 text-white font-black text-lg rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-[0.98] disabled:opacity-70"
+                  className="w-full py-4 bg-blue-600 text-white font-black text-lg rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-[0.98] disabled:opacity-70"
                 >
                   {isSubmitting ? 'Processing...' : 'Request Free Payroll Consultation'}
                 </button>
                 
-                <p className="text-center text-[10px] text-slate-400 font-medium">
-                  By clicking, you agree to our Terms of Service and Privacy Policy.
-                </p>
+              
               </form>
             </div>
           </motion.div>

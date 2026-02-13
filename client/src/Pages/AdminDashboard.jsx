@@ -11,8 +11,10 @@ import {
   BookUser,
   School,
   Award,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
-import api from '../api/axios' // Import the central axios instance
+import api from '../api/axios' 
 import './AdminDashboard.css'
 import {
   Bar,
@@ -37,9 +39,12 @@ const capitalize = (s) => {
 export default function AdminDashboard() {
   const [user, setUser] = useState({})
   const [applications, setApplications] = useState([])
+  const [rawAppsData, setRawAppsData] = useState([]) // Store raw data for filtering
+  const [rawInterviewsData, setRawInterviewsData] = useState([])
 
-  // State for the dynamic graph data
+  // State for the dynamic graph data and year filter
   const [trendData, setTrendData] = useState([])
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
 
   const [stats, setStats] = useState({
     totalCandidates: 0,
@@ -53,7 +58,6 @@ export default function AdminDashboard() {
   const [loadingStats, setLoadingStats] = useState(true)
 
   useEffect(() => {
-    // Logic to get user info from cookie
     const userData = Cookie.get('user')
     if (userData) {
       try {
@@ -63,10 +67,8 @@ export default function AdminDashboard() {
       }
     }
 
-    // Main fetch function for all dashboard data
     const fetchDashboardData = async () => {
       try {
-        // Fetch all required endpoints in parallel
         const [
           candidatesResponse,
           jobsResponse,
@@ -74,7 +76,7 @@ export default function AdminDashboard() {
           companiesResponse,
           interviewsResponse,
           collegeResponse,
-          applicationsResponse, // Fetch applications here to coordinate graph data
+          applicationsResponse,
         ] = await Promise.all([
           api.get('/candidates').catch((e) => ({ data: [] })),
           api.get('/jobs').catch((e) => ({ data: [] })),
@@ -85,12 +87,13 @@ export default function AdminDashboard() {
           api.get('/applications').catch((e) => ({ data: [] })),
         ])
 
-        // 1. Process Stats
+        setRawAppsData(applicationsResponse.data)
+        setRawInterviewsData(interviewsResponse.data)
+
         const pendingRequests = requestsResponse.data.filter(
           (req) => req.status === 'pending',
         )
 
-        // Logic: Check status/level AND ensure approvalStatus is 'approved' to match the list view
         const placedCandidates = interviewsResponse.data.filter(
           (req) =>
             (req.status?.toLowerCase() === 'placed' || req.interviewLevel === 'placed') &&
@@ -107,11 +110,10 @@ export default function AdminDashboard() {
           interviews: interviewsResponse.data.length,
         })
 
-        // 2. Set Applications Table Data
         setApplications(applicationsResponse.data)
-
-        // 3. Process Graph Data (Application Trends)
-        calculateGraphTrends(applicationsResponse.data, interviewsResponse.data)
+        
+        // Initial calculation
+        calculateGraphTrends(applicationsResponse.data, interviewsResponse.data, selectedYear)
 
       } catch (error) {
         console.error('Failed to fetch dashboard stats:', error)
@@ -123,12 +125,16 @@ export default function AdminDashboard() {
     fetchDashboardData()
   }, [])
 
-  // Function to process raw data into monthly trends for the chart
-  const calculateGraphTrends = (appsData, interviewsData) => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const currentYear = new Date().getFullYear();
+  // Recalculate graph whenever year changes
+  useEffect(() => {
+    if (rawAppsData.length > 0 || rawInterviewsData.length > 0) {
+      calculateGraphTrends(rawAppsData, rawInterviewsData, selectedYear)
+    }
+  }, [selectedYear, rawAppsData, rawInterviewsData])
 
-    // Initialize structure
+  const calculateGraphTrends = (appsData, interviewsData, targetYear) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
     const monthlyStats = months.map(m => ({
       month: m,
       applications: 0,
@@ -136,22 +142,18 @@ export default function AdminDashboard() {
       hired: 0
     }));
 
-    // Count Applications per month
     appsData.forEach(app => {
       const date = new Date(app.createdAt || app.date);
-      // Optional: Filter for current year only
-      if (date.getFullYear() === currentYear) {
+      if (date.getFullYear() === targetYear) {
         monthlyStats[date.getMonth()].applications += 1;
       }
     });
 
-    // Count Interviews and Hires per month
     interviewsData.forEach(int => {
       const date = new Date(int.date || int.createdAt);
-      if (date.getFullYear() === currentYear) {
+      if (date.getFullYear() === targetYear) {
         monthlyStats[date.getMonth()].interviews += 1;
 
-        // Only count as hired if status is placed AND approved
         if (
           (int.status?.toLowerCase() === 'placed' || int.interviewLevel === 'placed') &&
           int.approvalStatus === 'approved'
@@ -161,15 +163,16 @@ export default function AdminDashboard() {
       }
     });
 
-    // Determine current month index to slice the array (optional: show only up to current month)
-    const currentMonthIndex = new Date().getMonth();
-    // Showing data up to the current month
-    const relevantData = monthlyStats.slice(0, currentMonthIndex + 1);
-
-    setTrendData(relevantData.length > 0 ? relevantData : monthlyStats);
+    // If current year, only show up to current month. If past year, show all 12.
+    const now = new Date();
+    if (targetYear === now.getFullYear()) {
+        const currentMonthIndex = now.getMonth();
+        setTrendData(monthlyStats.slice(0, currentMonthIndex + 1));
+    } else {
+        setTrendData(monthlyStats);
+    }
   };
 
-  // Data for the Pie Chart (Job Status Distribution)
   const pieChartData = [
     { name: 'Candidates', value: stats.totalCandidates },
     { name: 'Total Jobs', value: stats.activeJobs },
@@ -180,7 +183,6 @@ export default function AdminDashboard() {
   const PIE_CHART_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
   const RADIAN = Math.PI / 180
 
-  // Custom label renderer for the Pie Chart
   const renderCustomizedLabel = ({
     cx,
     cy,
@@ -205,16 +207,15 @@ export default function AdminDashboard() {
     )
   }
 
-  // Reusable StatCard component
   const StatCard = ({ title, value, subtext, icon, percentage, path }) => (
     <a href={path}>
-      <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1'>
+      <div className='bg-white rounded-2xl p-4 hover:shadow-xl flex flex-col gap-1 transition-shadow duration-300'>
         <div className='flex items-center justify-between'>
           <div className='bg-[#7eade0] p-2 rounded-lg'>{icon}</div>
           {percentage && <p className='text-[#16a34a]'>{percentage}</p>}
         </div>
-        <div  >
-          <h1 className='text-decoration-none text-3xl font-bold mt-3'>
+        <div>
+          <h1 className='text-3xl font-bold mt-3'>
             {loadingStats ? '...' : value}
           </h1>
           <p className='text-lg font-semibold text-[#267edc]'>{title}</p>
@@ -225,15 +226,17 @@ export default function AdminDashboard() {
   )
 
   return (
-    <div className='flex flex-col gap-4 overflow-auto'>
+    <div className='flex flex-col gap-6 overflow-auto w-full p-6'>
+      
+      {/* Header Banner */}
       <div
-        className="admin-main rounded-2xl p-6 border-border flex items-center justify-center"
+        className="admin-main rounded-2xl p-6 border-border flex items-center justify-center shadow-sm"
         style={{
           width: '100%',
           height: '20vh',
           minHeight: '20vh',
           maxHeight: '20vh',
-          maxWidth: '1200px',
+          maxWidth: '100%', 
           margin: '0 auto',
           flex: '0 0 auto',
         }}
@@ -242,15 +245,12 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold">
             Welcome back, {capitalize(user.name) || 'Admin'}!
           </h1>
-          <span>Here&apos;s your {user.role} dashboard today.</span>
+          <span>Here's your {user.role} dashboard today.</span>
         </div>
       </div>
 
-
-
-      {/* Card Container */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
-
+      {/* Card Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <StatCard
           title='Total Candidates'
           value={stats.totalCandidates}
@@ -297,7 +297,7 @@ export default function AdminDashboard() {
         {user.role !== 'recruiter' && (<StatCard
           title='Interviews'
           value={stats.interviews}
-          subtext='Interviews scheduled so far'
+          subtext='Interviews scheduled'
           icon={<BookUser className='stroke-[#0b325b] stroke-2' />}
           percentage='+12%'
           path='interviews'
@@ -312,14 +312,34 @@ export default function AdminDashboard() {
         />
       </div>
 
-      {/* Charts */}
-      <div className='flex flex-col md:flex-row gap-4 mt-4'>
-        {/* Area Chart */}
-        <div className='bg-white rounded-xl w-full md:w-1/2 p-4'>
-          <div className='flex gap-2 text-xl font-bold mb-4'>
-            <TrendingUp className='stroke-2 stroke-[#0b325b]' />
-            Application Trends (Current Year)
+      {/* Charts Section */}
+      <div className='flex flex-col xl:flex-row gap-6'>
+        {/* Bar Chart */}
+        <div className='bg-white rounded-xl w-full xl:w-2/3 p-6 shadow-sm'>
+          <div className='flex items-center justify-between mb-6'>
+            <div className='flex gap-2 text-xl font-bold'>
+              <TrendingUp className='stroke-2 stroke-[#0b325b]' />
+              Application Trends ({selectedYear})
+            </div>
+            
+            {/* Year Filter Controls */}
+            <div className='flex items-center gap-3 bg-slate-50 p-1 rounded-lg border'>
+                <button 
+                  onClick={() => setSelectedYear(prev => prev - 1)}
+                  className='p-1 hover:bg-white rounded shadow-sm transition-all'
+                >
+                    <ChevronLeft size={20} className='text-slate-600'/>
+                </button>
+                <span className='font-bold text-slate-700 min-w-[45px] text-center'>{selectedYear}</span>
+                <button 
+                  onClick={() => setSelectedYear(prev => prev + 1)}
+                  className='p-1 hover:bg-white rounded shadow-sm transition-all'
+                >
+                    <ChevronRight size={20} className='text-slate-600'/>
+                </button>
+            </div>
           </div>
+
           <ResponsiveContainer height={300} width='100%'>
             <BarChart
               data={trendData}
@@ -372,8 +392,8 @@ export default function AdminDashboard() {
         </div>
 
         {/* Pie Chart */}
-        <div className='bg-white rounded-xl w-full md:w-1/2 p-4'>
-          <div className='flex gap-2 text-xl font-bold mb-4'>
+        <div className='bg-white rounded-xl w-full xl:w-1/3 p-6 shadow-sm'>
+          <div className='flex gap-2 text-xl font-bold mb-6'>
             <Briefcase className='stroke-2 stroke-[#0b325b]' />
             Hiring Overview
           </div>
@@ -385,7 +405,7 @@ export default function AdminDashboard() {
                 cy='50%'
                 labelLine={false}
                 label={renderCustomizedLabel}
-                outerRadius={120}
+                outerRadius={100}
                 fill='#8884d8'
                 dataKey='value'>
                 {pieChartData.map((entry, index) => (
@@ -401,9 +421,10 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-
-      {/* <<< 2. INSERT RECENT ACTIVITY COMPONENT HERE >>> */}
-      <RecentActivity />
+      {/* Activity Section */}
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <RecentActivity />
+      </div>
     </div>
   )
 }

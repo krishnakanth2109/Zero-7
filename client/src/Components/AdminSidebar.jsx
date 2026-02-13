@@ -3,47 +3,47 @@
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
-  AlignHorizontalJustifyStart,
-  AudioLines,
-  Building,
-  ChevronDown,
-  CircleUser,
-  ClipboardList,
-  FileUser,
-  Gift,
-  GraduationCap,
-  HardDrive,
-  Hourglass,
-  Layers,
   LayoutDashboard,
-  LogOut,
-  MessageSquare,
-  Receipt,
-  Shield,
-  Store,
-  UserCog,
-  UserSearch,
+  HardDrive,
+  Layers,
+  GraduationCap,
+  FileText,
+  CreditCard,
+  Building,
   Users,
+  ClipboardList,
   Briefcase,
-  FolderOpen,
+  MessageSquare,
+  Ticket,
+  FileUser,
+  Award,
+  Scroll,
+  UserCog,
+  UserPlus,
   Quote,
+  LogOut,
+  ChevronDown,
+  Gift
 } from 'lucide-react'
 import Cookie from 'js-cookie'
-import './AdminSidebar.css'
 
 export default function AdminSidebar({ isOpen, setIsOpen }) {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const [openInterviews, setOpenInterviews] = useState(false)
-  const [openBenchManagement, setOpenBenchManagement] = useState(false)
-  const [openCandidates, setOpenCandidates] = useState(false)
-  const [openJobsCompanies, setOpenJobsCompanies] = useState(false)
-  const [openRequests, setOpenRequests] = useState(false)
+  // --- State for Dropdowns ---
   const [openServices, setOpenServices] = useState(false)
+  const [openEnrollments, setOpenEnrollments] = useState(false)
+  const [openJobs, setOpenJobs] = useState(false)
+  const [openBench, setOpenBench] = useState(false)
+  const [openPlacements, setOpenPlacements] = useState(false)
+  const [openAdminMgmt, setOpenAdminMgmt] = useState(false)
+  const [openContent, setOpenContent] = useState(false)
 
-  const [newRequestCount, setNewRequestCount] = useState(0)
+  // Notification count (mock logic)
+  const [newRequestCount] = useState(0)
 
+  // User Role Detection
   const user = Cookie.get('user') ? JSON.parse(Cookie.get('user')) : null
   const role = user?.role?.toLowerCase() || ''
 
@@ -66,102 +66,224 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   ]
 
+  // --- 1. ADMIN LINKS (Full Access) ---
   const adminLinks = [
     ...commonLinks,
     {
       type: 'dropdown',
-      key: 'interviews',
-      label: 'Interviews',
-      icon: FileUser,
-      state: openInterviews,
-      setState: setOpenInterviews,
+      label: 'Services',
+      icon: HardDrive, 
+      state: openServices,
+      setState: setOpenServices,
       submenu: [
-        { path: '/admin/interviews', label: 'Interviews', icon: FileUser },
-        { path: '/admin/interviews/approvals', label: 'Interviews Approvals', icon: Hourglass },
+        { path: '/admin/it-programs', label: 'IT Training', icon: HardDrive },
+        { path: '/admin/non-it-programs', label: 'Non-IT Training', icon: Layers },
+        { path: '/admin/manage-digital-courses', label: 'Digital Courses', icon: GraduationCap },
+        { path: '/admin/payroll-requests', label: 'Payroll Services', icon: CreditCard },
+        { path: "/admin/college-connect", label: 'College Connect', icon: Building },
       ]
     },
     {
       type: 'dropdown',
-      key: 'bench-management',
+      label: 'Enrollments',
+      icon: ClipboardList,
+      state: openEnrollments,
+      setState: setOpenEnrollments,
+      submenu: [
+        { path: '/admin/studentenrollment', label: 'Training Enrolls', icon: Users },
+        { path: '/admin/digital-courses-enrollment', label: 'Digital Course Enrolls', icon: GraduationCap },
+        { path: '/admin/batch-enrollments', label: 'Bench Enrolls', icon: Layers },
+      ]
+    },
+    {
+      type: 'dropdown',
       label: 'Bench Management',
-      icon: AlignHorizontalJustifyStart,
-      state: openBenchManagement,
-      setState: setOpenBenchManagement,
-      submenu: [
-        { path: '/admin/manage-candidates', label: 'Manage Bench List', icon: AlignHorizontalJustifyStart },
-        { path: '/admin/candidateList', label: 'Bench Approvals', icon: Hourglass },
-      ]
-    },
-    {
-      type: 'dropdown',
-      key: 'candidates',
-      label: 'Candidates',
       icon: Users,
-      state: openCandidates,
-      setState: setOpenCandidates,
+      state: openBench,
+      setState: setOpenBench,
       submenu: [
-        { path: '/admin/studentenrollment', label: 'Candidate Enrollment', icon: Store },
-        { path: '/admin/applications', label: 'View Applications', icon: Layers },
-        { path: '/admin/placedcandidates', label: 'Placed Candidates', icon: CircleUser },
-        { path: '/admin/digital-courses-enrollment', label: 'Digital Courses Enrollment', icon: GraduationCap },
+        { path: '/admin/manage-candidates', label: 'Bench List', icon: Users },
+        { path: '/admin/candidateList', label: 'Bench Approvals', icon: FileUser },
       ]
     },
     {
       type: 'dropdown',
-      key: 'jobs-companies',
-      label: 'Jobs & Companies',
+      label: 'Job & Recruitment',
       icon: Briefcase,
-      state: openJobsCompanies,
-      setState: setOpenJobsCompanies,
+      state: openJobs,
+      setState: setOpenJobs,
       submenu: [
-        { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: CircleUser },
-        { path: '/admin/companies', label: 'Manage Companies', icon: Building },
+        { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: Briefcase },
+        { path: '/admin/applications', label: 'Job Applications', icon: FileText },
+        { path: '/admin/contact-inquiries', label: 'Contact Info', icon: MessageSquare },
+        { path: '/admin/manage-blogs', label: 'Blogs', icon: FileText },
+      ]
+    },
+    { path: '/admin/view-requests', label: 'Request Management', icon: Ticket, isNotification: true },
+    {
+      type: 'dropdown',
+      label: 'Placement & Hiring',
+      icon: Award,
+      state: openPlacements,
+      setState: setOpenPlacements,
+      submenu: [
+        { path: '/admin/interviews', label: 'Interviews', icon: Users },
+        { path: '/admin/interviews/approvals', label: 'Interview Approvals', icon: FileUser },
+        { path: '/admin/placedcandidates', label: 'Placed Candidates', icon: Award },
+        { path: '/admin/college-connect', label: 'College Proposals', icon: Scroll },
       ]
     },
     {
       type: 'dropdown',
-      key: 'requests',
-      label: 'Requests',
-      icon: FolderOpen,
-      state: openRequests,
-      setState: setOpenRequests,
+      label: 'Admin Management',
+      icon: UserCog,
+      state: openAdminMgmt,
+      setState: setOpenAdminMgmt,
       submenu: [
-        { path: '/admin/payroll-requests', label: 'Payroll Requests', icon: Receipt },
-        { path: '/admin/view-requests', label: 'View Requests', icon: AudioLines, isNotification: true },
+        { path: '/admin/manage-managers', label: 'Add Manager', icon: UserCog },
+        { path: '/admin/manage-recruiters', label: 'Add Recruiters', icon: UserPlus },
       ]
     },
-    { path: '/admin/manage-recruiters', label: 'Add Recruiter', icon: UserSearch },
-    { path: '/admin/manage-managers', label: 'Add Managers', icon: UserCog },
-    { path: '/admin/manage-blogs', label: 'Manage Blogs', icon: Shield },
-    { path: '/admin/manage-testimonials', label: 'Manage Testimonials', icon: Quote },
-    { path: '/admin/new-batch-dashboard', label: 'New Batches', icon: FileUser },
-    { path: '/admin/forms', label: 'College Connect Form', icon: Layers },
-    { path: '/admin/manage-offer', label: 'Manage Offer', icon: Gift },
-    { path: '/admin/batch-enrollments', label: 'Batch Enrollments', icon: ClipboardList },
     {
       type: 'dropdown',
-      key: 'services',
+      label: 'Content Management',
+      icon: Layers,
+      state: openContent,
+      setState: setOpenContent,
+      submenu: [
+        { path: '/admin/manage-testimonials', label: 'Testimonials', icon: Quote },
+        { path: '/admin/manage-offer', label: 'Manage Offers', icon: Gift },
+      ]
+    },
+  ]
+
+  // --- 2. MANAGER LINKS ---
+  // Added: Bench List, Manage Jobs, Job Applications, Interviews
+  const managerLinks = [
+    ...commonLinks,
+    // Bench Management (New)
+    {
+      type: 'dropdown',
+      label: 'Bench Management',
+      icon: Users,
+      state: openBench,
+      setState: setOpenBench,
+      submenu: [
+        { path: '/admin/manage-candidates', label: 'Bench List', icon: Users },
+      ]
+    },
+    // Job & Recruitment (New)
+    {
+      type: 'dropdown',
+      label: 'Job & Recruitment',
+      icon: Briefcase,
+      state: openJobs,
+      setState: setOpenJobs,
+      submenu: [
+        { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: Briefcase },
+        { path: '/admin/applications', label: 'Job Applications', icon: FileText },
+      ]
+    },
+    // Placement & Hiring (Updated with Interviews)
+    {
+      type: 'dropdown',
+      label: 'Placement & Hiring',
+      icon: Award,
+      state: openPlacements,
+      setState: setOpenPlacements,
+      submenu: [
+        { path: '/admin/interviews', label: 'Interviews', icon: Users },
+        { path: '/admin/placedcandidates', label: 'Placed Candidates', icon: Award },
+        { path: '/admin/college-connect', label: 'College Proposals', icon: Scroll },
+      ]
+    },
+    // Admin Mgmt
+    { path: '/admin/manage-recruiters', label: 'Add Recruiters', icon: UserPlus },
+    // Success Stories
+    { path: '/admin/manage-testimonials', label: 'Stories Success', icon: Quote },
+    
+    // Recruiter Tools (Dropdowns)
+    {
+      type: 'dropdown',
+      label: 'Programs & Services',
+      icon: HardDrive,
+      state: openServices,
+      setState: setOpenServices,
+      submenu: [
+        { path: '/admin/it-programs', label: 'IT Training', icon: HardDrive },
+        { path: '/admin/non-it-programs', label: 'Non-IT Training', icon: Layers },
+      ]
+    },
+    {
+      type: 'dropdown',
+      label: 'Recruiter Enrollments',
+      icon: ClipboardList,
+      state: openEnrollments,
+      setState: setOpenEnrollments,
+      submenu: [
+        { path: '/admin/digital-courses-enrollment', label: 'Digital Course Enrolls', icon: GraduationCap },
+        { path: '/admin/batch-enrollments', label: 'Bench Enrolls', icon: Layers },
+      ]
+    },
+  ]
+
+  // --- 3. RECRUITER LINKS ---
+  // Added: Bench List, Manage Jobs, Job Applications, Interviews
+  const recruiterLinks = [
+    ...commonLinks,
+    // Bench Management (New)
+    {
+      type: 'dropdown',
+      label: 'Bench Management',
+      icon: Users,
+      state: openBench,
+      setState: setOpenBench,
+      submenu: [
+        { path: '/admin/manage-candidates', label: 'Bench List', icon: Users },
+      ]
+    },
+    // Job & Recruitment (New)
+    {
+      type: 'dropdown',
+      label: 'Job & Recruitment',
+      icon: Briefcase,
+      state: openJobs,
+      setState: setOpenJobs,
+      submenu: [
+        { path: '/admin/manage-jobs', label: 'Manage Jobs', icon: Briefcase },
+        { path: '/admin/applications', label: 'Job Applications', icon: FileText },
+      ]
+    },
+    // Interviews (New)
+    { path: '/admin/interviews', label: 'Interviews', icon: Users },
+
+    // Existing Services
+    {
+      type: 'dropdown',
       label: 'Services',
       icon: HardDrive,
       state: openServices,
       setState: setOpenServices,
       submenu: [
-        // Updated to link to existing Admin components for IT/Non-IT and new routes for others
         { path: '/admin/it-programs', label: 'IT Training', icon: HardDrive },
         { path: '/admin/non-it-programs', label: 'Non-IT Training', icon: Layers },
-        { path: '/admin/manage-digital-courses', label: 'Digital Courses', icon: GraduationCap },
- 
-      
       ]
     },
-    { path: '/admin/contact-inquiries', label: 'Contact Inquiries', icon: MessageSquare },
+    // Existing Enrollments
+    {
+      type: 'dropdown',
+      label: 'Enrollments',
+      icon: ClipboardList,
+      state: openEnrollments,
+      setState: setOpenEnrollments,
+      submenu: [
+        { path: '/admin/digital-courses-enrollment', label: 'Digital Course Enrolls', icon: GraduationCap },
+        { path: '/admin/batch-enrollments', label: 'Bench Enrolls', icon: Layers },
+      ]
+    },
   ]
 
-  // (Keeping managerLinks and recruiterLinks same as provided for brevity, 
-  // ensure you add the services dropdown there if they also need access)
-  const managerLinks = [ ...commonLinks /* ... your manager links ... */ ]; 
-  const recruiterLinks = [ ...commonLinks /* ... your recruiter links ... */ ];
-
+  // Select links based on user role
   let linksToRender = []
   if (role === 'admin') linksToRender = adminLinks
   else if (role === 'manager') linksToRender = managerLinks
@@ -169,89 +291,123 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
   else linksToRender = commonLinks
 
   return (
-    <aside className={`admin-sidebar ${isOpen ? "open" : "collapsed"}`}>
-      <div className='admin-sidebar-header'>
-        <div className='logo-img'>
+    <>
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-20 lg:hidden transition-opacity"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      <aside 
+        className={`fixed top-0 left-0 h-full bg-white border-r border-gray-200 text-gray-800 transition-all duration-300 ease-in-out z-30 shadow-xl overflow-y-auto overflow-x-hidden
+          [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']
+          ${isOpen ? 'w-72 translate-x-0' : 'w-0 -translate-x-full lg:w-20 lg:translate-x-0'}
+        `}
+      >
+        {/* Logo Section */}
+        <div className="h-16 flex items-center justify-center border-b border-gray-200 bg-white sticky top-0 z-10 overflow-hidden whitespace-nowrap">
           {isOpen ? (
-            <img src='/Logo6.jpg' alt='logo' className='h-[30px] w-[40px]' />
+             <img src='/Logo6.jpg' alt='logo' className='h-12 w-50 object-contain max-w-[80%]' />
           ) : (
-            <img src='/L1.png' alt='logo1' className='h-[32px] w-[32px]' />
+             <img src='/L1.png' alt='logo' className='h-8 w-8 object-contain' />
           )}
         </div>
-      </div>
-      
-      <nav className="sidebar-nav-container">
-        {linksToRender.map((link, index) => {
-          if (link.type === 'dropdown') {
-            const submenuPaths = link.submenu.map(item => item.path)
-            const isDropdownActive = isSubmenuActive(submenuPaths)
 
-            return (
-              <div className='dropdown-container' key={link.key || index}>
-                <div
-                  onClick={() => link.setState(!link.state)}
-                  className={`sidebar-link services-header ${isDropdownActive ? 'active' : ''}`}
-                  data-tooltip={link.label}>
-                  <div className='dashboard-icon'>
-                    <link.icon style={{ width: '18px', flexShrink: 0 }} />
-                    <span className='link-text'>{link.label}</span>
+        {/* Navigation */}
+        <nav className="p-3 space-y-1">
+          {linksToRender.map((link, index) => {
+            
+            // --- Dropdown Item ---
+            if (link.type === 'dropdown') {
+              const submenuPaths = link.submenu.map(item => item.path)
+              const isDropdownActive = isSubmenuActive(submenuPaths)
+
+              return (
+                <div key={index} className="mb-1">
+                  <button
+                    onClick={() => {
+                        if(!isOpen) setIsOpen(true); 
+                        link.setState(!link.state);
+                    }}
+                    className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200 group
+                      ${isDropdownActive 
+                        ? 'bg-blue-600 text-white shadow-md' 
+                        : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700'}
+                    `}
+                  >
+                    <div className="flex items-center gap-3">
+                      <link.icon className={`w-5 h-5 flex-shrink-0 ${isDropdownActive ? 'text-white' : 'text-gray-500 group-hover:text-blue-600'}`} />
+                      <span className={`font-medium transition-opacity duration-200 whitespace-nowrap ${isOpen ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'}`}>
+                        {link.label}
+                      </span>
+                    </div>
+                    {isOpen && (
+                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${link.state ? 'rotate-180' : ''}`} />
+                    )}
+                  </button>
+
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${link.state && isOpen ? 'max-h-screen opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+                    <div className="bg-gray-50 rounded-lg py-1 mx-2 border border-gray-100">
+                      {link.submenu.map((sublink, subIndex) => (
+                        <Link
+                          key={subIndex}
+                          to={sublink.path}
+                          onClick={closeOnMobile}
+                          className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors rounded-md mx-1
+                            ${isActive(sublink.path) 
+                              ? 'text-blue-700 font-semibold bg-blue-100/50' 
+                              : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50'}
+                          `}
+                        >
+                          <span className="whitespace-nowrap">{sublink.label}</span>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                  <ChevronDown
-                    size={18}
-                    className={`dropdown-arrow ${link.state ? 'rotate' : ''}`}
-                  />
                 </div>
-                {link.state && (
-                  <div className='submenu'>
-                    {link.submenu.map((sublink) => (
-                      <Link
-                        key={sublink.path}
-                        to={sublink.path}
-                        onClick={closeOnMobile}
-                        className={`sidebar-link ${isActive(sublink.path) ? 'active' : ''}`}
-                        data-tooltip={sublink.label}
-                      >
-                        <div className='dashboard-icon'>
-                          {sublink.icon && <sublink.icon style={{ width: '16px', flexShrink: 0 }} />}
-                          <span className='link-text'>{sublink.label}</span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
+              )
+            }
+
+            // --- Standard Link Item ---
+            return (
+              <Link
+                key={index}
+                to={link.path}
+                onClick={closeOnMobile}
+                className={`flex items-center justify-between p-3 rounded-lg mb-1 transition-all duration-200 group relative
+                  ${isActive(link.path) 
+                    ? 'bg-blue-600 text-white shadow-md' 
+                    : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700'}
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  <link.icon className={`w-5 h-5 flex-shrink-0 ${isActive(link.path) ? 'text-white' : 'text-gray-500 group-hover:text-blue-600'}`} />
+                  <span className={`font-medium transition-opacity duration-200 whitespace-nowrap ${isOpen ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'}`}>
+                    {link.label}
+                  </span>
+                </div>
+                {link.isNotification && newRequestCount > 0 && isOpen && (
+                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{newRequestCount}</span>
                 )}
-              </div>
+              </Link>
             )
-          }
+          })}
+        </nav>
 
-          return (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`sidebar-link ${isActive(link.path) ? 'active' : ''}`}
-              data-tooltip={link.label}>
-              <div className='dashboard-icon'>
-                <link.icon style={{ width: '18px', flexShrink: 0 }} />
-                <span className='link-text'>{link.label}</span>
-              </div>
-              {link.isNotification && newRequestCount > 0 && (
-                <span className='notification-badge'>{newRequestCount}</span>
-              )}
-            </Link>
-          )
-        })}
-
-        <button
-          className="logout-btn"
-          data-tooltip="Logout" 
-          onClick={() => {
-            closeOnMobile();
-            handleLogout();
-          }}
-        >
-          <LogOut size={18} />
-          <span className='link-text'>Logout</span>
-        </button>
-      </nav>
-    </aside>
+        {/* Logout Footer */}
+        <div className="p-3 border-t border-gray-200 sticky bottom-0 bg-white">
+          <button
+            onClick={() => { closeOnMobile(); handleLogout(); }}
+            className="w-full flex items-center p-3 rounded-lg text-red-600 hover:bg-red-50 transition-all duration-200"
+          >
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            <span className={`ml-3 font-medium transition-opacity duration-200 whitespace-nowrap ${isOpen ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'}`}>
+              Logout
+            </span>
+          </button>
+        </div>
+      </aside>
+    </>
   )
 }

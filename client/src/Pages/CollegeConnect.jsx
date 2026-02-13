@@ -386,10 +386,11 @@ const CollegeConnect = () => {
         <p>
           Want to collaborate with us? Reach out today and let’s build a future
           together.
-        </p>
+        </p> <br />
         <button onClick={handleContactRedirect} className='btn-secondary'>
           Contact Us
         </button>
+        <br />
       </section>
 
       {/* PROPOSAL FORM */}

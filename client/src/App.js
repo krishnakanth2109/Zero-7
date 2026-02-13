@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import Cookie from 'js-cookie';
 
-
 // Bootstrap imports
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -38,7 +37,7 @@ import AdminDashboard from './Pages/AdminDashboard';
 import Login from './Pages/admin/Login';
 import AdminItPrograms from './Pages/AdminItPrograms';
 import AdminNonItPrograms from './Pages/AdminNonItPrograms';
-import AdminForms from './Components/AdminHomeForm';
+import AdminForms from './Components/AdminHomeForm'; // This is the College Connect component
 import AdminManageJobs from './Pages/AdminManageJobs';
 import AdminViewApplications from './Pages/AdminViewApplications';
 import NewBatchDashboard from './Pages/NewBatchDashboard.jsx';
@@ -60,7 +59,6 @@ import AdminManageOffer from './Pages/AdminManageOffer';
 import AdminBatchEnrollments from './Pages/AdminBatchEnrollments';
 import AdminUserPage from './Pages/AdminUserPage.jsx';
 import AdminDigitalCourses from './Pages/AdminDigitalCourses.jsx';
-// --- NEW IMPORT FOR TESTIMONIALS ---
 import AdminManageTestimonials from './Pages/ManageTestimonials'; 
 
 import { NotificationProvider } from './context/NotificationContext';
@@ -75,9 +73,7 @@ const LoginPage = () => {
     }
   }, [navigate]);
 
-  const handleLoginSuccess = () => {
-    navigate('/admin/dashboard');
-  };
+  const handleLoginSuccess = () => { navigate('/admin/dashboard'); };
   return <Login onLogin={handleLoginSuccess} />;
 };
 
@@ -95,7 +91,7 @@ function App() {
         {!isAdminPage && <Navbar />}
         <div className='content'>
           <Routes>
-            {/* --- Public Routes --- */}
+            {/* Public Routes */}
             <Route path='/' element={<Home />} />
             <Route path='/about' element={<About />} />
             <Route path='/services' element={<Services />}>
@@ -113,35 +109,29 @@ function App() {
             <Route path='/blog' element={<Blog />} />
             <Route path='/faqs' element={<FAQs />} />
             <Route path='/contact' element={<Contact />} />
-            <Route path='/college-connect' element={<CollegeConnect />} />
             <Route path='/current-hirings' element={<CurrentHirings />} />
             <Route path='/digital-courses' element={<DigitalCourses />} />
             
-            {/* --- Admin Login Route --- */}
             <Route path='/admin' element={<LoginPage />} />
 
-            {/* --- Protected Admin Routes --- */}
+            {/* Protected Admin Routes */}
             <Route
               path='/admin'
-              element={
-                <PrivateRoute>
-                  <AdminLayout />
-                </PrivateRoute>
-              }
+              element={<PrivateRoute><AdminLayout /></PrivateRoute>}
             >
               <Route path='dashboard' element={<AdminDashboard />} />
               <Route path='userPage/:id' element={<AdminUserPage />} />
               <Route path='it-programs' element={<AdminItPrograms />} />
               <Route path='non-it-programs' element={<AdminNonItPrograms />} />
-              <Route path='forms' element={<AdminForms />} />
+              
+              {/* UPDATED ROUTE TO MATCH SIDEBAR */}
+              <Route path='college-connect' element={<AdminForms />} />
+              
               <Route path='manage-jobs' element={<AdminManageJobs />} />
               <Route path='applications' element={<AdminViewApplications />} />
               <Route path='new-batch-dashboard' element={<NewBatchDashboard />} />
               <Route path='manage-blogs' element={<ManageBlogs />} />
-              
-              {/* --- NEW ROUTE FOR TESTIMONIALS --- */}
               <Route path='manage-testimonials' element={<AdminManageTestimonials />} />
-
               <Route path='studentenrollment' element={<ViewEnrollments />} />
               <Route path='interviews' element={<InterviewTracker />} />
               <Route path='interviews/approvals' element={<AdminInterviewApprovals />} />
@@ -157,7 +147,7 @@ function App() {
               <Route path='payroll-requests' element={<AdminPayrollRequests />} />
               <Route path='manage-offer' element={<AdminManageOffer />} />
               <Route path='batch-enrollments' element={<AdminBatchEnrollments />} />
-                 <Route path='manage-digital-courses' element={<AdminDigitalCourses />} />
+              <Route path='manage-digital-courses' element={<AdminDigitalCourses />} />
             </Route>
           </Routes>
         </div>
@@ -166,7 +156,6 @@ function App() {
         {!isAdminPage && <FloatingWhatsApp />}
       </div>
     </NotificationProvider>
-    
   );
 }
 

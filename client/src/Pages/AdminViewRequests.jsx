@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import {
-  CheckCircle,
-  XCircle,
-  Eye,
-  Trash2,
+  CheckSquare,      
+  MinusCircle,      
+  Maximize2,        
+  Trash,            
   Calendar,
   Building,
-  User,
+  User,             
+  Users,            // Added for the header icon
   Mail,
   Phone,
   Globe,
@@ -16,9 +17,11 @@ import {
   Search,
   ChevronUp,
   ChevronDown,
-  FileQuestion,
   Filter,
-  X
+  X,
+  ShieldCheck,
+  ShieldAlert,
+  ClipboardList
 } from 'lucide-react'
 import api from '../api/axios'
 
@@ -192,7 +195,7 @@ export default function AdminViewRequests() {
       <div className='bg-[#1976d2] rounded-xl shadow-lg p-6 mb-8 flex flex-col md:flex-row items-center justify-between text-white'>
         <div className='flex items-center space-x-5 w-full md:w-auto mb-6 md:mb-0'>
           <div className='bg-white p-4 rounded-full flex items-center justify-center shadow-md'>
-            <FileQuestion className='text-[#1976d2]' size={32} />
+            <Users className='text-[#1976d2]' size={32} /> {/* Replaced Inbox with Users icon */}
           </div>
           <div>
             <h1 className='text-3xl font-bold tracking-tight'>Candidate Requests</h1>
@@ -368,7 +371,7 @@ export default function AdminViewRequests() {
                               className='p-1.5 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors'
                               title='View Details'
                             >
-                              <Eye size={16} />
+                              <Maximize2 size={16} />
                             </button>
                             
                             <button
@@ -377,7 +380,7 @@ export default function AdminViewRequests() {
                               className={`p-1.5 rounded-lg transition-colors ${!isPending ? 'opacity-30 cursor-not-allowed bg-gray-100 text-gray-400' : 'bg-green-100 text-green-600 hover:bg-green-200'}`}
                               title='Approve'
                             >
-                               {loadingType === 'approve' && loadingId === req._id ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div> : <CheckCircle size={16} />}
+                               {loadingType === 'approve' && loadingId === req._id ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div> : <CheckSquare size={16} />}
                             </button>
 
                             <button
@@ -386,7 +389,7 @@ export default function AdminViewRequests() {
                               className={`p-1.5 rounded-lg transition-colors ${!isPending ? 'opacity-30 cursor-not-allowed bg-gray-100 text-gray-400' : 'bg-amber-100 text-amber-600 hover:bg-amber-200'}`}
                               title='Reject'
                             >
-                               {loadingType === 'reject' && loadingId === req._id ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div> : <XCircle size={16} />}
+                               {loadingType === 'reject' && loadingId === req._id ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div> : <MinusCircle size={16} />}
                             </button>
 
                             <button
@@ -395,7 +398,7 @@ export default function AdminViewRequests() {
                               className='p-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors'
                               title='Delete'
                             >
-                               {loadingType === 'delete' && loadingId === req._id ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div> : <Trash2 size={16} />}
+                               {loadingType === 'delete' && loadingId === req._id ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div> : <Trash size={16} />}
                             </button>
                           </div>
                         </td>
@@ -416,7 +419,7 @@ export default function AdminViewRequests() {
             
             {/* Modal Header */}
             <div className='bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center'>
-              <h3 className='text-lg font-bold text-gray-800'>Request Details</h3>
+              <h3 className='text-lg font-bold text-gray-800'>Request Information</h3>
               <button onClick={() => setSelectedRequest(null)} className='text-gray-400 hover:text-gray-600 transition-colors'>
                 <X size={20} />
               </button>
@@ -445,7 +448,7 @@ export default function AdminViewRequests() {
               <div>
                 <label className="text-xs font-bold text-gray-400 uppercase">Contact Info</label>
                 <div className="bg-gray-50 p-3 rounded-lg mt-1 space-y-2 text-sm text-gray-700">
-                    <p className="flex items-center"><User size={14} className="mr-2 text-gray-400"/> {selectedRequest.contactPerson} <span className="text-xs text-gray-400 ml-1">({selectedRequest.designation})</span></p>
+                    <p className="flex items-center"><ClipboardList size={14} className="mr-2 text-gray-400"/> {selectedRequest.contactPerson} <span className="text-xs text-gray-400 ml-1">({selectedRequest.designation})</span></p>
                     <p className="flex items-center"><Mail size={14} className="mr-2 text-gray-400"/> <a href={`mailto:${selectedRequest.email}`} className="text-blue-600 hover:underline">{selectedRequest.email}</a></p>
                     <p className="flex items-center"><Phone size={14} className="mr-2 text-gray-400"/> <a href={`tel:${selectedRequest.phone}`} className="text-blue-600 hover:underline">{selectedRequest.phone}</a></p>
                     {selectedRequest.website && (
@@ -489,13 +492,13 @@ export default function AdminViewRequests() {
                      onClick={() => { handleApprove(selectedRequest._id); setSelectedRequest(null); }}
                      className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 flex items-center"
                    >
-                     <CheckCircle size={16} className="mr-1.5"/> Approve
+                     <ShieldCheck size={16} className="mr-1.5"/> Approve
                    </button>
                    <button 
                      onClick={() => { handleReject(selectedRequest._id); setSelectedRequest(null); }}
                      className="px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 flex items-center"
                    >
-                     <XCircle size={16} className="mr-1.5"/> Reject
+                     <ShieldAlert size={16} className="mr-1.5"/> Reject
                    </button>
                  </>
               )}
@@ -503,7 +506,7 @@ export default function AdminViewRequests() {
                  onClick={() => { handleDelete(selectedRequest._id); setSelectedRequest(null); }}
                  className="px-4 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-bold hover:bg-red-200 flex items-center"
                >
-                 <Trash2 size={16} className="mr-1.5"/> Delete
+                 <Trash size={16} className="mr-1.5"/> Delete
                </button>
             </div>
 

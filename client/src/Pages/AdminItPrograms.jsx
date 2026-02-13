@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./AdminItPrograms.css";
+import { 
+  Edit, 
+  Trash2, 
+  PlusCircle, 
+  Terminal, 
+  CheckCircle, 
+  Loader2,
+  Code2
+} from "lucide-react";
 
-// Use environment variable or fallback to localhost
 const API_URL = `${
   process.env.REACT_APP_API_URL || "http://localhost:5000/api"
 }/it-programs`;
@@ -12,15 +19,13 @@ const AdminItPrograms = () => {
   const [form, setForm] = useState({
     title: "",
     icon: "",
-    price: "",
     description: "",
     details: "",
     technologies: ""
   });
-  const [editingId, setEditingId] = useState(null);
-  
-  // New state for validation errors
   const [errors, setErrors] = useState({});
+  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchPrograms();
@@ -35,244 +40,218 @@ const AdminItPrograms = () => {
     }
   };
 
-  // --- Validation Logic (Updated for ALL fields) ---
-  const validateForm = () => {
-    let tempErrors = {};
-    let isValid = true;
-
-    // 1. Title Validation
-    if (!form.title.trim()) {
-      tempErrors.title = "Title is required.";
-      isValid = false;
-    } else if (form.title.length < 3) {
-      tempErrors.title = "Title must be at least 3 characters.";
-      isValid = false;
-    }
-
-    // 2. Icon Validation
-    if (!form.icon.trim()) {
-      tempErrors.icon = "Icon is required.";
-      isValid = false;
-    }
-
-    // 3. Price Validation
-    if (!form.price.trim()) {
-      tempErrors.price = "Price is required.";
-      isValid = false;
-    } else if (!/^[0-9$.,\s]+$/.test(form.price)) {
-      tempErrors.price = "Invalid price format.";
-      isValid = false;
-    }
-
-    // 4. Description Validation
-    if (!form.description.trim()) {
-      tempErrors.description = "Description is required.";
-      isValid = false;
-    }
-
-    // 5. Details Validation
-    if (!form.details.trim()) {
-      tempErrors.details = "Details are required.";
-      isValid = false;
-    }
-
-    // 6. Technologies Validation
-    if (!form.technologies.trim()) {
-      tempErrors.technologies = "Technologies are required.";
-      isValid = false;
-    }
-
-    setErrors(tempErrors);
-    return isValid;
+  // --- VALIDATION & HANDLERS ---
+  const validate = () => {
+    const newErrors = {};
+    if (!form.title.trim()) newErrors.title = "Course Title is required";
+    if (!form.description.trim()) newErrors.description = "Description is required";
+    if (!form.details.trim()) newErrors.details = "Full details are required";
+    if (!form.technologies.trim()) newErrors.technologies = "Technologies are required";
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    let newValue = value;
 
-    // Clear error for this field as the user types
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: ""
-      });
+    // --- FIRST LETTER CAPITALIZATION ---
+    if (["title", "description", "details", "technologies"].includes(name)) {
+      if (newValue.length > 0) {
+        newValue = newValue.charAt(0).toUpperCase() + newValue.slice(1);
+      }
     }
+
+    setForm({ ...form, [name]: newValue });
+    if (errors[name]) setErrors({ ...errors, [name]: "" });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
 
-    // Run Validation before submitting
-    if (!validateForm()) {
-      return; 
-    }
-
+    setLoading(true);
     try {
-      const payload = {
-        ...form,
-        technologies: form.technologies.split(",").map((t) => t.trim()).filter(t => t !== "")
+      const payload = { 
+        ...form, 
+        technologies: form.technologies.split(",").map(t => t.trim()).filter(t => t) 
       };
-
+      
       if (editingId) {
         await axios.put(`${API_URL}/${editingId}`, payload);
-        alert("Program updated ✅");
       } else {
         await axios.post(API_URL, payload);
-        alert("Program added ✅");
       }
-
-      // Reset form and errors
-      setForm({
-        title: "",
-        icon: "",
-        price: "",
-        description: "",
-        details: "",
-        technologies: ""
-      });
-      setErrors({});
+      
+      setForm({ title:"", icon:"", description:"", details:"", technologies:"" });
       setEditingId(null);
       fetchPrograms();
     } catch (err) {
-      console.error(err);
-      alert("Error saving program ❌");
+      alert("Error saving program");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleEdit = (program) => {
     setEditingId(program._id);
-    setErrors({}); // Clear errors when switching to edit mode
     setForm({
       title: program.title,
       icon: program.icon,
-      price: program.price,
       description: program.description,
-      details: program.details,
+      details: program.details || "",
       technologies: program.technologies.join(", ")
     });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this program?")) return;
+    if (!window.confirm("Are you sure you want to delete this IT program?")) return;
     try {
       await axios.delete(`${API_URL}/${id}`);
-      alert("Program deleted ✅");
       fetchPrograms();
     } catch (err) {
       console.error(err);
-      alert("Error deleting program ❌");
     }
   };
 
-  // Helper style for error messages
-  const errorStyle = { color: 'red', fontSize: '0.85rem', marginTop: '5px', display: 'block' };
-
   return (
-    <div className="admin-container">
-      <h1 className="admin-title">🎓 Admin - Manage IT Programs</h1>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="admin-form">
-        <h2>{editingId ? "✏️ Edit Program" : "➕ Add Program"}</h2>
-        <div className="form-grid">
-          
-          {/* Title Field */}
-          <div className="input-group">
-            <input 
-              name="title" 
-              placeholder="Title *" 
-              value={form.title} 
-              onChange={handleChange} 
-              className={errors.title ? "input-error" : ""}
-            />
-            {errors.title && <span style={errorStyle}>{errors.title}</span>}
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8 font-sans">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+          <div className="bg-indigo-100 p-3 rounded-xl text-indigo-600">
+            <Terminal size={30} />
           </div>
-
-          {/* Icon Field */}
-          <div className="input-group">
-            <input 
-              name="icon" 
-              placeholder="Icon (Win + .) *" 
-              value={form.icon} 
-              onChange={handleChange}
-              className={errors.icon ? "input-error" : ""}
-            />
-            {errors.icon && <span style={errorStyle}>{errors.icon}</span>}
-          </div>
-
-          {/* Price Field */}
-          <div className="input-group">
-            <input 
-              name="price" 
-              placeholder="Price *" 
-              value={form.price} 
-              onChange={handleChange} 
-              className={errors.price ? "input-error" : ""}
-            />
-            {errors.price && <span style={errorStyle}>{errors.price}</span>}
-          </div>
-
-          {/* Description Field */}
-          <div className="input-group">
-            <input 
-              name="description" 
-              placeholder="Short Description *" 
-              value={form.description} 
-              onChange={handleChange} 
-              className={errors.description ? "input-error" : ""}
-            />
-            {errors.description && <span style={errorStyle}>{errors.description}</span>}
-          </div>
-
-          {/* Details Field (Textarea) */}
-          <div className="input-group full-width">
-            <textarea 
-              name="details" 
-              placeholder="Details *" 
-              value={form.details} 
-              onChange={handleChange}
-              className={errors.details ? "input-error" : ""}
-            ></textarea>
-            {errors.details && <span style={errorStyle}>{errors.details}</span>}
-          </div>
-
-          {/* Technologies Field */}
-          <div className="input-group full-width">
-            <input 
-              name="technologies" 
-              placeholder="Technologies (comma separated) *" 
-              value={form.technologies} 
-              onChange={handleChange} 
-              className={errors.technologies ? "input-error" : ""}
-            />
-            {errors.technologies && <span style={errorStyle}>{errors.technologies}</span>}
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800 tracking-tight">IT Program Manager</h1>
+            <p className="text-gray-500 text-sm">Deploy and manage technical training curriculum</p>
           </div>
         </div>
-        <button type="submit" className="btn btn-primary">
-          {editingId ? "Update Program" : "Add Program"}
-        </button>
-      </form>
 
-      {/* Programs List */}
-      <h2 className="section-heading">📚 Existing Programs</h2>
-      <div className="programs-grid">
-        {programs.map((p) => (
-          <div key={p._id} className="program-card">
-            <div className="program-header">
-              <span className="program-icon">{p.icon}</span>
-              <h3>{p.title}</h3>
-            </div>
-            <p className="program-price">{p.price}</p>
-            <p className="program-desc">{p.description}</p>
-            <p className="program-tech">
-              <strong>Tech:</strong> {p.technologies.join(", ")}
-            </p>
-            <div className="card-actions">
-              <button onClick={() => handleEdit(p)} className="btn btn-secondary">Edit</button>
-              <button onClick={() => handleDelete(p._id)} className="btn btn-secondary">Delete</button>
-            </div>
+        {/* Form Card */}
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden mb-10 transition-all max-w-2xl">
+          <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+            <h2 className="font-bold text-gray-700 flex items-center gap-2">
+              {editingId ? <Edit size={18} /> : <PlusCircle size={18} />}
+              {editingId ? "Edit IT Program" : "Add New IT Program"}
+            </h2>
           </div>
-        ))}
+          
+          <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            {/* Title */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-slate-600 ml-1 uppercase">Course Title</label>
+              <input 
+                name="title" value={form.title} onChange={handleChange}
+                className={`w-full px-4 py-2.5 rounded-xl border ${errors.title ? 'border-red-500 bg-red-50' : 'border-gray-200'} focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm`}
+                placeholder="e.g. Full Stack Development with MERN"
+              />
+              {errors.title && <span className="text-[10px] text-red-500 font-bold ml-1">{errors.title}</span>}
+            </div>
+
+            {/* Icon Field */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-slate-600 ml-1 uppercase">Emoji Icon</label>
+              <input 
+                name="icon" value={form.icon} onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                placeholder="Win + . (e.g. 💻)"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-slate-600 ml-1 uppercase">Short Description</label>
+              <input 
+                name="description" value={form.description} onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                placeholder="Brief summary for card view"
+              />
+            </div>
+
+            {/* Details */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-slate-600 ml-1 uppercase">Full Course Details</label>
+              <textarea 
+                name="details" value={form.details} onChange={handleChange} rows={4}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none resize-none text-sm"
+                placeholder="Complete curriculum overview..."
+              />
+            </div>
+
+            {/* Technologies */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-slate-600 ml-1 uppercase">Technologies (Comma Separated)</label>
+              <input 
+                name="technologies" value={form.technologies} onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                placeholder="React, Node.js, MongoDB, AWS"
+              />
+            </div>
+
+            <div className="pt-2">
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-100 transition-all flex items-center justify-center gap-2 transform active:scale-95"
+              >
+                {loading ? <Loader2 className="animate-spin" /> : editingId ? "Update IT Program" : "Create IT Program"}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* List Section */}
+        <h2 className="text-lg font-black text-slate-700 mb-6 uppercase tracking-widest flex items-center gap-2">
+          <CheckCircle size={20} className="text-emerald-500" /> Active IT Courses
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {programs.map(p => (
+            <div key={p._id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all group">
+              <div className="flex justify-between items-start mb-4">
+                <div className="text-3xl bg-indigo-50 w-12 h-12 flex items-center justify-center rounded-xl border border-indigo-100 group-hover:scale-110 transition-transform">
+                  {p.icon || "💻"}
+                </div>
+              </div>
+
+              <h3 className="font-bold text-slate-800 text-lg mb-2">{p.title}</h3>
+              <p className="text-slate-500 text-sm line-clamp-2 mb-4 leading-relaxed">{p.description}</p>
+              
+              <div className="flex flex-wrap gap-1.5 mb-6">
+                {p.technologies.slice(0, 3).map((t, i) => (
+                  <span key={i} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md flex items-center gap-1">
+                    <Code2 size={10} /> {t}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => handleEdit(p)}
+                  className="flex-1 py-2 rounded-lg bg-indigo-50 text-indigo-600 font-bold text-xs hover:bg-indigo-600 hover:text-white transition-all flex items-center justify-center gap-2"
+                >
+                  <Edit size={14} /> Edit
+                </button>
+                <button 
+                  onClick={() => handleDelete(p._id)}
+                  className="flex-1 py-2 rounded-lg bg-rose-50 text-rose-600 font-bold text-xs hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center gap-2"
+                >
+                  <Trash2 size={14} /> Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {programs.length === 0 && (
+          <div className="text-center py-20 bg-slate-100/50 rounded-3xl border-2 border-dashed border-slate-200">
+            <p className="text-slate-400 font-medium italic">No technical programs listed yet.</p>
+          </div>
+        )}
       </div>
     </div>
   );

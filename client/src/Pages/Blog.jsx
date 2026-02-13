@@ -120,9 +120,7 @@ const Blog = () => {
         <div className="blog-cta-content">
           <h2>Stay Updated with Our Latest Insights</h2>
           <p>Subscribe to our newsletter and never miss out on career tips, industry trends, and professional advice.</p>
-          <button className="blog-cta-button" onClick={handleSubscribe}>
-            Subscribe to Newsletter
-          </button>
+        
         </div>
       </div>
       

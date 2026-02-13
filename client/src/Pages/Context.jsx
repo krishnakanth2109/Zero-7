@@ -1,4 +1,4 @@
-// File: src/Components/Context.js (or wherever your file is located)
+// File: src/Components/Context.js
 
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
@@ -59,15 +59,12 @@ export default function Context() {
     }
   }
 
-  // --- CHANGED LOGIC HERE ---
   useEffect(() => {
     const fetchPlaced = async () => {
       try {
         const res = await axios.get(`${API_URL}/interview`)
         
-        // STRICT FILTERING:
         // Only include if the interviewLevel is exactly 'placed'.
-        // We removed "|| interview.status === 'placed'" to prevent L1/L2 showing up.
         const placedCandidates = res.data.filter(
           (interview) => interview.interviewLevel?.toLowerCase() === 'placed'
         )
@@ -139,8 +136,9 @@ export default function Context() {
         }
         
         .service-card ul {
-            list-style: none;
+            list-style: none !important; /* Force remove bullets */
             padding: 0;
+            margin: 0;
         }
         .service-card ul li {
           display: flex;
@@ -149,6 +147,12 @@ export default function Context() {
           line-height: 1.5;
           font-size: 0.95rem;
           color: #4b5563;
+          position: relative;
+        }
+        /* Safety: Remove any pseudo-element ticks from external CSS */
+        .service-card ul li::before {
+          content: none !important; 
+          display: none !important;
         }
         .service-card h3 {
             margin-bottom: 1rem;
@@ -351,21 +355,11 @@ export default function Context() {
             </div>
             <h3>Placement-Driven Approach</h3>
             <ul>
-              <li>
-                <FaCheckCircle /> Dedicated placement cell
-              </li>
-              <li>
-                <FaCheckCircle /> 300+ recruiter network
-              </li>
-              <li>
-                <FaCheckCircle /> Weekly interview opportunities
-              </li>
-              <li>
-                <FaCheckCircle /> Personalized career roadmap
-              </li>
-              <li>
-                <FaCheckCircle /> Post-placement support
-              </li>
+              <li><FaCheckCircle /> Dedicated placement cell</li>
+              <li><FaCheckCircle /> 300+ recruiter network</li>
+              <li><FaCheckCircle /> Weekly interview opportunities</li>
+              <li><FaCheckCircle /> Personalized career roadmap</li>
+              <li><FaCheckCircle /> Post-placement support</li>
             </ul>
           </div>
 
@@ -375,21 +369,11 @@ export default function Context() {
             </div>
             <h3>Real-Time Projects & Expert Mentorship</h3>
             <ul>
-              <li>
-                <FaCheckCircle /> Project-based training
-              </li>
-              <li>
-                <FaCheckCircle /> Corporate trainers with{' '}
-              </li>
-              <li>
-                <FaCheckCircle /> Industry-relevant curriculum
-              </li>
-              <li>
-                <FaCheckCircle /> One-on-one mentorship sessions
-              </li>
-              <li>
-                <FaCheckCircle /> Portfolio development guidance
-              </li>
+              <li><FaCheckCircle /> Project-based training</li>
+              <li><FaCheckCircle /> Corporate trainers with industry experience</li>
+              <li><FaCheckCircle /> Industry-relevant curriculum</li>
+              <li><FaCheckCircle /> One-on-one mentorship sessions</li>
+              <li><FaCheckCircle /> Portfolio development guidance</li>
             </ul>
           </div>
 
@@ -399,21 +383,11 @@ export default function Context() {
             </div>
             <h3>Trusted by Companies & Colleges</h3>
             <ul>
-              <li>
-                <FaCheckCircle /> Partnerships with 50+ institutions
-              </li>
-              <li>
-                <FaCheckCircle /> Corporate tie-ups across IT & Non-IT
-              </li>
-              <li>
-                <FaCheckCircle /> Proven track record of success
-              </li>
-              <li>
-                <FaCheckCircle /> Industry recognition and awards
-              </li>
-              <li>
-                <FaCheckCircle /> Long-standing reputation
-              </li>
+              <li><FaCheckCircle /> Partnerships with 50+ institutions</li>
+              <li><FaCheckCircle /> Corporate tie-ups across IT & Non-IT</li>
+              <li><FaCheckCircle /> Proven track record of success</li>
+              <li><FaCheckCircle /> Industry recognition and awards</li>
+              <li><FaCheckCircle /> Long-standing reputation</li>
             </ul>
           </div>
         </div>
@@ -490,7 +464,7 @@ export default function Context() {
             </div>
             <div className='testimonial-content'>
               <p className='testimonial-text'>
-                With the expert guidance of our Data Analytics trainer,students developed strong skills in data analysis, visualization, and tools like Excel and SQL.
+                With the expert guidance of our Data Analytics trainer, students developed strong skills in data analysis, visualization, and tools like Excel and SQL.
               </p>
               <div className='testimonial-author'>
                 <span className='testimonial-name'>Swetha</span>

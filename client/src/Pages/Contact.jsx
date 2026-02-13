@@ -64,9 +64,16 @@ const Contact = () => {
   const handleChange = (e) => {
     const { name, value } = e.target
 
-    // Specific logic for name input to prevent numbers while typing
+    // Specific logic for name input
     if (name === 'name') {
-      const cleaned = value.replace(/[^A-Za-z\s]/g, '')
+      // 1. Remove non-alphabets
+      let cleaned = value.replace(/[^A-Za-z\s]/g, '')
+      
+      // 2. Capitalize the first letter
+      if (cleaned.length > 0) {
+        cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+      }
+
       setFormData({ ...formData, [name]: cleaned })
     } else {
       setFormData({ ...formData, [name]: value })
@@ -160,10 +167,10 @@ const Contact = () => {
 
         {/* RIGHT CARD - Form */}
         <div className='form-card'>
-          <h2>Quick Inquiry</h2>
-          <div className='card-line'></div>
+          <h2 className="text-2xl font-bold mb-2">Quick Inquiry</h2>
+          <div className='card-line mb-6 border-b border-gray-200'></div>
 
-          <form onSubmit={handleSubmit} noValidate>
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             {/* Name Field */}
             <div className='input-group'>
               <input
@@ -172,10 +179,14 @@ const Contact = () => {
                 placeholder='Your Name'
                 value={formData.name}
                 onChange={handleChange}
-                className={errors.name ? 'input-error' : ''}
+                className={`w-full bg-gray-50 border text-gray-900 rounded-lg px-4 py-3 focus:bg-white focus:outline-none transition-colors placeholder-gray-400 ${
+                  errors.name 
+                    ? 'border-red-500 focus:border-red-500' 
+                    : 'border-gray-200 focus:border-blue-500'
+                }`}
               />
               {errors.name && (
-                <span style={{ color: 'red', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                <span className="text-red-500 text-xs mt-1 block">
                   {errors.name}
                 </span>
               )}
@@ -189,10 +200,14 @@ const Contact = () => {
                 placeholder='Your Email'
                 value={formData.email}
                 onChange={handleChange}
-                className={errors.email ? 'input-error' : ''}
+                className={`w-full bg-gray-50 border text-gray-900 rounded-lg px-4 py-3 focus:bg-white focus:outline-none transition-colors placeholder-gray-400 ${
+                  errors.email 
+                    ? 'border-red-500 focus:border-red-500' 
+                    : 'border-gray-200 focus:border-blue-500'
+                }`}
               />
               {errors.email && (
-                <span style={{ color: 'red', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                <span className="text-red-500 text-xs mt-1 block">
                   {errors.email}
                 </span>
               )}
@@ -200,20 +215,30 @@ const Contact = () => {
 
             {/* Service Selection */}
             <div className='input-group'>
-              <select
-                name='service'
-                value={formData.service}
-                onChange={handleChange}
-                className={errors.service ? 'input-error' : ''}
-              >
-                <option value=''>Select Service</option>
-                <option value='Training'>Training</option>
-                <option value='Payroll Services'>Payroll Services</option>
-                <option value='Resume Marketing'>Resume Marketing</option>
-                <option value='Campus Hiring'>Campus Hiring</option>
-              </select>
+              <div className="relative">
+                <select
+                  name='service'
+                  value={formData.service}
+                  onChange={handleChange}
+                  className={`w-full bg-gray-50 border text-gray-900 rounded-lg px-4 py-3 focus:bg-white focus:outline-none transition-colors appearance-none ${
+                    errors.service 
+                      ? 'border-red-500 focus:border-red-500' 
+                      : 'border-gray-200 focus:border-blue-500'
+                  }`}
+                >
+                  <option value=''>Select Service</option>
+                  <option value='Training'>Training</option>
+                  <option value='Payroll Services'>Payroll Services</option>
+                  <option value='Resume Marketing'>Resume Marketing</option>
+                  <option value='Campus Hiring'>Campus Hiring</option>
+                </select>
+                {/* Custom arrow pointer to ensure it looks good */}
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
               {errors.service && (
-                <span style={{ color: 'red', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                <span className="text-red-500 text-xs mt-1 block">
                   {errors.service}
                 </span>
               )}
@@ -227,20 +252,32 @@ const Contact = () => {
                 placeholder='Your Message'
                 value={formData.message}
                 onChange={handleChange}
-                className={errors.message ? 'input-error' : ''}
+                className={`w-full bg-gray-50 border text-gray-900 rounded-lg px-4 py-3 focus:bg-white focus:outline-none transition-colors resize-none placeholder-gray-400 ${
+                  errors.message 
+                    ? 'border-red-500 focus:border-red-500' 
+                    : 'border-gray-200 focus:border-blue-500'
+                }`}
               />
               {errors.message && (
-                <span style={{ color: 'red', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                <span className="text-red-500 text-xs mt-1 block">
                   {errors.message}
                 </span>
               )}
             </div>
 
-            <button type='submit' className='submit-btn' disabled={isSubmitting}>
+            <button 
+              type='submit' 
+              disabled={isSubmitting}
+              className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            >
               {isSubmitting ? 'Sending...' : 'Send Message'}
             </button>
 
-            {statusMessage && <p className='status' style={{ marginTop: '15px' }}>{statusMessage}</p>}
+            {statusMessage && (
+              <p className={`text-center text-sm mt-4 ${statusMessage.includes('Success') ? 'text-green-600' : 'text-red-600'}`}>
+                {statusMessage}
+              </p>
+            )}
           </form>
         </div>
       </div>

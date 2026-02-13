@@ -10,7 +10,7 @@ import Pagination from '../Components/Pagination'
 import {
   Briefcase, User, Phone, Mail, MapPin, FileText,
   Clock, IndianRupee, ArrowDownCircle, Search, CheckCircle, X,
-  Sparkles
+  Sparkles, Layers
 } from 'lucide-react'
 import './CurrentHirings.css'
 
@@ -277,8 +277,6 @@ const CurrentHirings = () => {
                 >
                   <div className="card-gradient-overlay"></div>
                   
-                  {/* REMOVED: <div className="big-number">{step.id}</div> */}
-                  
                   <motion.div 
                     className="icon-circle"
                     whileHover={{ scale: 1.1, rotate: 10, backgroundColor: "#3b82f6", color: "#fff" }}
@@ -314,49 +312,108 @@ const CurrentHirings = () => {
           ) : error ? (
             <div className="error-state">{error}</div>
           ) : (
-            <div className="table-container glass-panel">
-              <table className="modern-table">
-                <thead>
-                  <tr>
-                    <th>Posted</th>
-                    <th>Role</th>
-                    <th>Industry</th>
-                    <th>Experience</th>
-                    <th>Skills</th>
-                    <th>Salary</th>
-                    <th>Location</th>
-                    <th className="align-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedJobs.length > 0 ? paginatedJobs.map((job) => (
-                    <tr key={job._id} className="job-row">
-                      <td>
-                        <div className="role-cell">
-                          <span className="time-badge">{daysAgo(job.createdAt)}</span>
-                        </div>
-                      </td>
-                      <td className="font-medium">{job.role}</td>
-                      <td>{job.industry || 'N/A'}</td>
-                      <td>{job.exp}</td>
-                      <td className="skills-cell">{job.skills}</td>
-                      <td>{job.salary}</td>
-                      <td>{job.location}</td>
-                      <td className="align-right">
-                        <button 
-                          className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-                          onClick={() => handleApplyClick(job)}
-                        >
-                          Apply
-                        </button>
-                      </td>
+            <>
+              {/* DESKTOP VIEW: Table (Hidden on Mobile) */}
+              <div className="hidden md:block table-container glass-panel">
+                <table className="modern-table">
+                  <thead>
+                    <tr>
+                      <th>Posted</th>
+                      <th>Role</th>
+                      <th>Industry</th>
+                      <th>Experience</th>
+                      <th>Skills</th>
+                      <th>Salary</th>
+                      <th>Location</th>
+                      <th className="align-right">Action</th>
                     </tr>
-                  )) : (
-                    <tr><td colSpan="8" className="no-data">No jobs available right now.</td></tr>
-                  )}
-                </tbody>
-              </table>
-              <div className="pagination-wrapper">
+                  </thead>
+                  <tbody>
+                    {paginatedJobs.length > 0 ? paginatedJobs.map((job) => (
+                      <tr key={job._id} className="job-row">
+                        <td>
+                          <div className="role-cell">
+                            <span className="time-badge">{daysAgo(job.createdAt)}</span>
+                          </div>
+                        </td>
+                        <td className="font-medium">{job.role}</td>
+                        <td>{job.industry || 'N/A'}</td>
+                        <td>{job.exp}</td>
+                        <td className="skills-cell">{job.skills}</td>
+                        <td>{job.salary}</td>
+                        <td>{job.location}</td>
+                        <td className="align-right">
+                          <button 
+                            className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                            onClick={() => handleApplyClick(job)}
+                          >
+                            Apply
+                          </button>
+                        </td>
+                      </tr>
+                    )) : (
+                      <tr><td colSpan="8" className="no-data">No jobs available right now.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* MOBILE VIEW: Card Grid (Hidden on Desktop) */}
+              <div className="md:hidden space-y-4 px-4">
+                {paginatedJobs.length > 0 ? paginatedJobs.map((job) => (
+                  <motion.div 
+                    key={job._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    className="bg-white/90 backdrop-blur-sm p-5 rounded-xl border border-gray-100 shadow-md flex flex-col gap-3"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-bold text-lg text-slate-800 leading-tight">{job.role}</h3>
+                        <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded mt-1 inline-block">
+                          {daysAgo(job.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-600 mt-2">
+                       <div className="flex items-center gap-2">
+                         <Briefcase size={16} className="text-blue-500"/>
+                         <span className="truncate">{job.industry || 'N/A'}</span>
+                       </div>
+                       <div className="flex items-center gap-2">
+                         <Clock size={16} className="text-blue-500"/>
+                         <span>{job.exp}</span>
+                       </div>
+                       <div className="flex items-center gap-2">
+                         <IndianRupee size={16} className="text-blue-500"/>
+                         <span>{job.salary}</span>
+                       </div>
+                       <div className="flex items-center gap-2">
+                         <MapPin size={16} className="text-blue-500"/>
+                         <span className="truncate">{job.location}</span>
+                       </div>
+                    </div>
+
+                    <div className="mt-2 pt-2 border-t border-gray-100">
+                      <p className="text-xs text-gray-400 font-medium uppercase mb-1">Skills</p>
+                      <p className="text-sm text-gray-700 line-clamp-2">{job.skills}</p>
+                    </div>
+
+                    <button 
+                      className="w-full mt-2 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 active:scale-95 transition-all shadow-sm"
+                      onClick={() => handleApplyClick(job)}
+                    >
+                      Apply Now
+                    </button>
+                  </motion.div>
+                )) : (
+                  <div className="text-center py-10 text-gray-500">No jobs available.</div>
+                )}
+              </div>
+
+              {/* Pagination (Visible for both) */}
+              <div className="pagination-wrapper mt-6">
                  <Pagination
                     currentPage={currentPage}
                     totalItems={jobPositions.length}
@@ -366,7 +423,7 @@ const CurrentHirings = () => {
                     itemsPerPageOptions={[5, 10, 20]}
                   />
               </div>
-            </div>
+            </>
           )}
         </div>
       </section>

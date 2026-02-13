@@ -234,9 +234,7 @@ const Ittraining = () => {
                 <div className='it-course-icon'>{course.icon}</div>
                 <h3 className='it-course-title'>{course.title}</h3>
                 <p className='it-course-description'>{course.description}</p>
-                <p className='text-xl text-red-400 mb-3 font-bold'>
-                  ₹{course.price}
-                </p>
+              
 
                 <button
                   className='it-learn-more-btn'
@@ -251,7 +249,7 @@ const Ittraining = () => {
                     {/* Technologies Covered */}
                     {course.technologies && course.technologies.length > 0 && (
                       <>
-                        <h4>Technologies Covered:</h4>
+                        <h4>Technologies Covered:</h4><br />
                         <div className='tech-badge-container'>
                           {course.technologies.map((tech, index) => {
                             // pick gradient class by index rotation

@@ -1,599 +1,424 @@
-import React, { useEffect, useState } from 'react'
-import './About.css'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Rocket, Users, TrendingUp, RefreshCw, 
+  Handshake, Wrench, Network, Award, 
+  MonitorPlay, Wallet, FileText, UserCheck,
+  Briefcase, Building2, GraduationCap, CheckCircle2,
+  ArrowRight
+} from 'lucide-react';
 
 const About = () => {
-  const [stats, setStats] = useState({
-    careers: 0,
-    partners: 0,
-    retention: 0,
-  })
+  const navigate = useNavigate();
 
-  // --- Start of new code for typewriter effect ---
+  // --- SCROLL FIX: Helper function to scroll top then navigate ---
+  const handleNavigate = (path) => {
+    window.scrollTo(0, 0); // This forces the scrollbar to the top
+    navigate(path);
+  };
 
-  // Full text for the paragraphs
-  const fullParagraph1 =
-    'At Zero7 Technologies, we believe every career deserves a second chance and every talent deserves the right platform. Established in 2025, we specialize in IT & Non-IT Training, Payroll Process Outsourcing, Resume Marketing, and Campus Drives.'
-  const fullParagraph2 =
-    'Our mission is to empower individuals with skills, confidence, and opportunities while supporting organizations with trained and reliable talent.'
+  // --- Stats Animation ---
+  const [stats, setStats] = useState({ careers: 0, partners: 0, retention: 0 });
 
-  // State to hold the "typed" text
-  const [typedParagraph1, setTypedParagraph1] = useState('')
-  const [typedParagraph2, setTypedParagraph2] = useState('')
-
-  // useEffect to handle the typing animation for both paragraphs
   useEffect(() => {
-    // Typing logic for the first paragraph
-    if (typedParagraph1.length < fullParagraph1.length) {
-      const timeoutId = setTimeout(() => {
-        setTypedParagraph1(fullParagraph1.slice(0, typedParagraph1.length + 1))
-      }, 35) // Adjust typing speed (milliseconds)
-      return () => clearTimeout(timeoutId)
-    }
-
-    // Typing logic for the second paragraph (starts after the first one finishes)
-    if (
-      typedParagraph1.length === fullParagraph1.length &&
-      typedParagraph2.length < fullParagraph2.length
-    ) {
-      const timeoutId = setTimeout(() => {
-        setTypedParagraph2(fullParagraph2.slice(0, typedParagraph2.length + 1))
-      }, 35) // Adjust typing speed (milliseconds)
-      return () => clearTimeout(timeoutId)
-    }
-  }, [typedParagraph1, typedParagraph2])
-
-  // --- End of new code for typewriter effect ---
-
-  const navigate = useNavigate()
-
-  // Animate stats dynamically
-  useEffect(() => {
-    let careers = 0
-    let partners = 0
-    let retention = 0
-
     const interval = setInterval(() => {
-      if (careers < 5000) careers += 100
-      if (partners < 120) partners += 5
-      if (retention < 94) retention += 2
+      setStats(prev => ({
+        careers: prev.careers < 5000 ? prev.careers + 100 : 5000,
+        partners: prev.partners < 120 ? prev.partners + 5 : 120,
+        retention: prev.retention < 94 ? prev.retention + 2 : 94,
+      }));
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
 
-      setStats({
-        careers: careers > 5000 ? 5000 : careers,
-        partners: partners > 120 ? 120 : partners,
-        retention: retention > 94 ? 94 : retention,
-      })
-    }, 80)
+  // --- Data Objects ---
+  const principles = [
+    { 
+      icon: <Rocket className="w-6 h-6 text-white" />, 
+      title: "Innovation First", 
+      desc: "Leveraging cutting-edge methodologies and technologies to deliver forward-thinking solutions.",
+      bg: "bg-blue-500"
+    },
+    { 
+      icon: <TrendingUp className="w-6 h-6 text-white" />, 
+      title: "Result-Oriented", 
+      desc: "Our programs are designed to yield measurable outcomes and real-world applications.",
+      bg: "bg-indigo-500"
+    },
+    { 
+      icon: <Users className="w-6 h-6 text-white" />, 
+      title: "People-Centric", 
+      desc: "We believe in the power of human potential, focusing on creating personalized experiences.",
+      bg: "bg-sky-500"
+    },
+    { 
+      icon: <RefreshCw className="w-6 h-6 text-white" />, 
+      title: "Continuous Growth", 
+      desc: "We advocate for lifelong learning and constantly evolving to meet industry demands.",
+      bg: "bg-emerald-500"
+    }
+  ];
 
-    return () => clearInterval(interval)
-  }, [])
+  const reasons = [
+    { icon: <Handshake className="w-6 h-6 text-blue-600" />, title: "Visionary Foundation", desc: "Bridging the gap between talent and opportunity with unmatched solutions." },
+    { icon: <Wrench className="w-6 h-6 text-blue-600" />, title: "Practical Training", desc: "Focus on hands-on skills over theory for immediate application." },
+    { icon: <Network className="w-6 h-6 text-blue-600" />, title: "Extensive Network", desc: "Strong connections with top corporates, colleges, and recruiters." },
+    { icon: <RefreshCw className="w-6 h-6 text-blue-600" />, title: "Commitment to Growth", desc: "Dedicated to career transformation and enhancing employability." },
+    { icon: <Users className="w-6 h-6 text-blue-600" />, title: "Trusted Reliability", desc: "Built on integrity, transparency, and excellence in every interaction." },
+    { icon: <Award className="w-6 h-6 text-blue-600" />, title: "Proven Track Record", desc: "Thousands of careers transformed and trusted partnerships established." }
+  ];
+
+  const services = [
+    { icon: <MonitorPlay className="w-8 h-8 text-blue-600" />, title: "IT & Non-IT Training", tags: ["Specialized", "Expert-led", "Job-Ready"] },
+    { icon: <Wallet className="w-8 h-8 text-emerald-600" />, title: "Payroll Outsourcing", tags: ["Compliant", "Accurate", "Efficient"] },
+    { icon: <FileText className="w-8 h-8 text-amber-500" />, title: "Resume Marketing", tags: ["ATS Optimized", "Personalized", "Impactful"] },
+    { icon: <UserCheck className="w-8 h-8 text-purple-600" />, title: "Bench Marketing", tags: ["Utilization", "Quick Deployment", "Strategic"] }
+  ];
 
   return (
-    <div className='about-page'>
-      {/* Hero Section */}
-      <section className='about-hero'>
-        <div className='hero-overlay'>
-          <h1>About Zero7 Technologies</h1>
-          <p className='subheading'>
-            Building bridges between ambition and opportunity in the new world
-            of work
+    <div className="font-sans text-slate-800 bg-slate-50 overflow-x-hidden">
+      
+      {/* 1. Header Section */}
+      <section className="relative pt-20 pb-16 px-6 bg-white text-center">
+        <div className="max-w-4xl mx-auto">
+          <div className="inline-block px-4 py-1.5 mb-6 rounded-full bg-blue-50 text-blue-700 font-semibold text-sm tracking-wide">
+            About Zero7 Technologies
+          </div>
+          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 leading-tight">
+            About <span className="text-blue-700">Zero7 Technologies</span>
+          </h1>
+          <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Zero7 Technologies is your partner in learning, growing, and realizing your potential. 
+            We are dedicated to helping job seekers and organizations build a brighter tomorrow, today.
           </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              onClick={() => handleNavigate('/current-hirings')}
+              className="inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-white bg-blue-700 rounded-lg hover:bg-blue-800 transition-all duration-300 shadow-lg hover:shadow-blue-500/30"
+            >
+              Join Our Mission <ArrowRight className="ml-2 w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => handleNavigate('/contact')}
+              className="inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-slate-700 bg-white border-2 border-slate-200 rounded-lg hover:border-blue-700 hover:text-blue-700 transition-all duration-300"
+            >
+              Our Foundation <ArrowRight className="ml-2 w-5 h-5" />
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* Who We Are Section - MODIFIED FOR TYPEWRITER EFFECT */}
-      <section className='who-we-are'>
-        <div className='container'>
-          <div className='section-content'>
-            <div className='text-content'>
-              <h2 className='text-3xl font-bold mb-4'>Who We Are</h2>
-              <p className='text-lg'>
-                <strong>{typedParagraph1}</strong>
-                {/* Blinking cursor for the first paragraph */}
-                {typedParagraph1.length < fullParagraph1.length && (
-                  <span className='inline-block w-0.5 h-6 bg-gray-800 ml-1 animate-blink align-middle'></span>
-                )}
-              </p>
-              <p className='text-lg mt-4'>
-                {typedParagraph2}
-                {/* Blinking cursor for the second paragraph */}
-                {typedParagraph1.length === fullParagraph1.length &&
-                  typedParagraph2.length < fullParagraph2.length && (
-                    <span className='inline-block w-0.5 h-6 bg-gray-800 ml-1 animate-blink align-middle'></span>
-                  )}
+      {/* 2. Who We Are */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <div className="inline-block px-3 py-1 rounded bg-blue-100 text-blue-800 text-xs font-bold uppercase tracking-wider">
+              Who We Are
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight">
+              Empowering Careers, <br />
+              <span className="text-blue-700">Transforming Lives</span>
+            </h2>
+            <p className="text-lg text-slate-600 leading-relaxed">
+              At Zero7 Technologies, we believe every career deserves a second chance and every talent 
+              deserves the right platform. Established in 2025, we specialize in bridging the gap between talent and opportunity.
+            </p>
+            <div className="border-l-4 border-blue-600 pl-4 py-1 my-6 bg-slate-50 rounded-r-lg">
+              <p className="text-slate-800 font-medium italic text-lg">
+                "Our mission is to empower individuals with skills, confidence, and opportunities."
               </p>
             </div>
-            <div className='image-container'>
-              <img
-                src='https://images.unsplash.com/photo-1579389083078-4e7018379f7e?auto=format&fit=crop&w=1200&q=80'
-                alt='Team collaboration'
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              {[
+                "IT & Non-IT Training Programs",
+                "Payroll Process Outsourcing",
+                "Resume Marketing Excellence",
+                "Campus Drive Partnerships"
+              ].map((item, i) => (
+                <div key={i} className="flex items-center text-slate-700 font-medium">
+                  <CheckCircle2 className="w-5 h-5 text-sky-500 mr-2 flex-shrink-0" />
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="relative">
+            <div className="absolute -inset-4 bg-blue-100 rounded-2xl transform rotate-2"></div>
+            <img 
+              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" 
+              alt="Team Collaboration" 
+              className="relative rounded-2xl shadow-xl w-full object-cover h-[500px]"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Principles */}
+      <section className="py-20 px-6 bg-slate-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="text-blue-600 font-bold tracking-wider text-sm uppercase block mb-2">Our Core Values</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Principles That <span className="text-blue-700">Guide Us</span>
+            </h2>
+            <p className="text-slate-600 text-lg">
+              These core beliefs shape our approach to education, integrity, and long-term success.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {principles.map((item, index) => (
+              <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-100 group">
+                <div className={`${item.bg} w-12 h-12 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
+                <p className="text-slate-600 leading-relaxed text-sm">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Stats Section */}
+      <section className="py-20 px-6 bg-[#1e293b] text-white overflow-hidden relative">
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8 relative z-10">
+          <div className="bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10 text-center hover:bg-white/10 transition-colors duration-300">
+            <div className="flex justify-center mb-4 text-sky-400">
+              <Rocket className="w-10 h-10" />
+            </div>
+            <div className="text-5xl font-extrabold mb-2 text-white tracking-tight">{stats.careers}+</div>
+            <div className="text-lg font-bold text-sky-200 uppercase tracking-wide mb-2">Careers Transformed</div>
+            <p className="text-slate-400 text-sm">Individuals placed in dream roles</p>
+          </div>
+          <div className="bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10 text-center hover:bg-white/10 transition-colors duration-300">
+            <div className="flex justify-center mb-4 text-sky-400">
+              <Handshake className="w-10 h-10" />
+            </div>
+            <div className="text-5xl font-extrabold mb-2 text-white tracking-tight">{stats.partners}+</div>
+            <div className="text-lg font-bold text-sky-200 uppercase tracking-wide mb-2">Enterprise Partners</div>
+            <p className="text-slate-400 text-sm">Leading companies trust us</p>
+          </div>
+          <div className="bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10 text-center hover:bg-white/10 transition-colors duration-300">
+            <div className="flex justify-center mb-4 text-sky-400">
+              <CheckCircle2 className="w-10 h-10" />
+            </div>
+            <div className="text-5xl font-extrabold mb-2 text-white tracking-tight">{stats.retention}%</div>
+            <div className="text-lg font-bold text-sky-200 uppercase tracking-wide mb-2">Placement Retention</div>
+            <p className="text-slate-400 text-sm">Long-term career success</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Why Choose Us */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="bg-blue-50 text-blue-700 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wide">Why Choose Us</span>
+            <h2 className="text-4xl font-bold text-slate-900 mt-4 mb-4">Why Zero7 <span className="text-blue-700">Technologies?</span></h2>
+            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+              Founded with a vision to bridge the gap between talent and opportunity, we deliver practical solutions.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {reasons.map((item, idx) => (
+              <div key={idx} className="flex flex-col items-start p-8 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-300 group">
+                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-300">
+                  <div className="text-blue-600 group-hover:text-white transition-colors duration-300">
+                    {item.icon}
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
+                <p className="text-slate-600 leading-relaxed text-sm">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Comprehensive Services */}
+      <section className="py-24 px-6 bg-slate-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-blue-600 font-bold tracking-wider text-sm uppercase">Our Expertise</span>
+            <h2 className="text-4xl font-bold text-slate-900 mt-2">
+              Our Comprehensive <span className="text-blue-700">Services</span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {services.map((svc, idx) => (
+              <div key={idx} className="bg-white p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-start border-t-4 border-transparent hover:border-blue-600 hover:-translate-y-2">
+                <div className="mb-6 p-3 bg-slate-50 rounded-lg">{svc.icon}</div>
+                <h3 className="text-xl font-bold text-slate-900 mb-4">{svc.title}</h3>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {svc.tags.map((tag, i) => (
+                    <span key={i} className="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-1 rounded">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Who We Empower */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-blue-600 font-bold tracking-wider text-sm uppercase">Our Impact</span>
+            <h2 className="text-4xl font-bold text-slate-900 mt-2">
+              Who We <span className="text-blue-700">Empower</span>
+            </h2>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Card 1: Job Seekers */}
+            <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto text-blue-600">
+                <Briefcase className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 text-center mb-4">For Job Seekers</h3>
+              <p className="text-slate-600 text-center mb-8 flex-grow">
+                We provide tools, training, and confidence to help you land your next role, whether fresh or experienced.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {["Resume Optimization", "Skill Enhancement", "Placement Support", "Interview Prep"].map((pt, i) => (
+                  <li key={i} className="flex items-center text-sm font-medium text-slate-700">
+                    <CheckCircle2 className="w-4 h-4 text-blue-600 mr-3 flex-shrink-0" /> {pt}
+                  </li>
+                ))}
+              </ul>
+              <button 
+                onClick={() => handleNavigate('/current-hirings')}
+                className="w-full py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors"
+              >
+                Start Your Journey
+              </button>
+            </div>
+
+            {/* Card 2: Companies */}
+            <div className="bg-blue-900 text-white p-8 rounded-2xl shadow-xl transform scale-105 z-10 flex flex-col">
+              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-6 mx-auto text-white">
+                <Building2 className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-bold text-white text-center mb-4">For Companies</h3>
+              <p className="text-blue-100 text-center mb-8 flex-grow">
+                Access a pool of vetted, skilled candidates ready to contribute. We streamline your hiring process.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {["Pre-screened Talent", "Quick Turnaround", "Customized Training", "Cost-effective Hiring"].map((pt, i) => (
+                  <li key={i} className="flex items-center text-sm font-medium text-blue-50">
+                    <CheckCircle2 className="w-4 h-4 text-sky-400 mr-3 flex-shrink-0" /> {pt}
+                  </li>
+                ))}
+              </ul>
+              <button 
+                onClick={() => handleNavigate('/bench-list')}
+                className="w-full py-3 bg-white text-blue-900 rounded-lg font-bold hover:bg-blue-50 transition-colors"
+              >
+                Hire Talent
+              </button>
+            </div>
+
+            {/* Card 3: Colleges */}
+            <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto text-blue-600">
+                <GraduationCap className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 text-center mb-4">For Colleges</h3>
+              <p className="text-slate-600 text-center mb-8 flex-grow">
+                Bridge the gap between academia and industry. We partner to host drives and boost placement rates.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {["Campus Hiring Drives", "Industry Curriculum", "Skill Workshops", "Placement Assistance"].map((pt, i) => (
+                  <li key={i} className="flex items-center text-sm font-medium text-slate-700">
+                    <CheckCircle2 className="w-4 h-4 text-blue-600 mr-3 flex-shrink-0" /> {pt}
+                  </li>
+                ))}
+              </ul>
+              {/* UPDATED: Path changed to /services/college-connect */}
+              <button 
+                onClick={() => handleNavigate('/services/college-connect')}
+                className="w-full py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors"
+              >
+                Partner With Us
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Vision & Values Section */}
-      <section className='vision-values'>
-        <div className='container'>
-          <h2>Our Core Beliefs</h2>
-          <p className='section-intro'>
-            These principles guide every step of our journey
+      {/* 8. Vision & Mission */}
+      <section className="py-20 px-6 bg-slate-50">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+          <div className="bg-white p-8 rounded-2xl shadow-sm border-l-8 border-blue-600 hover:shadow-lg transition-shadow">
+            <div className="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center mb-6 text-blue-700">
+              <Rocket className="w-6 h-6" />
+            </div>
+            <h4 className="text-2xl font-bold text-slate-900 mb-4">Our Vision</h4>
+            <p className="text-slate-600 italic leading-relaxed text-lg">
+              "To be a leading force in career empowerment and talent solutions, creating a future where every individual has the opportunity to achieve their professional potential."
+            </p>
+          </div>
+          <div className="bg-white p-8 rounded-2xl shadow-sm border-l-8 border-indigo-600 hover:shadow-lg transition-shadow">
+            <div className="bg-indigo-100 w-12 h-12 rounded-lg flex items-center justify-center mb-6 text-indigo-700">
+              <Handshake className="w-6 h-6" />
+            </div>
+            <h4 className="text-2xl font-bold text-slate-900 mb-4">Our Mission</h4>
+            <p className="text-slate-600 italic leading-relaxed text-lg">
+              "To provide high-quality training and strategic staffing solutions that bridge skill gaps, foster career growth, and drive organizational success."
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 9. Bottom CTA */}
+      <section className="py-24 px-6 bg-[#0B3B69] text-center relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
+          <div className="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-64 h-64 bg-blue-400 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="inline-block px-6 py-2 rounded-full bg-white/10 backdrop-blur-sm text-white text-sm font-semibold tracking-wide mb-8 border border-white/20">
+            Ready For Your Next Step?
+          </div>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight uppercase tracking-tight">
+            Step Into the Future with <br />
+            <span className="text-blue-300">Zero7 Technologies</span>
+          </h2>
+          <p className="text-lg md:text-xl text-blue-100 mb-12 max-w-2xl mx-auto">
+            Whether you’re a job seeker or a business looking for top talent, we are here to support your growth journey.
           </p>
-
-          <div className='values-grid'>
-            <div className='flip-card'>
-              <div className='flip-card-inner'>
-                <div className='flip-card-front'>
-                  <img src='/img01.jpg' alt='Potential' />
-                </div>
-                <div className='flip-card-back'>
-                  <h3>Excellence Beyond Experience</h3>
-                  <p>
-                    We believe talent is everywhere. Our programs focus on
-                    nurturing hidden potential rather than just credentials.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className='flip-card'>
-              <div className='flip-card-inner'>
-                <div className='flip-card-front'>
-                  <img src='/img02.jpg' alt='Partnership' />
-                </div>
-                <div className='flip-card-back'>
-                  <h3>Your Growth, Our Commitment</h3>
-                  <p>
-                    We build long-term relationships with individuals and
-                    organizations—success for us means sustainable growth for
-                    everyone involved.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className='flip-card'>
-              <div className='flip-card-inner'>
-                <div className='flip-card-front'>
-                  <img src='/img03.jpg' alt='Data Meets Humanity' />
-                </div>
-                <div className='flip-card-back'>
-                  <h3>Where Data Meets the Human Story </h3>
-                  <p>
-                    We use analytics and market intelligence to empower careers,
-                    but we never forget the human story behind every number.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className='flip-card'>
-              <div className='flip-card-inner'>
-                <div className='flip-card-front'>
-                  <img src='/img04.jpg' alt='Innovation' />
-                </div>
-                <div className='flip-card-back'>
-                  <h3>Evolving Careers, Empowering Companies</h3>
-                  <p>
-                    Our solutions evolve with the future of work—ensuring that
-                    every professional stays relevant and every company stays
-                    competitive.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* Stats Section */}
-      <section className='stats-bar'>
-        <div className='stat-item'>
-          <span className='stat-number'>{stats.careers}+</span>
-          <span className='stat-label'>Careers Transformed</span>
-        </div>
-        <div className='stat-item'>
-          <span className='stat-number'>{stats.partners}+</span>
-          <span className='stat-label'>Enterprise Partners</span>
-        </div>
-        <div className='stat-item'>
-          <span className='stat-number'>{stats.retention}%</span>
-          <span className='stat-label'>Placement Retention</span>
-        </div>
-      </section>
-      {/* Why Choose Zero7 Technologies? */}
-      <section className='py-16 md:py-24 bg-white'>
-        <div className='container mx-auto px-6 text-center'>
-          <h2 className='text-3xl md:text-5xl font-extrabold mb-12 text-blue-700 leading-tight'>
-            Why Choose Zero7 Technologies?
-          </h2>
-          <p className='text-lg md:text-xl max-w-4xl mx-auto text-gray-700 mb-12'>
-            Founded with a vision to bridge the gap between talent and
-            opportunity, we are dedicated to empowering individuals and
-            organizations through practical, job-ready solutions.
-          </p>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-            <div className='p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300'>
-              <div className='text-5xl text-purple-600 mb-4 flex justify-center'>
-                <i className='fas fa-handshake'></i>{' '}
-                {/* Icon: Partnership/Vision */}
-              </div>
-              <h3 className='text-xl font-semibold mb-3'>
-                Our Visionary Foundation
-              </h3>
-              <p className='text-gray-600'>
-                Founded to bridge the gap between talent and opportunity.
-              </p>
-            </div>
-            <div className='p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300'>
-              <div className='text-5xl text-green-600 mb-4 flex justify-center'>
-                <i className='fas fa-tools'></i> {/* Icon: Practical/Skills */}
-              </div>
-              <h3 className='text-xl font-semibold mb-3'>
-                Practical, Job-Ready Training
-              </h3>
-              <p className='text-gray-600'>
-                Focus on hands-on skills rather than just theory for immediate
-                application.
-              </p>
-            </div>
-            <div className='p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300'>
-              <div className='text-5xl text-yellow-600 mb-4 flex justify-center'>
-                <i className='fas fa-network-wired'></i> {/* Icon: Network */}
-              </div>
-              <h3 className='text-xl font-semibold mb-3'>
-                Extensive Industry Network
-              </h3>
-              <p className='text-gray-600'>
-                Strong connections with corporates, colleges, and recruiters.
-              </p>
-            </div>
-            <div className='p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300'>
-              <div className='text-5xl text-red-600 mb-4 flex justify-center'>
-                <i className='fas fa-rocket'></i>{' '}
-                {/* Icon: Transformation/Growth */}
-              </div>
-              <h3 className='text-xl font-semibold mb-3'>
-                Commitment to Transformation
-              </h3>
-              <p className='text-gray-600'>
-                Dedicated to career transformation and enhanced employability.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section> 
-      {/* Our Services */}
-      <section className='py-16 md:py-24 bg-white'>
-        <div className='container mx-auto px-6 text-center'>
-          <h2 className='text-3xl md:text-5xl font-extrabold mb-12 text-blue-700 leading-tight'>
-            Our Comprehensive Services
-          </h2>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-            {/* Service Card 1: IT & Non-IT Training */}
-            <div className='flex flex-col items-center p-8 bg-blue-50 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-t-4 border-blue-500'>
-              <div className='text-6xl text-blue-600 mb-6'>
-                <i className='fas fa-chalkboard-teacher'></i>
-              </div>
-              <h3 className='text-2xl font-bold mb-4 text-gray-800'>
-                IT & Non-IT Training
-              </h3>
-              <p className='text-gray-700 text-center flex-grow'>
-                Expert-led programs to equip you with in-demand skills, ensuring
-                you are job-ready and confident.
-              </p>
-            </div>
-
-            {/* Service Card 2: Payroll Process Outsourcing */}
-            <div className='flex flex-col items-center p-8 bg-green-50 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-t-4 border-green-500'>
-              <div className='text-6xl text-green-600 mb-6'>
-                <i className='fas fa-wallet'></i>
-              </div>
-              <h3 className='text-2xl font-bold mb-4 text-gray-800'>
-                Payroll Outsourcing
-              </h3>
-              <p className='text-gray-700 text-center flex-grow'>
-                Simplify your operations with efficient and accurate payroll
-                services, freeing you to focus on core goals.
-              </p>
-            </div>
-
-            {/* Service Card 4: Resume Marketing */}
-            <div className='flex flex-col items-center p-8 bg-yellow-50 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-t-4 border-yellow-500'>
-              <div className='text-6xl text-yellow-600 mb-6'>
-                <i className='fas fa-file-alt'></i>
-              </div>
-              <h3 className='text-2xl font-bold mb-4 text-gray-800'>
-                Resume Marketing
-              </h3>
-              <p className='text-gray-700 text-center flex-grow'>
-                Ensuring your profile stands out to top recruiters,
-                significantly increasing your interview chances.
-              </p>
-            </div>
-
-            {/* Service Card 3: College Drives & Campus Hiring */}
-            <div className='flex flex-col items-center p-8 bg-purple-50 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border-t-4 border-purple-500'>
-              <div className='text-6xl text-purple-600 mb-6'>
-                <i className='fas fa-graduation-cap'></i>
-              </div>
-              <h3 className='text-2xl font-bold mb-4 text-gray-800'>
-                Bench <br/>Marketing
-              </h3>
-              <p className='text-gray-700 text-center flex-grow'>
-                We showcase bench talent to maximize utilization and enable fast, seamless deployment</p>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <button 
+              onClick={() => handleNavigate('/current-hirings')}
+              className="px-8 py-4 bg-white text-[#0B3B69] font-bold rounded-lg hover:bg-blue-50 transition-all duration-300 shadow-xl flex items-center justify-center"
+            >
+              Join Our Mission <ArrowRight className="ml-2 w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => handleNavigate('/bench-list')}
+              className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center justify-center"
+            >
+              Get Opportunities <ArrowRight className="ml-2 w-5 h-5" />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* === MODIFIED SECTION STARTS HERE === */}
-      <section className='py-16 md:py-24 bg-white'>
-        <div className='container mx-auto px-6'>
-          <h2 className='text-3xl md:text-5xl font-extrabold mb-16 text-center text-blue-700 leading-tight'>
-            Who We Empower
-          </h2>
-          {/* Updated grid for 3 columns on large screens */}
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-            {/* Card 1: For Job Seekers (Dynamic Styling) */}
-            <div className='bg-white p-8 rounded-xl shadow-lg flex flex-col items-center text-center transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2'>
-              <div className='text-6xl text-purple-600 mb-5'>
-                <i className='fas fa-user-tie'></i>
-              </div>
-              <h3 className='text-2xl font-bold mb-3 text-gray-800'>
-                For Job Seekers
-              </h3>
-              <p className='text-gray-600 leading-relaxed'>
-                We provide the tools, training, and confidence to help you land
-                your next role, whether you're starting fresh, switching
-                careers, or returning to work.
-              </p>
-            </div>
-
-            {/* Card 2: For Companies (Dynamic Styling) */}
-            <div className='bg-white p-8 rounded-xl shadow-lg flex flex-col items-center text-center transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2'>
-              <div className='text-6xl text-blue-600 mb-5'>
-                <i className='fas fa-building'></i>
-              </div>
-              <h3 className='text-2xl font-bold mb-3 text-gray-800'>
-                For Companies
-              </h3>
-              <p className='text-gray-600 leading-relaxed'>
-                Access a pool of vetted, skilled candidates ready to contribute
-                from day one. We streamline your hiring process, saving you time
-                and reducing costs.
-              </p>
-            </div>
-
-            {/* Card 3: For Colleges (Dynamic Styling) */}
-            <div className='bg-white p-8 rounded-xl shadow-lg flex flex-col items-center text-center transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2'>
-              <div className='text-6xl text-green-600 mb-5'>
-                <i className='fas fa-university'></i>
-              </div>
-              <h3 className='text-2xl font-bold mb-3 text-gray-800'>
-                For Colleges
-              </h3>
-              <p className='text-gray-600 leading-relaxed'>
-                Bridge the gap between academia and industry. We partner with
-                you to host campus drives, connecting your students with top
-                companies and boosting placement rates.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* === MODIFIED SECTION ENDS HERE === */}
-
-      {/* Our Values */}
-      <div className='min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8'>
-        <div className='max-w-7xl mx-auto'>
-          {/* Vision Section */}
-          <div className='mt-5'>
-            <div className='relative'>
-              <div
-                className='absolute inset-0 flex items-center'
-                aria-hidden='true'>
-                <div className='w-full border-t border-gray-300' />
-              </div>
-              <div className='relative flex justify-center'>
-                <span className='px-3 bg-gray-50 text-lg font-bold text-gray-900'>
-  Our Vision
-</span>
-
-              </div>
-            </div>
-            <div className='mt-10 text-center'>
-              <p className='text-2xl text-gray-700 font-medium'>
-                "To be a leading force in career empowerment and talent
-                solutions, creating a future where every individual has the
-                opportunity to achieve their professional potential."
-              </p>
-            </div>
-          </div>
-
-          {/* Mission Section */}
-          <div className='mt-20'>
-            <div className='relative'>
-              <div
-                className='absolute inset-0 flex items-center'
-                aria-hidden='true'>
-                <div className='w-full border-t border-gray-300' />
-              </div>
-              <div className='relative flex justify-center'>
-                <span className='px-3 bg-gray-50 text-lg font-bold text-gray-900'>
-  Our Mission
-</span>
-              </div>
-            </div>
-            <div className='mt-10 text-center'>
-              <p className='text-2xl text-gray-700 font-medium'>
-                "To provide high-quality training and strategic staffing
-                solutions that bridge skill gaps, foster career growth, and
-                drive organizational success."
-              </p>
-            </div>
-          </div>
-
-          {/* Values Section */}
-          <div className='mt-20'>
-            <div className='relative'>
-              <div
-                className='absolute inset-0 flex items-center'
-                aria-hidden='true'>
-                <div className='w-full border-t border-gray-300' />
-              </div>
-              <div className='relative flex justify-center'>
-                <span className='px-3 bg-gray-50 text-lg font-bold text-gray-900'>
-                  Our Values
-                </span>
-              </div>
-            </div>
-
-            <dl className='mt-10 space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10'>
-              <div className='relative'>
-                <dt>
-                  <div className='absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white'>
-                    {/* Icon for Empowerment */}
-                    <svg
-                      className='h-6 w-6'
-                      xmlns='http://www.w3.org/2000/svg'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      stroke='currentColor'
-                      aria-hidden='true'>
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M13 10V3L4 14h7v7l9-11h-7z'
-                      />
-                    </svg>
-                  </div>
-                  <p className='ml-16 ms-5 ps-2 pt-3 text-lg leading-6 font-medium text-gray-900'>
-                    Empowerment
-                  </p>
-                </dt>
-                <dd className='mt-4 ml-16 text-base text-gray-500'>
-                  We believe in giving people the tools to take control of their
-                  careers.
-                </dd>
-              </div>
-
-              <div className='relative'>
-                <dt>
-                  <div className='absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white'>
-                    {/* Icon for Integrity */}
-                    <svg
-                      className='h-6 w-6'
-                      xmlns='http://www.w3.org/2000/svg'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      stroke='currentColor'
-                      aria-hidden='true'>
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-                      />
-                    </svg>
-                  </div>
-                  <p className='ml-16  ms-5 ps-2 pt-3 text-lg leading-6 font-medium text-gray-900'>
-                    Integrity
-                  </p>
-                </dt>
-                <dd className='mt-4 ml-16 text-base text-gray-500'>
-                  We operate with honesty and transparency in all our
-                  partnerships.
-                </dd>
-              </div>
-
-              <div className='relative'>
-                <dt>
-                  <div className='absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white'>
-                    {/* Icon for Excellence */}
-                    <svg
-                      className='h-6 w-6'
-                      xmlns='http://www.w3.org/2000/svg'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      stroke='currentColor'
-                      aria-hidden='true'>
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M5 3v4M3 3h4M7 3h2M3 7h4m4 0h2M3 11h4m4 0h2M3 15h4m4 0h2m-4 4h4m-4 0v4m-4-4h4m4 0h2m-4 4h4'
-                      />
-                    </svg>
-                  </div>
-                  <p className='ml-16  ms-5 ps-2 pt-3 text-lg leading-6 font-medium text-gray-900'>
-                    Excellence
-                  </p>
-                </dt>
-                <dd className='mt-4 ml-16 text-base text-gray-500'>
-                  We are committed to delivering high-quality services and
-                  results.
-                </dd>
-              </div>
-
-              <div className='relative'>
-                <dt>
-                  <div className='absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white'>
-                    {/* Icon for Innovation */}
-                    <svg
-                      className='h-6 w-6'
-                      xmlns='http://www.w3.org/2000/svg'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      stroke='currentColor'
-                      aria-hidden='true'>
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4.636 4.636l-.707.707M3 12H2m13.757 4.243l-.707.707M12 21v-1M4.243 15.757l.707-.707m-4.243 4.243L12 12l-6-6-6 6 6 6z'
-                      />
-                    </svg>
-                  </div>
-                  <p className='ml-16 ms-5 ps-2 pt-3 text-lg leading-6 font-medium text-gray-900'>
-                    Innovation
-                  </p>
-                </dt>
-                <dd className='mt-4 ml-16 text-base text-gray-500'>
-                  We continuously adapt our services to meet the dynamic needs
-                  of the job market.
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <section className='cta-section'>
-        <h3 className='text-2xl font-bold'>Step Into the Future</h3>
-        <p>
-          Whether you’re a job seeker or a business looking for top talent,
-          Zero7 Technologies is here to support your growth journey.
-        </p>
-        <div className='cta-buttons'>
-          <button
-            className='primary-btn'
-            onClick={() => navigate('/current-hirings')}>
-            Join Our Mission
-          </button>
-          <button
-            className='secondary-btn'
-            onClick={() => navigate('/bench-list')}>
-            Explore Opportunities
-          </button>
-        </div>
-       
-      </section>
-      <br />
     </div>
-  )
-}
+  );
+};
 
-export default About
+export default About;

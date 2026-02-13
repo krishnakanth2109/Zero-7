@@ -183,10 +183,7 @@ const Nonittraining = () => {
                 <div className='nonit-course-icon'>{course.icon}</div>
                 <h3 className='nonit-course-title'>{course.title}</h3>
                 <p className='nonit-course-description'>{course.description}</p>
-                <p className='text-xl text-red-400 mb-3 font-bold'>
-                  ₹{course.price}
-                </p>
-
+              
                 <button
                   className='nonit-learn-more-btn'
                   onClick={() => toggleCard(course._id)}
@@ -207,7 +204,7 @@ const Nonittraining = () => {
                       </span>
                     </p>
 
-                    <h4>Skills You’ll Gain:</h4>
+                    <h4>Skills You’ll Gain:</h4><br />
                     <div className='tech-badge-container'>
                       {course.skills.map((skill, index) => (
                         <span
